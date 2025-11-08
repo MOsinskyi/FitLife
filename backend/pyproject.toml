@@ -3,7 +3,7 @@ name = "fitlife"
 version = "0.1.0"
 description = ""
 authors = ["Maksym Osinskyi <maximosinskiy@gmail.com>"]
-readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.12"
@@ -11,6 +11,7 @@ fastapi = {extras = ["standard"], version = "^0.119.0"}
 pydantic-settings = "^2.11.0"
 passlib = "^1.7.4"
 python-jose = "^3.5.0"
+uvicorn = "^0.38.0"
 
 
 [build-system]
