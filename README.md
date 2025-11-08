@@ -30,6 +30,29 @@ A modern REST API for managing gym operations, including memberships, coaches, c
 
 ## Installation
 
+### Quick Setup (Recommended)
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd fitlife
+```
+
+2. Run the setup command:
+```bash
+make setup
+```
+
+This will install dependencies and create a `.env` file from the template.
+
+3. Edit `backend/.env` and set your `SECRET_KEY`:
+```bash
+# Generate a secure key:
+openssl rand -hex 32
+```
+
+### Manual Setup
+
 1. Clone the repository:
 ```bash
 git clone <repository-url>
@@ -69,8 +92,26 @@ openssl rand -hex 32
 
 ## Running the Application
 
-### Development Server
+### Using Makefile (Recommended)
 
+**Development mode with auto-reload:**
+```bash
+make dev
+```
+
+**Production mode:**
+```bash
+make run
+```
+
+**See all available commands:**
+```bash
+make help
+```
+
+### Manual Execution
+
+**Development Server:**
 ```bash
 cd backend
 poetry run uvicorn fitlife.main:app --reload --host 0.0.0.0 --port 8000
@@ -176,6 +217,7 @@ fitlife/
 │   ├── pyproject.toml           # Poetry dependencies
 │   ├── poetry.lock              # Locked dependencies
 │   └── .env.templates           # Environment template
+├── Makefile                     # Common development commands
 ├── CLAUDE.md                    # Development guide
 └── README.md                    # This file
 ```
@@ -187,6 +229,26 @@ fitlife/
 **Future Enhancement**: The repository pattern is already implemented, making it straightforward to migrate to a persistent database (PostgreSQL, MySQL, etc.) by replacing the repository implementations.
 
 ## Development
+
+### Common Development Commands
+
+The project includes a Makefile with helpful commands:
+
+```bash
+make help          # Show all available commands
+make setup         # Complete setup (install + create .env)
+make dev           # Run development server with auto-reload
+make run           # Run production server
+make test          # Run tests
+make lint          # Run linting checks
+make format        # Format code with black and isort
+make clean         # Remove cache files
+make shell         # Open Poetry shell
+make docs          # Show API documentation URLs
+make info          # Show project information
+make add-dep       # Add a dependency (usage: make add-dep DEP=package-name)
+make update-deps   # Update all dependencies
+```
 
 ### Code Organization
 
