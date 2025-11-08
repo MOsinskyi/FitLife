@@ -60,10 +60,10 @@ dev:
 shell:
 	cd $(BACKEND_DIR) && poetry shell
 
-# Run tests (placeholder for future implementation)
+# Run tests
 test:
 	@echo "Running tests..."
-	cd $(BACKEND_DIR) && $(PYTHON) -m pytest tests/ -v || echo "No tests found yet"
+	cd $(BACKEND_DIR) && PYTHONPATH=src $(PYTHON) -m pytest tests/ -v
 
 # Linting
 lint:
