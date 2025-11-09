@@ -88,7 +88,7 @@ def test_create_manager_invalid_email(client, manager_token):
             "password": "password123"
         }
     )
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
 
 
 def test_unauthorized_access_to_managers(client):

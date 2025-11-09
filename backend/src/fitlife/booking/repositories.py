@@ -1,6 +1,6 @@
 import uuid
-from datetime import datetime
-from typing import Dict, List
+from datetime import datetime, timezone
+from typing import Dict, List, Optional
 
 
 class BookingRepository:
@@ -12,11 +12,17 @@ class BookingRepository:
         booking = {
             "id": booking_id,
             **booking_data,
-            "booking_time": datetime.utcnow(),
+            "booking_time": datetime.now(timezone.utc),
             "status": "confirmed"
         }
         self.bookings_db[booking_id] = booking
         return booking
+
+    def get_by_id(self, booking_id: str) -> Optional[Dict]:
+        return self.bookings_db.get(booking_id)
+
+    def get_all(self) -> List[Dict]:
+        return list(self.bookings_db.values())
 
     def get_by_customer(self, customer_id: str) -> List[Dict]:
         return [b for b in self.bookings_db.values() if b["customer_id"] == customer_id]

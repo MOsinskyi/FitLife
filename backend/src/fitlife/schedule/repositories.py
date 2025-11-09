@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, Dict, List
 
 
@@ -12,7 +12,7 @@ class ScheduleRepository:
         schedule = {
             "id": schedule_id,
             **schedule_data,
-            "created_at": datetime.utcnow(),
+            "created_at": datetime.now(timezone.utc),
             "participants_count": 0
         }
         self.schedules_db[schedule_id] = schedule

@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List
 
 from fastapi import APIRouter, Depends, status
@@ -16,6 +16,65 @@ from fitlife.user.repositories import UserRepository
 from fitlife.user.schemas import UserCreate, UserResponse
 
 router = APIRouter()
+
+
+@router.post("", response_model=UserResponse)
+async def create_manager(
+        user: UserCreate,
+        current_user: dict = Depends(get_current_manager),
+        db: dict = Depends(get_db),
+):
+    from fastapi import HTTPException
+
+    user_repo = UserRepository(db)
+    if user_repo.get_by_email(user.email):
+        raise HTTPException(status_code=400, detail="Email already registered")
+
+    user_id = str(uuid.uuid4())
+    hashed_password = get_password_hash(user.password)
+
+    user_data = {
+        "id": user_id,
+        "email": user.email,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "phone": user.phone,
+        "role": "manager",
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc),
+        "hashed_password": hashed_password
+    }
+
+    db["accounts"][user.email] = user_data
+
+    return {k: v for k, v in user_data.items() if k != "hashed_password"}
+
+
+@router.get("", response_model=List[UserResponse])
+async def get_managers_list(
+        current_user: dict = Depends(get_current_manager),
+        db: dict = Depends(get_db),
+):
+    user_repo = UserRepository(db)
+    managers = user_repo.get_all_managers()
+    return [{k: v for k, v in manager.items() if k != "hashed_password"} for manager in managers]
+
+
+@router.get("/{manager_id}", response_model=UserResponse)
+async def get_manager_by_id(
+        manager_id: str,
+        current_user: dict = Depends(get_current_manager),
+        db: dict = Depends(get_db),
+):
+    from fastapi import HTTPException
+
+    user_repo = UserRepository(db)
+    manager = user_repo.get_by_id(manager_id, "manager")
+
+    if not manager:
+        raise HTTPException(status_code=404, detail="Manager not found")
+
+    return {k: v for k, v in manager.items() if k != "hashed_password"}
 
 
 @router.post("/accounts", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
@@ -44,7 +103,7 @@ async def create_account(
         "phone": user.phone,
         "role": role,
         "is_active": True,
-        "created_at": datetime.utcnow(),
+        "created_at": datetime.now(timezone.utc),
         "hashed_password": hashed_password
     }
 

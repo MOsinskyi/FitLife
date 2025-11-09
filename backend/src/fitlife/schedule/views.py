@@ -11,7 +11,7 @@ from fitlife.schedule.services import ScheduleService
 router = APIRouter()
 
 
-@router.post("", response_model=ScheduleResponse, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=ScheduleResponse)
 async def create_schedule(
         schedule_data: ScheduleCreate,
         current_user: dict = Depends(get_current_coach),
@@ -31,3 +31,20 @@ async def view_schedules(
 ):
     schedule_repo = ScheduleRepository(db)
     return schedule_repo.get_all()
+
+
+@router.get("/{schedule_id}", response_model=ScheduleResponse)
+async def get_schedule_by_id(
+        schedule_id: str,
+        current_user: dict = Depends(get_current_user),
+        db: dict = Depends(get_db),
+):
+    from fastapi import HTTPException
+
+    schedule_repo = ScheduleRepository(db)
+    schedule = schedule_repo.get_by_id(schedule_id)
+
+    if not schedule:
+        raise HTTPException(status_code=404, detail="Schedule not found")
+
+    return schedule

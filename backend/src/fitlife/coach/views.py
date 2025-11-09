@@ -8,9 +8,56 @@ from fitlife.database import get_db
 from fitlife.user.repositories import UserRepository
 from fitlife.user.services import UserService
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 router = APIRouter()
+
+@router.post("", response_model=CoachResponse)
+async def create_coach(
+        coach: CoachCreate,
+        db: dict = Depends(get_db)
+):
+    from fastapi import HTTPException
+
+    user_repo = UserRepository(db)
+
+    # Check if email already exists
+    if user_repo.get_by_email(coach.email):
+        raise HTTPException(status_code=400, detail="Email already registered")
+
+    user_service = UserService(user_repo)
+    coach_data = coach.model_dump()
+    new_coach = user_service.register_coach(coach_data)
+
+    return {k: v for k, v in new_coach.items() if k != "hashed_password"}
+
+
+@router.get("", response_model=List[CoachResponse])
+async def get_coaches_list(
+        current_user: dict = Depends(get_current_coach),
+        db: dict = Depends(get_db)
+):
+    user_repo = UserRepository(db)
+    coaches = user_repo.get_all_coaches()
+    return [{k: v for k, v in coach.items() if k != "hashed_password"} for coach in coaches]
+
+
+@router.get("/{coach_id}", response_model=CoachResponse)
+async def get_coach_by_id(
+        coach_id: str,
+        current_user: dict = Depends(get_current_coach),
+        db: dict = Depends(get_db)
+):
+    from fastapi import HTTPException
+
+    user_repo = UserRepository(db)
+    coach = user_repo.get_by_id(coach_id, "coach")
+
+    if not coach:
+        raise HTTPException(status_code=404, detail="Coach not found")
+
+    return {k: v for k, v in coach.items() if k != "hashed_password"}
+
 
 @router.post("/register", response_model=CoachResponse, status_code=status.HTTP_201_CREATED)
 async def register_coach(
@@ -41,7 +88,7 @@ async def mark_customer_visit(
     return VisitRecordResponse(
         id=str(uuid.uuid4()),
         customer_id=customer_id,
-        visit_time=datetime.utcnow(),
+        visit_time=datetime.now(timezone.utc),
         marked_by=current_user["id"]
     )
 

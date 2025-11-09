@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, Dict, List
 
 
@@ -17,6 +17,11 @@ class UserRepository:
             return self.coaches_db.get(user_id)
         elif role == "customer":
             return self.customers_db.get(user_id)
+        elif role == "manager":
+            # Search for manager in accounts_db
+            for account in self.accounts_db.values():
+                if account.get("id") == user_id and account.get("role") == "manager":
+                    return account
         return None
 
     def create_coach(self, coach_data: dict) -> Dict:
@@ -26,7 +31,7 @@ class UserRepository:
             **coach_data,
             "role": "coach",
             "is_active": True,
-            "created_at": datetime.utcnow()
+            "created_at": datetime.now(timezone.utc)
         }
         self.accounts_db[coach_data["email"]] = coach
         self.coaches_db[coach_id] = coach
@@ -39,7 +44,7 @@ class UserRepository:
             **customer_data,
             "role": "customer",
             "is_active": True,
-            "created_at": datetime.utcnow(),
+            "created_at": datetime.now(timezone.utc),
             "membership_id": None,
             "visit_count": 0
         }
@@ -52,6 +57,9 @@ class UserRepository:
 
     def get_all_customers(self) -> List[Dict]:
         return list(self.customers_db.values())
+
+    def get_all_managers(self) -> List[Dict]:
+        return [account for account in self.accounts_db.values() if account.get("role") == "manager"]
 
     def update_customer_visits(self, customer_id: str) -> Dict:
         customer = self.customers_db.get(customer_id)

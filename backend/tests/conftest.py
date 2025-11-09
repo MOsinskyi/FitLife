@@ -1,3 +1,5 @@
+from datetime import timezone
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -47,7 +49,7 @@ def sample_manager(clean_db):
         "hashed_password": get_password_hash("testpassword"),
         "role": "manager",
         "is_active": True,
-        "created_at": datetime.utcnow()
+        "created_at": datetime.now(timezone.utc)
     }
     accounts_db["manager@test.com"] = manager
     return manager

@@ -1,12 +1,12 @@
 import pytest
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from fastapi import status
 
 
 @pytest.fixture
 def sample_schedule(client, coach_token, sample_coach):
     """Create a sample schedule."""
-    start_time = datetime.utcnow() + timedelta(days=1)
+    start_time = datetime.now(timezone.utc) + timedelta(days=1)
     end_time = start_time + timedelta(hours=1)
 
     response = client.post(
@@ -27,7 +27,7 @@ def sample_schedule(client, coach_token, sample_coach):
 
 def test_create_schedule_as_coach(client, coach_token, sample_coach):
     """Test creating a schedule as a coach."""
-    start_time = datetime.utcnow() + timedelta(days=1)
+    start_time = datetime.now(timezone.utc) + timedelta(days=1)
     end_time = start_time + timedelta(hours=1)
 
     response = client.post(
@@ -52,7 +52,7 @@ def test_create_schedule_as_coach(client, coach_token, sample_coach):
 
 def test_create_schedule_as_customer_forbidden(client, customer_token, sample_coach):
     """Test that customers cannot create schedules."""
-    start_time = datetime.utcnow() + timedelta(days=1)
+    start_time = datetime.now(timezone.utc) + timedelta(days=1)
     end_time = start_time + timedelta(hours=1)
 
     response = client.post(
@@ -107,7 +107,7 @@ def test_get_nonexistent_schedule(client, coach_token):
 
 def test_create_schedule_invalid_time_range(client, coach_token, sample_coach):
     """Test creating a schedule with end time before start time."""
-    start_time = datetime.utcnow() + timedelta(days=1)
+    start_time = datetime.now(timezone.utc) + timedelta(days=1)
     end_time = start_time - timedelta(hours=1)  # Invalid: end before start
 
     response = client.post(
@@ -124,7 +124,7 @@ def test_create_schedule_invalid_time_range(client, coach_token, sample_coach):
         }
     )
     # Assuming validation exists - adjust based on implementation
-    assert response.status_code in [status.HTTP_400_BAD_REQUEST, status.HTTP_422_UNPROCESSABLE_ENTITY, status.HTTP_200_OK]
+    assert response.status_code in [status.HTTP_400_BAD_REQUEST, status.HTTP_422_UNPROCESSABLE_CONTENT, status.HTTP_200_OK]
 
 
 def test_unauthorized_access_to_schedules(client):

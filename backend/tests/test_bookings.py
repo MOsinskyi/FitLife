@@ -1,12 +1,12 @@
 import pytest
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from fastapi import status
 
 
 @pytest.fixture
 def sample_schedule(client, coach_token, sample_coach):
     """Create a sample schedule for booking tests."""
-    start_time = datetime.utcnow() + timedelta(days=1)
+    start_time = datetime.now(timezone.utc) + timedelta(days=1)
     end_time = start_time + timedelta(hours=1)
 
     response = client.post(
