@@ -1,6 +1,4 @@
-from typing import List
-
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends
 
 from fitlife.database import get_db
 from fitlife.deps import get_current_coach, get_current_user
@@ -13,9 +11,9 @@ router = APIRouter()
 
 @router.post("", response_model=ScheduleResponse)
 async def create_schedule(
-        schedule_data: ScheduleCreate,
-        current_user: dict = Depends(get_current_coach),
-        db: dict = Depends(get_db),
+    schedule_data: ScheduleCreate,
+    current_user: dict = Depends(get_current_coach),
+    db: dict = Depends(get_db),
 ):
     schedule_repo = ScheduleRepository(db)
     schedule_service = ScheduleService(schedule_repo)
@@ -24,21 +22,23 @@ async def create_schedule(
     return schedule
 
 
-@router.get("", response_model=List[ScheduleResponse])
+@router.get("", response_model=list[ScheduleResponse])
 async def view_schedules(
-        current_user: dict = Depends(get_current_user),
-        db: dict = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+    db: dict = Depends(get_db),
 ):
+    _ = current_user  # Required for authentication
     schedule_repo = ScheduleRepository(db)
     return schedule_repo.get_all()
 
 
 @router.get("/{schedule_id}", response_model=ScheduleResponse)
 async def get_schedule_by_id(
-        schedule_id: str,
-        current_user: dict = Depends(get_current_user),
-        db: dict = Depends(get_db),
+    schedule_id: str,
+    current_user: dict = Depends(get_current_user),
+    db: dict = Depends(get_db),
 ):
+    _ = current_user  # Required for authentication
     from fastapi import HTTPException
 
     schedule_repo = ScheduleRepository(db)

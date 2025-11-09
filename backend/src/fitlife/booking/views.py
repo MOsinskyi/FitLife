@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends
 
 from fitlife.booking.repositories import BookingRepository
 from fitlife.booking.schemas import BookingCreate, BookingResponse
@@ -12,9 +12,9 @@ router = APIRouter()
 
 @router.post("", response_model=BookingResponse)
 async def book_training(
-        booking_data: BookingCreate,
-        current_user: dict = Depends(get_current_customer),
-        db: dict = Depends(get_db),
+    booking_data: BookingCreate,
+    current_user: dict = Depends(get_current_customer),
+    db: dict = Depends(get_db),
 ):
     booking_repo = BookingRepository(db)
     schedule_repo = ScheduleRepository(db)
@@ -26,9 +26,10 @@ async def book_training(
 
 @router.get("", response_model=list[BookingResponse])
 async def get_bookings_list(
-        current_user: dict = Depends(get_current_customer),
-        db: dict = Depends(get_db),
+    current_user: dict = Depends(get_current_customer),
+    db: dict = Depends(get_db),
 ):
+    _ = current_user  # Required for authentication
     booking_repo = BookingRepository(db)
     bookings = booking_repo.get_all()
     return bookings
@@ -36,10 +37,11 @@ async def get_bookings_list(
 
 @router.get("/{booking_id}", response_model=BookingResponse)
 async def get_booking_by_id(
-        booking_id: str,
-        current_user: dict = Depends(get_current_customer),
-        db: dict = Depends(get_db),
+    booking_id: str,
+    current_user: dict = Depends(get_current_customer),
+    db: dict = Depends(get_db),
 ):
+    _ = current_user  # Required for authentication
     from fastapi import HTTPException
 
     booking_repo = BookingRepository(db)

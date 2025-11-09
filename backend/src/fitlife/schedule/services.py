@@ -1,6 +1,8 @@
-from fitlife.schedule.repositories import ScheduleRepository
-from fastapi import HTTPException
 from datetime import datetime
+
+from fastapi import HTTPException
+
+from fitlife.schedule.repositories import ScheduleRepository
 
 
 class ScheduleService:
@@ -16,9 +18,9 @@ class ScheduleService:
         end_time = schedule_data.get("end_time")
 
         if isinstance(start_time, str):
-            start_time = datetime.fromisoformat(start_time.replace('Z', '+00:00'))
+            start_time = datetime.fromisoformat(start_time.replace("Z", "+00:00"))
         if isinstance(end_time, str):
-            end_time = datetime.fromisoformat(end_time.replace('Z', '+00:00'))
+            end_time = datetime.fromisoformat(end_time.replace("Z", "+00:00"))
 
         if start_time and end_time and end_time <= start_time:
             raise HTTPException(status_code=400, detail="End time must be after start time")

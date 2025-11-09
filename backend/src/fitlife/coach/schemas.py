@@ -1,13 +1,11 @@
-from typing import Optional
-
 from fitlife.user.schemas import UserCreate, UserResponse
 
 
 class CoachCreate(UserCreate):
-    specialization: Optional[str] = None
-    bio: Optional[str] = None
+    specialization: str | None = None
+    bio: str | None = None
 
 
 class CoachResponse(UserResponse):
-    specialization: Optional[str] = None
-    bio: Optional[str] = None
+    specialization: str | None = None
+    bio: str | None = None

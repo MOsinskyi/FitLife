@@ -1,11 +1,11 @@
 from typing import Any
 
-accounts_db = {}
-coaches_db = {}
-customers_db = {}
-memberships_db = {}
-booking_db = {}
-schedules_db = {}
+accounts_db: dict[str, Any] = {}
+coaches_db: dict[str, Any] = {}
+customers_db: dict[str, Any] = {}
+memberships_db: dict[str, Any] = {}
+booking_db: dict[str, Any] = {}
+schedules_db: dict[str, Any] = {}
 
 
 def get_db() -> dict[str, Any]:

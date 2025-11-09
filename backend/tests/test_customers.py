@@ -1,4 +1,3 @@
-import pytest
 from fastapi import status
 
 
@@ -12,8 +11,8 @@ def test_create_customer(client, manager_token):
             "first_name": "New",
             "last_name": "Customer",
             "phone": "9876543210",
-            "password": "newpassword123"
-        }
+            "password": "newpassword123",
+        },
     )
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
@@ -27,8 +26,7 @@ def test_create_customer(client, manager_token):
 def test_get_customers_list(client, customer_token, sample_customer):
     """Test getting list of customers."""
     response = client.get(
-        "/api/v1/customers",
-        headers={"Authorization": f"Bearer {customer_token}"}
+        "/api/v1/customers", headers={"Authorization": f"Bearer {customer_token}"}
     )
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
@@ -40,8 +38,7 @@ def test_get_customer_by_id(client, customer_token, sample_customer):
     """Test getting a specific customer by ID."""
     customer_id = sample_customer["id"]
     response = client.get(
-        f"/api/v1/customers/{customer_id}",
-        headers={"Authorization": f"Bearer {customer_token}"}
+        f"/api/v1/customers/{customer_id}", headers={"Authorization": f"Bearer {customer_token}"}
     )
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
@@ -52,8 +49,7 @@ def test_get_customer_by_id(client, customer_token, sample_customer):
 def test_get_nonexistent_customer(client, customer_token):
     """Test getting a non-existent customer."""
     response = client.get(
-        "/api/v1/customers/nonexistent-id",
-        headers={"Authorization": f"Bearer {customer_token}"}
+        "/api/v1/customers/nonexistent-id", headers={"Authorization": f"Bearer {customer_token}"}
     )
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -68,8 +64,8 @@ def test_create_customer_duplicate_email(client, manager_token, sample_customer)
             "first_name": "Duplicate",
             "last_name": "Customer",
             "phone": "9876543210",
-            "password": "password123"
-        }
+            "password": "password123",
+        },
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
 

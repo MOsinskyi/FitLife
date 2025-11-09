@@ -1,12 +1,11 @@
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel
 
 
 class MembershipTypeCreate(BaseModel):
     name: str
-    description: Optional[str] = None
+    description: str | None = None
     duration_days: int
     price: float
 

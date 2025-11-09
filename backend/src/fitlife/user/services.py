@@ -1,6 +1,8 @@
 from fastapi import HTTPException
+
 from fitlife.security import get_password_hash
 from fitlife.user.repositories import UserRepository
+
 
 class UserService:
     def __init__(self, user_repo: UserRepository):

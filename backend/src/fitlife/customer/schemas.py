@@ -1,5 +1,3 @@
-from typing import Optional
-
 from fitlife.user.schemas import UserCreate, UserResponse
 
 
@@ -8,5 +6,5 @@ class CustomerCreate(UserCreate):
 
 
 class CustomerResponse(UserResponse):
-    membership_id: Optional[str] = None
+    membership_id: str | None = None
     visit_count: int = 0

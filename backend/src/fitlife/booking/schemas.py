@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel
 
@@ -26,5 +25,5 @@ class VisitRecordResponse(BaseModel):
 class StatsResponse(BaseModel):
     total_bookings: int
     completed_sessions: int
-    active_membership: Optional[dict] = None
+    active_membership: dict | None = None
     visit_count: int

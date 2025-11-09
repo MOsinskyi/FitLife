@@ -1,4 +1,4 @@
-.PHONY: help install run dev clean test lint format check env setup
+.PHONY: help install run dev clean test lint format check env setup pre-commit-install pre-commit-run pre-commit-all
 
 # Variables
 BACKEND_DIR = backend
@@ -17,9 +17,12 @@ help:
 	@echo "  make dev        - Run the application with auto-reload (development)"
 	@echo "  make shell      - Open Poetry shell"
 	@echo "  make test       - Run tests (when implemented)"
-	@echo "  make lint       - Run linting checks"
+	@echo "  make lint       - Run linting checks (ruff, mypy)"
 	@echo "  make format     - Format code with black and isort"
 	@echo "  make check      - Run all checks (lint + test)"
+	@echo "  make pre-commit-install - Install pre-commit hooks"
+	@echo "  make pre-commit-run     - Run pre-commit on staged files"
+	@echo "  make pre-commit-all     - Run pre-commit on all files"
 	@echo "  make env        - Create .env file from template"
 	@echo "  make clean      - Remove cache files and build artifacts"
 	@echo "  make clean-all  - Remove cache files, build artifacts, and venv"
@@ -68,14 +71,29 @@ test:
 # Linting
 lint:
 	@echo "Running linting checks..."
-	cd $(BACKEND_DIR) && $(PYTHON) -m flake8 src/ || echo "flake8 not installed"
-	cd $(BACKEND_DIR) && $(PYTHON) -m mypy src/ || echo "mypy not installed"
+	cd $(BACKEND_DIR) && poetry run ruff check src/ tests/
+	cd $(BACKEND_DIR) && poetry run mypy src/
 
 # Format code
 format:
 	@echo "Formatting code..."
-	cd $(BACKEND_DIR) && $(PYTHON) -m black src/ || echo "black not installed"
-	cd $(BACKEND_DIR) && $(PYTHON) -m isort src/ || echo "isort not installed"
+	cd $(BACKEND_DIR) && poetry run black src/ tests/
+	cd $(BACKEND_DIR) && poetry run isort src/ tests/
+	cd $(BACKEND_DIR) && poetry run ruff format src/ tests/
+
+# Pre-commit hooks
+pre-commit-install:
+	@echo "Installing pre-commit hooks..."
+	cd $(BACKEND_DIR) && poetry run pre-commit install
+	@echo "Pre-commit hooks installed!"
+
+pre-commit-run:
+	@echo "Running pre-commit on staged files..."
+	cd $(BACKEND_DIR) && poetry run pre-commit run
+
+pre-commit-all:
+	@echo "Running pre-commit on all files..."
+	cd $(BACKEND_DIR) && poetry run pre-commit run --all-files
 
 # Run all checks
 check: lint test

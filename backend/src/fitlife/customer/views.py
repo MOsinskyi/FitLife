@@ -2,19 +2,19 @@ from fastapi import APIRouter, Depends, status
 
 from fitlife.booking.repositories import BookingRepository
 from fitlife.booking.schemas import StatsResponse
+from fitlife.customer.schemas import CustomerCreate, CustomerResponse
 from fitlife.database import get_db
 from fitlife.deps import get_current_customer
 from fitlife.user.repositories import UserRepository
 from fitlife.user.services import UserService
-from fitlife.customer.schemas import CustomerCreate, CustomerResponse
 
 router = APIRouter()
 
 
 @router.post("", response_model=CustomerResponse)
 async def create_customer(
-        customer: CustomerCreate,
-        db: dict = Depends(get_db),
+    customer: CustomerCreate,
+    db: dict = Depends(get_db),
 ):
     from fastapi import HTTPException
 
@@ -33,8 +33,8 @@ async def create_customer(
 
 @router.get("", response_model=list[CustomerResponse])
 async def get_customers_list(
-        current_user: dict = Depends(get_current_customer),
-        db: dict = Depends(get_db),
+    current_user: dict = Depends(get_current_customer),  # type: ignore # noqa: ARG001
+    db: dict = Depends(get_db),
 ):
     user_repo = UserRepository(db)
     customers = user_repo.get_all_customers()
@@ -43,9 +43,9 @@ async def get_customers_list(
 
 @router.get("/{customer_id}", response_model=CustomerResponse)
 async def get_customer_by_id(
-        customer_id: str,
-        current_user: dict = Depends(get_current_customer),
-        db: dict = Depends(get_db),
+    customer_id: str,
+    current_user: dict = Depends(get_current_customer),  # type: ignore # noqa: ARG001
+    db: dict = Depends(get_db),
 ):
     from fastapi import HTTPException
 
@@ -60,8 +60,8 @@ async def get_customer_by_id(
 
 @router.post("/register", response_model=CustomerResponse, status_code=status.HTTP_201_CREATED)
 async def register_customer(
-        customer: CustomerCreate,
-        db: dict = Depends(get_db),
+    customer: CustomerCreate,
+    db: dict = Depends(get_db),
 ):
     user_repo = UserRepository(db)
     user_service = UserService(user_repo)
@@ -79,8 +79,8 @@ async def get_customer_profile(current_user: dict = Depends(get_current_customer
 
 @router.get("/me/stats", response_model=StatsResponse)
 async def view_own_stats(
-        current_user: dict = Depends(get_current_customer),
-        db: dict = Depends(get_db),
+    current_user: dict = Depends(get_current_customer),  # type: ignore # noqa: ARG001
+    db: dict = Depends(get_db),
 ):
     booking_repo = BookingRepository(db)
     customer_bookings = booking_repo.get_by_customer(current_user["id"])
@@ -90,5 +90,5 @@ async def view_own_stats(
         total_bookings=len(customer_bookings),
         completed_sessions=len(completed),
         active_membership=None,
-        visit_count=current_user.get("visit_count", 0)
+        visit_count=current_user.get("visit_count", 0),
     )

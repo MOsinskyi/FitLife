@@ -1,4 +1,3 @@
-import pytest
 from fastapi import status
 
 
@@ -12,8 +11,8 @@ def test_create_coach(client, manager_token):
             "first_name": "New",
             "last_name": "Coach",
             "phone": "9876543210",
-            "password": "newpassword123"
-        }
+            "password": "newpassword123",
+        },
     )
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
@@ -26,10 +25,7 @@ def test_create_coach(client, manager_token):
 
 def test_get_coaches_list(client, coach_token, sample_coach):
     """Test getting list of coaches."""
-    response = client.get(
-        "/api/v1/coaches",
-        headers={"Authorization": f"Bearer {coach_token}"}
-    )
+    response = client.get("/api/v1/coaches", headers={"Authorization": f"Bearer {coach_token}"})
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
     assert isinstance(data, list)
@@ -40,8 +36,7 @@ def test_get_coach_by_id(client, coach_token, sample_coach):
     """Test getting a specific coach by ID."""
     coach_id = sample_coach["id"]
     response = client.get(
-        f"/api/v1/coaches/{coach_id}",
-        headers={"Authorization": f"Bearer {coach_token}"}
+        f"/api/v1/coaches/{coach_id}", headers={"Authorization": f"Bearer {coach_token}"}
     )
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
@@ -52,8 +47,7 @@ def test_get_coach_by_id(client, coach_token, sample_coach):
 def test_get_nonexistent_coach(client, coach_token):
     """Test getting a non-existent coach."""
     response = client.get(
-        "/api/v1/coaches/nonexistent-id",
-        headers={"Authorization": f"Bearer {coach_token}"}
+        "/api/v1/coaches/nonexistent-id", headers={"Authorization": f"Bearer {coach_token}"}
     )
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -68,8 +62,8 @@ def test_create_coach_duplicate_email(client, manager_token, sample_coach):
             "first_name": "Duplicate",
             "last_name": "Coach",
             "phone": "9876543210",
-            "password": "password123"
-        }
+            "password": "password123",
+        },
     )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
 

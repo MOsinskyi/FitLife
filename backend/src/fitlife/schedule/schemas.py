@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel
 
@@ -7,11 +6,11 @@ from pydantic import BaseModel
 class ScheduleCreate(BaseModel):
     coach_id: str
     title: str
-    description: Optional[str] = None
+    description: str | None = None
     start_time: datetime
     end_time: datetime
     max_participants: int = 10
-    training_type: Optional[str] = None
+    training_type: str | None = None
 
 
 class ScheduleResponse(ScheduleCreate):

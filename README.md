@@ -33,12 +33,14 @@ A modern REST API for managing gym operations, including memberships, coaches, c
 ### Quick Setup (Recommended)
 
 1. Clone the repository:
+
 ```bash
 git clone <repository-url>
 cd fitlife
 ```
 
 2. Run the setup command:
+
 ```bash
 make setup
 ```
@@ -46,6 +48,7 @@ make setup
 This will install dependencies and create a `.env` file from the template.
 
 3. Edit `backend/.env` and set your `SECRET_KEY`:
+
 ```bash
 # Generate a secure key:
 openssl rand -hex 32
@@ -54,27 +57,32 @@ openssl rand -hex 32
 ### Manual Setup
 
 1. Clone the repository:
+
 ```bash
 git clone <repository-url>
 cd fitlife
 ```
 
 2. Navigate to the backend directory:
+
 ```bash
 cd backend
 ```
 
 3. Install dependencies using Poetry:
+
 ```bash
 poetry install
 ```
 
 4. Configure environment variables:
+
 ```bash
 cp .env.templates .env
 ```
 
 Edit `.env` and set the following variables:
+
 ```env
 PROJECT_NAME=Gym Training Network API
 VERSION=1.0.0
@@ -86,6 +94,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES=30
 ```
 
 **Important**: Generate a secure `SECRET_KEY` for production use:
+
 ```bash
 openssl rand -hex 32
 ```
@@ -95,16 +104,19 @@ openssl rand -hex 32
 ### Using Makefile (Recommended)
 
 **Development mode with auto-reload:**
+
 ```bash
 make dev
 ```
 
 **Production mode:**
+
 ```bash
 make run
 ```
 
 **See all available commands:**
+
 ```bash
 make help
 ```
@@ -112,12 +124,14 @@ make help
 ### Manual Execution
 
 **Development Server:**
+
 ```bash
 cd backend
 poetry run uvicorn fitlife.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 The API will be available at:
+
 - **API Base**: http://localhost:8000
 - **Interactive Docs**: http://localhost:8000/api/v1/docs
 - **ReDoc**: http://localhost:8000/api/v1/redoc
@@ -137,6 +151,7 @@ poetry run python -m fitlife.main
 All protected endpoints require a JWT token obtained via login.
 
 **Login:**
+
 ```bash
 POST /api/v1/auth/login
 Content-Type: application/x-www-form-urlencoded
@@ -145,6 +160,7 @@ username=user@example.com&password=yourpassword
 ```
 
 **Response:**
+
 ```json
 {
   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -153,6 +169,7 @@ username=user@example.com&password=yourpassword
 ```
 
 **Using the token:**
+
 ```bash
 curl -H "Authorization: Bearer <access_token>" http://localhost:8000/api/v1/customers
 ```
@@ -160,29 +177,35 @@ curl -H "Authorization: Bearer <access_token>" http://localhost:8000/api/v1/cust
 ### API Endpoints
 
 #### Authentication
+
 - `POST /api/v1/auth/login` - Authenticate and get access token
 
 #### Managers (Users)
+
 - `GET /api/v1/managers` - List all managers
 - `POST /api/v1/managers` - Create a new manager
 - `GET /api/v1/managers/{id}` - Get manager details
 
 #### Coaches
+
 - `GET /api/v1/coaches` - List all coaches
 - `POST /api/v1/coaches` - Create a new coach
 - `GET /api/v1/coaches/{id}` - Get coach details
 
 #### Customers
+
 - `GET /api/v1/customers` - List all customers
 - `POST /api/v1/customers` - Create a new customer
 - `GET /api/v1/customers/{id}` - Get customer details
 
 #### Schedules
+
 - `GET /api/v1/schedules` - List all training schedules
 - `POST /api/v1/schedules` - Create a new schedule (coach only)
 - `GET /api/v1/schedules/{id}` - Get schedule details
 
 #### Bookings
+
 - `GET /api/v1/bookings` - List bookings
 - `POST /api/v1/bookings` - Create a booking (customer only)
 - `GET /api/v1/bookings/{id}` - Get booking details
@@ -253,6 +276,7 @@ make update-deps   # Update all dependencies
 ### Code Organization
 
 Each module follows a consistent pattern:
+
 - `schemas.py`: Pydantic models for validation
 - `views.py`: FastAPI route handlers
 - `services.py`: Business logic (where applicable)

@@ -19,6 +19,7 @@ tests/
 ## Running Tests
 
 ### Run all tests
+
 ```bash
 make test
 # or
@@ -26,16 +27,19 @@ cd backend && PYTHONPATH=src poetry run pytest tests/ -v
 ```
 
 ### Run specific test file
+
 ```bash
 cd backend && PYTHONPATH=src poetry run pytest tests/test_auth.py -v
 ```
 
 ### Run specific test
+
 ```bash
 cd backend && PYTHONPATH=src poetry run pytest tests/test_auth.py::test_login_success -v
 ```
 
 ### Run with coverage
+
 ```bash
 cd backend && PYTHONPATH=src poetry run pytest tests/ --cov=fitlife --cov-report=html
 ```
@@ -43,6 +47,7 @@ cd backend && PYTHONPATH=src poetry run pytest tests/ --cov=fitlife --cov-report
 ## Test Coverage
 
 ### Authentication Tests (`test_auth.py`)
+
 - Health check endpoint
 - Root endpoint
 - Login with valid/invalid credentials
@@ -51,6 +56,7 @@ cd backend && PYTHONPATH=src poetry run pytest tests/ --cov=fitlife --cov-report
 - Role-based access control
 
 ### Security Tests (`test_security.py`)
+
 - Password hashing with bcrypt
 - Password verification
 - Hash uniqueness (salt generation)
@@ -59,6 +65,7 @@ cd backend && PYTHONPATH=src poetry run pytest tests/ --cov=fitlife --cov-report
 - Invalid signature/algorithm handling
 
 ### User Management Tests (`test_users.py`)
+
 - Create managers
 - List managers
 - Get manager by ID
@@ -66,6 +73,7 @@ cd backend && PYTHONPATH=src poetry run pytest tests/ --cov=fitlife --cov-report
 - Input validation
 
 ### Coach Tests (`test_coaches.py`)
+
 - Coach registration
 - List coaches
 - Get coach by ID
@@ -73,6 +81,7 @@ cd backend && PYTHONPATH=src poetry run pytest tests/ --cov=fitlife --cov-report
 - Authorization checks
 
 ### Customer Tests (`test_customers.py`)
+
 - Customer registration
 - List customers
 - Get customer by ID
@@ -80,12 +89,14 @@ cd backend && PYTHONPATH=src poetry run pytest tests/ --cov=fitlife --cov-report
 - Authorization checks
 
 ### Schedule Tests (`test_schedules.py`)
+
 - Create schedules as coach
 - Prevent customer from creating schedules
 - List and retrieve schedules
 - Invalid time range handling
 
 ### Booking Tests (`test_bookings.py`)
+
 - Create bookings as customer
 - Prevent coach from creating bookings
 - List and retrieve bookings

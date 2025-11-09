@@ -1,12 +1,10 @@
-from multiprocessing import managers
-
 from fastapi import APIRouter
 
 from fitlife.auth import views as auth
-from fitlife.customer import views as customer
-from fitlife.coach import views as coach
-from fitlife.schedule import views as schedule
 from fitlife.booking import views as booking
+from fitlife.coach import views as coach
+from fitlife.customer import views as customer
+from fitlife.schedule import views as schedule
 from fitlife.user import views as user
 
 api_router = APIRouter()

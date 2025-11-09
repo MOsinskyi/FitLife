@@ -3,8 +3,8 @@ from datetime import timedelta
 from fastapi import HTTPException, status
 
 from fitlife.config import settings
+from fitlife.security import create_access_token, verify_password
 from fitlife.user.repositories import UserRepository
-from fitlife.security import verify_password, create_access_token
 
 
 class AuthService:
@@ -24,6 +24,5 @@ class AuthService:
     def create_token(self, user: dict) -> str:
         access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
         return create_access_token(
-            data={"sub": user["email"], "role": user["role"]},
-            expires_delta=access_token_expires
+            data={"sub": user["email"], "role": user["role"]}, expires_delta=access_token_expires
         )

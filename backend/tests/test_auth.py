@@ -1,4 +1,3 @@
-import pytest
 from fastapi import status
 
 
@@ -22,11 +21,7 @@ def test_root_endpoint(client):
 def test_login_success(client, sample_manager):
     """Test successful login."""
     response = client.post(
-        "/api/v1/auth/login",
-        data={
-            "username": "manager@test.com",
-            "password": "testpassword"
-        }
+        "/api/v1/auth/login", data={"username": "manager@test.com", "password": "testpassword"}
     )
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
@@ -38,11 +33,7 @@ def test_login_success(client, sample_manager):
 def test_login_invalid_credentials(client, sample_manager):
     """Test login with invalid password."""
     response = client.post(
-        "/api/v1/auth/login",
-        data={
-            "username": "manager@test.com",
-            "password": "wrongpassword"
-        }
+        "/api/v1/auth/login", data={"username": "manager@test.com", "password": "wrongpassword"}
     )
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
@@ -50,11 +41,7 @@ def test_login_invalid_credentials(client, sample_manager):
 def test_login_nonexistent_user(client, clean_db):
     """Test login with non-existent user."""
     response = client.post(
-        "/api/v1/auth/login",
-        data={
-            "username": "nonexistent@test.com",
-            "password": "testpassword"
-        }
+        "/api/v1/auth/login", data={"username": "nonexistent@test.com", "password": "testpassword"}
     )
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
@@ -67,25 +54,20 @@ def test_access_protected_endpoint_without_token(client):
 
 def test_access_protected_endpoint_with_valid_token(client, manager_token):
     """Test accessing protected endpoint with valid token."""
-    response = client.get(
-        "/api/v1/managers",
-        headers={"Authorization": f"Bearer {manager_token}"}
-    )
+    response = client.get("/api/v1/managers", headers={"Authorization": f"Bearer {manager_token}"})
     assert response.status_code == status.HTTP_200_OK
 
 
 def test_access_protected_endpoint_with_invalid_token(client):
     """Test accessing protected endpoint with invalid token."""
-    response = client.get(
-        "/api/v1/managers",
-        headers={"Authorization": "Bearer invalid_token"}
-    )
+    response = client.get("/api/v1/managers", headers={"Authorization": "Bearer invalid_token"})
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
 def test_token_contains_user_email(client, sample_manager, manager_token):
     """Test that token payload contains user email."""
     from jose import jwt
+
     from fitlife.config import settings
 
     payload = jwt.decode(manager_token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
@@ -94,10 +76,7 @@ def test_token_contains_user_email(client, sample_manager, manager_token):
 
 def test_coach_cannot_access_manager_endpoint(client, coach_token):
     """Test that coach cannot access manager-only endpoints."""
-    response = client.get(
-        "/api/v1/managers",
-        headers={"Authorization": f"Bearer {coach_token}"}
-    )
+    response = client.get("/api/v1/managers", headers={"Authorization": f"Bearer {coach_token}"})
     # This might return 403 if role-checking is enforced on the endpoint
     # or 200 if the endpoint allows all authenticated users
     # Adjust based on your actual implementation

@@ -1,11 +1,8 @@
-import pytest
 from datetime import timedelta
 
-from fitlife.security import (
-    verify_password,
-    get_password_hash,
-    create_access_token
-)
+import pytest
+
+from fitlife.security import create_access_token, get_password_hash, verify_password
 
 
 def test_password_hashing():
@@ -56,6 +53,7 @@ def test_create_access_token_default_expiry():
 
     # Decode and verify token
     from jose import jwt
+
     from fitlife.config import settings
 
     payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
@@ -73,6 +71,7 @@ def test_create_access_token_custom_expiry():
 
     # Decode and verify token
     from jose import jwt
+
     from fitlife.config import settings
 
     payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
@@ -82,14 +81,11 @@ def test_create_access_token_custom_expiry():
 
 def test_create_access_token_with_additional_claims():
     """Test creating access token with additional claims."""
-    data = {
-        "sub": "test@example.com",
-        "role": "manager",
-        "user_id": "123"
-    }
+    data = {"sub": "test@example.com", "role": "manager", "user_id": "123"}
     token = create_access_token(data)
 
     from jose import jwt
+
     from fitlife.config import settings
 
     payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
@@ -100,7 +96,8 @@ def test_create_access_token_with_additional_claims():
 
 def test_token_verification_invalid_signature():
     """Test that token with invalid signature fails verification."""
-    from jose import jwt, JWTError
+    from jose import JWTError, jwt
+
     from fitlife.config import settings
 
     data = {"sub": "test@example.com"}
@@ -113,7 +110,8 @@ def test_token_verification_invalid_signature():
 
 def test_token_verification_invalid_algorithm():
     """Test that token with invalid algorithm fails verification."""
-    from jose import jwt, JWTError
+    from jose import JWTError, jwt
+
     from fitlife.config import settings
 
     data = {"sub": "test@example.com"}

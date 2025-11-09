@@ -11,8 +11,8 @@ router = APIRouter()
 
 @router.post("/login", response_model=Token)
 async def login(
-        form_data: OAuth2PasswordRequestForm = Depends(),
-        db: dict = Depends(get_db),
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: dict = Depends(get_db),
 ):
     user_repo = UserRepository(db)
     auth_service = AuthService(user_repo)
