@@ -171,6 +171,9 @@ frontend:build:
 pre-commit:
   image: python:$PYTHON_VERSION-slim
   stage: lint
+  variables:
+    # Skip hooks that require Node.js (prettier)
+    SKIP: prettier
   before_script:
     # Install git (required by pre-commit)
     - apt-get update && apt-get install -y git
