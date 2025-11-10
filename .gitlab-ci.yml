@@ -169,14 +169,25 @@ frontend:build:
 # ============================================
 
 pre-commit:
-  extends: .backend_base
+  image: python:$PYTHON_VERSION-slim
   stage: lint
+  before_script:
+    # Install git (required by pre-commit)
+    - apt-get update && apt-get install -y git
+    - pip install --upgrade pip
+    - pip install poetry==$POETRY_VERSION
+    # Install backend dependencies (pre-commit is in backend)
+    - cd backend
+    - poetry config virtualenvs.in-project true
+    - poetry install --no-root
+    - cd ..
   script:
-    - cd .. # Go back to project root
+    # Run pre-commit from project root using the backend venv
     - backend/.venv/bin/pre-commit run --all-files
   allow_failure: true
   only:
     - merge_requests
+  <<: *cache_python
 # ============================================
 # Docker Build (Optional)
 # ============================================
