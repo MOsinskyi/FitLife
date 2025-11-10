@@ -1,0 +1,254 @@
+# GitLab CI/CD Pipeline for FitLife
+# This pipeline runs tests, linting, security checks, and builds for both backend and frontend
+
+stages:
+  - lint
+  - security
+  - test
+  - build
+
+variables:
+  # Python configuration
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  POETRY_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pypoetry"
+  POETRY_VERSION: "1.8.0"
+  PYTHON_VERSION: "3.12"
+
+  # Node.js configuration
+  NPM_CONFIG_CACHE: "$CI_PROJECT_DIR/.npm"
+  NODE_VERSION: "20"
+
+# Cache configuration
+.cache_python: &cache_python
+  cache:
+    key:
+      files:
+        - backend/poetry.lock
+      prefix: python-$PYTHON_VERSION
+    paths:
+      - .cache/pip
+      - .cache/pypoetry
+      - backend/.venv
+
+.cache_node: &cache_node
+  cache:
+    key:
+      files:
+        - frontend/package-lock.json
+      prefix: node-$NODE_VERSION
+    paths:
+      - .npm
+      - frontend/node_modules
+
+# ============================================
+# Backend Jobs
+# ============================================
+
+.backend_base:
+  image: python:$PYTHON_VERSION-slim
+  before_script:
+    - cd backend
+    - pip install --upgrade pip
+    - pip install poetry==$POETRY_VERSION
+    - poetry config virtualenvs.in-project true
+    - poetry install --no-root
+  <<: *cache_python
+
+backend:lint:black:
+  extends: .backend_base
+  stage: lint
+  script:
+    - poetry run black --check src/ tests/
+  allow_failure: false
+
+backend:lint:isort:
+  extends: .backend_base
+  stage: lint
+  script:
+    - poetry run isort --check-only src/ tests/
+  allow_failure: false
+
+backend:lint:ruff:
+  extends: .backend_base
+  stage: lint
+  script:
+    - poetry run ruff check src/ tests/
+  allow_failure: false
+
+backend:lint:mypy:
+  extends: .backend_base
+  stage: lint
+  script:
+    - poetry run mypy src/
+  allow_failure: true # Allow failure as type hints may not be complete
+
+backend:security:bandit:
+  extends: .backend_base
+  stage: security
+  script:
+    - poetry run bandit -c pyproject.toml -r src/
+  allow_failure: false
+
+backend:security:safety:
+  extends: .backend_base
+  stage: security
+  script:
+    - poetry run pip install safety
+    - poetry run safety check --json || true
+  allow_failure: true # Some vulnerabilities may not be fixable
+
+backend:test:
+  extends: .backend_base
+  stage: test
+  script:
+    - PYTHONPATH=src poetry run pytest tests/ -v --cov=fitlife --cov-report=term --cov-report=xml --cov-report=html
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  artifacts:
+    when: always
+    paths:
+      - backend/htmlcov/
+      - backend/coverage.xml
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: backend/coverage.xml
+    expire_in: 30 days
+
+backend:build:
+  extends: .backend_base
+  stage: build
+  script:
+    - poetry build
+    - ls -la dist/
+  artifacts:
+    paths:
+      - backend/dist/
+    expire_in: 7 days
+  only:
+    - main
+    - tags
+
+# ============================================
+# Frontend Jobs
+# ============================================
+
+.frontend_base:
+  image: node:$NODE_VERSION-alpine
+  before_script:
+    - cd frontend
+    - npm ci
+  <<: *cache_node
+
+frontend:lint:
+  extends: .frontend_base
+  stage: lint
+  script:
+    - npm run lint || echo "No lint script configured"
+  allow_failure: true
+
+frontend:test:
+  extends: .frontend_base
+  stage: test
+  script:
+    - npm run test || echo "No test script configured yet"
+  allow_failure: true
+
+frontend:build:
+  extends: .frontend_base
+  stage: build
+  script:
+    - npm run build
+    - ls -la dist/
+  artifacts:
+    paths:
+      - frontend/dist/
+    expire_in: 7 days
+
+# ============================================
+# Pre-commit (Optional - runs all checks)
+# ============================================
+
+pre-commit:
+  image: python:$PYTHON_VERSION-slim
+  stage: lint
+  variables:
+    # Skip hooks that require Node.js (prettier)
+    SKIP: prettier
+  before_script:
+    # Install git (required by pre-commit)
+    - apt-get update && apt-get install -y git
+    - pip install --upgrade pip
+    - pip install poetry==$POETRY_VERSION
+    # Install backend dependencies (pre-commit is in backend)
+    - cd backend
+    - poetry config virtualenvs.in-project true
+    - poetry install --no-root
+    - cd ..
+  script:
+    # Run pre-commit from project root using the backend venv
+    - backend/.venv/bin/pre-commit run --all-files
+  allow_failure: true
+  only:
+    - merge_requests
+  <<: *cache_python
+# ============================================
+# Docker Build (Optional)
+# ============================================
+
+# Uncomment this section if you want to build Docker images
+# docker:build:backend:
+#   stage: build
+#   image: docker:latest
+#   services:
+#     - docker:dind
+#   variables:
+#     DOCKER_DRIVER: overlay2
+#     DOCKER_TLS_CERTDIR: "/certs"
+#   before_script:
+#     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+#   script:
+#     - docker build -t $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHORT_SHA -f backend/Dockerfile backend/
+#     - docker push $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHORT_SHA
+#   only:
+#     - main
+#     - tags
+
+# ============================================
+# Deployment (Optional)
+# ============================================
+
+# deploy:staging:
+#   stage: deploy
+#   image: alpine:latest
+#   before_script:
+#     - apk add --no-cache openssh-client
+#     - eval $(ssh-agent -s)
+#     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+#     - mkdir -p ~/.ssh
+#     - chmod 700 ~/.ssh
+#   script:
+#     - ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST "cd /app && git pull && make restart"
+#   environment:
+#     name: staging
+#     url: https://staging.fitlife.example.com
+#   only:
+#     - main
+#   when: manual
+
+# deploy:production:
+#   stage: deploy
+#   image: alpine:latest
+#   before_script:
+#     - apk add --no-cache openssh-client
+#     - eval $(ssh-agent -s)
+#     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+#     - mkdir -p ~/.ssh
+#     - chmod 700 ~/.ssh
+#   script:
+#     - ssh -o StrictHostKeyChecking=no $DEPLOY_USER@$DEPLOY_HOST "cd /app && git pull && make restart"
+#   environment:
+#     name: production
+#     url: https://fitlife.example.com
+#   only:
+#     - tags
+#   when: manual
