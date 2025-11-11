@@ -1,4 +1,5 @@
 from datetime import timedelta
+from typing import Any
 
 from fastapi import HTTPException, status
 
@@ -11,7 +12,7 @@ class AuthService:
     def __init__(self, user_repo: UserRepository):
         self.user_repo = user_repo
 
-    def authenticate_user(self, email: str, password: str):
+    def authenticate_user(self, email: str, password: str) -> dict[Any, Any]:
         user = self.user_repo.get_by_email(email)
         if not user or not verify_password(password, user["hashed_password"]):
             raise HTTPException(
@@ -19,10 +20,12 @@ class AuthService:
                 detail="Incorrect email or password",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-        return user
+        user_result: dict[Any, Any] = user
+        return user_result
 
-    def create_token(self, user: dict) -> str:
+    def create_token(self, user: dict[str, Any]) -> str:
         access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-        return create_access_token(
+        token: str = create_access_token(
             data={"sub": user["email"], "role": user["role"]}, expires_delta=access_token_expires
         )
+        return token

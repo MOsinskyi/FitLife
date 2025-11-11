@@ -1,26 +1,31 @@
 import uuid
 from datetime import UTC, datetime
+from typing import Any
 
 
 class UserRepository:
-    def __init__(self, db: dict):
-        self.accounts_db = db["accounts"]
-        self.coaches_db = db["coaches"]
-        self.customers_db = db["customers"]
+    def __init__(self, db: dict[str, Any]):
+        self.accounts_db: dict[str, Any] = db["accounts"]
+        self.coaches_db: dict[str, Any] = db["coaches"]
+        self.customers_db: dict[str, Any] = db["customers"]
 
-    def get_by_email(self, email: str) -> dict | None:
-        return self.accounts_db.get(email)
+    def get_by_email(self, email: str) -> dict[Any, Any] | None:
+        result: dict[Any, Any] | None = self.accounts_db.get(email)
+        return result
 
-    def get_by_id(self, user_id: str, role: str) -> dict | None:
+    def get_by_id(self, user_id: str, role: str) -> dict[Any, Any] | None:
         if role == "coach":
-            return self.coaches_db.get(user_id)
+            result: dict[Any, Any] | None = self.coaches_db.get(user_id)
+            return result
         elif role == "customer":
-            return self.customers_db.get(user_id)
+            result = self.customers_db.get(user_id)
+            return result
         elif role == "manager":
             # Search for manager in accounts_db
             for account in self.accounts_db.values():
                 if account.get("id") == user_id and account.get("role") == "manager":
-                    return account
+                    account_result: dict[Any, Any] = account
+                    return account_result
         return None
 
     def create_coach(self, coach_data: dict) -> dict:
@@ -62,8 +67,9 @@ class UserRepository:
             account for account in self.accounts_db.values() if account.get("role") == "manager"
         ]
 
-    def update_customer_visits(self, customer_id: str) -> dict:
-        customer = self.customers_db.get(customer_id)
+    def update_customer_visits(self, customer_id: str) -> dict[Any, Any]:
+        customer: dict[Any, Any] | None = self.customers_db.get(customer_id)
         if customer:
             customer["visit_count"] = customer.get("visit_count", 0) + 1
-        return customer
+            return customer
+        return {}

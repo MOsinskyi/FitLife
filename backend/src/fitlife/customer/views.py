@@ -33,7 +33,7 @@ async def create_customer(
 
 @router.get("", response_model=list[CustomerResponse])
 async def get_customers_list(
-    current_user: dict = Depends(get_current_customer),  # type: ignore # noqa: ARG001
+    current_user: dict = Depends(get_current_customer),  # noqa: ARG001
     db: dict = Depends(get_db),
 ):
     user_repo = UserRepository(db)
@@ -44,7 +44,7 @@ async def get_customers_list(
 @router.get("/{customer_id}", response_model=CustomerResponse)
 async def get_customer_by_id(
     customer_id: str,
-    current_user: dict = Depends(get_current_customer),  # type: ignore # noqa: ARG001
+    current_user: dict = Depends(get_current_customer),  # noqa: ARG001
     db: dict = Depends(get_db),
 ):
     from fastapi import HTTPException
@@ -79,7 +79,7 @@ async def get_customer_profile(current_user: dict = Depends(get_current_customer
 
 @router.get("/me/stats", response_model=StatsResponse)
 async def view_own_stats(
-    current_user: dict = Depends(get_current_customer),  # type: ignore # noqa: ARG001
+    current_user: dict = Depends(get_current_customer),
     db: dict = Depends(get_db),
 ):
     booking_repo = BookingRepository(db)
