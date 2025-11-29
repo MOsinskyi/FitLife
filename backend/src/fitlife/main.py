@@ -1,43 +1,22 @@
 from fastapi import FastAPI
-from starlette.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
-from .config import settings
-from .routers import api_router
-
-app = FastAPI(
-    title=settings.PROJECT_NAME,
-    version=settings.VERSION,
-    openapi_url=f"{settings.API_V1_STR}/openapi.json",
-)
-
-# CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Configure appropriately for production
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Include API router
-app.include_router(api_router, prefix=settings.API_V1_STR)
+app = FastAPI()
 
 
-@app.get("/")
-async def root():
-    return {
-        "message": f"{settings.PROJECT_NAME}",
-        "version": settings.VERSION,
-        "docs": f"{settings.API_V1_STR}/docs",
-    }
+class MemberSchema(BaseModel):
+    name: str
+    phone: str
 
 
-@app.get("/health")
-async def health_check():
-    return {"status": "healthy"}
+members = []
 
 
-if __name__ == "__main__":
-    import uvicorn
+@app.post("/members")
+def add_member(member: MemberSchema):
+    members.append(member)
 
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)  # nosec B104
+
+@app.get("/members")
+def get_members():
+    return members

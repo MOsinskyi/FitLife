@@ -1,0 +1,10 @@
+<script setup>
+</script>
+
+<template>
+    <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="100,10 40,180 190,60 10,60 160,180" fill="grey" />
+    </svg>
+</template>
+
+<style setup></style>

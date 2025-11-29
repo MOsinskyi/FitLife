@@ -5,7 +5,7 @@
 repos:
   # General file checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       # File quality checks
       - id: trailing-whitespace
@@ -36,7 +36,7 @@ repos:
 
   # Python code formatting with Black
   - repo: https://github.com/psf/black
-    rev: 24.10.0
+    rev: 25.11.0
     hooks:
       - id: black
         language_version: python3.12
@@ -45,7 +45,7 @@ repos:
 
   # Import sorting with isort
   - repo: https://github.com/PyCQA/isort
-    rev: 5.13.2
+    rev: 7.0.0
     hooks:
       - id: isort
         args: [--profile=black, --line-length=100]
@@ -53,7 +53,7 @@ repos:
 
   # Python linting with Ruff (fast, modern alternative to flake8, pylint)
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.8.4
+    rev: v0.14.7
     hooks:
       # Linter
       - id: ruff
@@ -65,7 +65,7 @@ repos:
 
   # Security vulnerability scanning
   - repo: https://github.com/PyCQA/bandit
-    rev: 1.7.10
+    rev: 1.9.2
     hooks:
       - id: bandit
         args: [-c, backend/pyproject.toml, -r, backend/src]
@@ -74,7 +74,7 @@ repos:
 
   # Type checking with mypy
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.13.0
+    rev: v1.19.0
     hooks:
       - id: mypy
         additional_dependencies:
@@ -85,7 +85,7 @@ repos:
 
   # Check for common security issues in dependencies
   - repo: https://github.com/Lucas-C/pre-commit-hooks-safety
-    rev: v1.3.3
+    rev: v1.4.2
     hooks:
       - id: python-safety-dependencies-check
         files: backend/pyproject.toml
