@@ -1,23 +1,20 @@
-from datetime import datetime
+import enum
+from decimal import Decimal
+from uuid import UUID, uuid4
 
-from pydantic import BaseModel
-
-
-class MembershipTypeCreate(BaseModel):
-    name: str
-    description: str | None = None
-    duration_days: int
-    price: float
+from pydantic import BaseModel, Field
 
 
-class MembershipTypeResponse(MembershipTypeCreate):
-    id: str
+class MembershipTypes(enum.Enum):
+    DISPOSABLE = 'Disposable'
+    MONTHLY = 'Monthly'
+    ANNUAL = 'Annual'
 
 
-class CustomerMembershipResponse(BaseModel):
-    id: str
-    customer_id: str
-    membership_type_id: str
-    start_date: datetime
-    end_date: datetime
-    is_active: bool = True
+class MembershipAddSchema(BaseModel):
+    type: MembershipTypes
+    fee: Decimal = Field(decimal_places=2, max_digits=4)
+
+
+class MembershipSchema(MembershipAddSchema):
+    id: UUID = Field(default_factory=uuid4)
