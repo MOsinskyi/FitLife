@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.exceptions import HTTPException as StarletteHTTPException
 from fastapi.responses import JSONResponse
+from starlette.staticfiles import StaticFiles
 
 from fitlife.database import router as database_router
 from fitlife.member.routers import router as member_router
@@ -11,6 +12,8 @@ from fitlife.workout_session.routers import router as workout_session_router
 app = FastAPI(
     title='FitLife API',
 )
+
+app.mount('/static', StaticFiles(directory='static', html=True), name='static')
 
 
 @app.exception_handler(StarletteHTTPException)
