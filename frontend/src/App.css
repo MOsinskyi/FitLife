@@ -1,42 +1,146 @@
 #root {
-  max-width: 1280px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 2rem;
+}
+
+.app-container {
+  padding: 20px;
+}
+
+h1 {
   text-align: center;
+  color: #333;
+  margin-bottom: 30px;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+h2 {
+  color: #555;
+  margin-bottom: 15px;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.error-message {
+  background-color: #fee;
+  color: #c33;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  border: 1px solid #fcc;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.form-container {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.card {
-  padding: 2em;
+.form-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
 }
 
-.read-the-docs {
-  color: #888;
+.form-group input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #646cff;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #646cff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+button:hover:not(:disabled) {
+  background-color: #535bf2;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+button.delete-btn {
+  background-color: #dc3545;
+  margin-left: 5px;
+}
+
+button.delete-btn:hover:not(:disabled) {
+  background-color: #c82333;
+}
+
+button.cancel-btn {
+  background-color: #6c757d;
+}
+
+button.cancel-btn:hover:not(:disabled) {
+  background-color: #5a6268;
+}
+
+button.refresh-btn {
+  background-color: #28a745;
+  margin-bottom: 15px;
+}
+
+button.refresh-btn:hover:not(:disabled) {
+  background-color: #218838;
+}
+
+.table-container {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+thead {
+  background-color: #f8f9fa;
+}
+
+th {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 2px solid #dee2e6;
+  font-weight: 600;
+  color: #495057;
+}
+
+td {
+  padding: 12px;
+  border-bottom: 1px solid #dee2e6;
+}
+
+tr:hover {
+  background-color: #f8f9fa;
+}
+
+td button {
+  padding: 6px 12px;
+  font-size: 12px;
 }

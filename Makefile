@@ -1,4 +1,4 @@
-.PHONY: lint, install, update
+.PHONY: lint, install, update, backend, frontend, run-dev
 
 HOST = 0.0.0.0
 PORT = 8000
@@ -12,5 +12,10 @@ install:
 update:
 	pre-commit autoupdate
 
-run-dev:
+run-dev: run_backend run_frontend
+
+run_backend:
 	cd backend && PYTHONPATH=src poetry run uvicorn fitlife.main:app --reload --host $(HOST) --port $(PORT)
+
+run_frontend:
+	cd frontend && npm run dev
