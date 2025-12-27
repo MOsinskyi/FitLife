@@ -1,8 +1,5 @@
 .PHONY: lint, install, update, backend, frontend, run-dev, install-pre-commit, install-backend, install-frontend, tests
 
-HOST = 0.0.0.0
-PORT = 8000
-
 lint:
 	pre-commit run -a
 
