@@ -23,7 +23,7 @@ async def health_check():
 
 
 @router.post(
-    '/stress-test',
+    '/heavy-calculation',
     summary='Do stress test',
     tags=['🪛 Test'],
     description='Simulate heavy calculation',

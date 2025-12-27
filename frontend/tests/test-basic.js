@@ -15,7 +15,7 @@ export const options = {
 const BASE_URL = 'http://localhost:8000';
 
 export default function () {
-    let res = http.post(`${BASE_URL}/stress-test?iterations=100000&chars_count=50`);
+    let res = http.post(`${BASE_URL}/heavy-calculation?iterations=100000&chars_count=50`);
     check(res, {
         'status is 200': (r) => r.status === 200,
         'response time < 300ms': (r) => r.timings.duration < 300,
