@@ -1,4 +1,4 @@
-.PHONY: lint, install, update, backend, frontend, run-dev
+.PHONY: lint, install, update, backend, frontend, run-dev, install-pre-commit, install-backend, install-frontend, tests
 
 HOST = 0.0.0.0
 PORT = 8000
@@ -6,16 +6,34 @@ PORT = 8000
 lint:
 	pre-commit run -a
 
-install:
-	pre-commit uninstall && pre-commit install && pre-commit install-hooks
+install-pre-commit:
+	pre-commit uninstall && \
+	pre-commit install && \
+	pre-commit install-hooks
+
+install-backend:
+	cd backend && \
+	poetry install --no-root
+
+install-frontend:
+	cd frontend && \
+	npm install
+
+test-frontend:
+	cd frontend && \
+	k6 run tests/test-basic.js
+
+install: install-pre-commit install-backend install-frontend
+
+tests: test-frontend
 
 update:
 	pre-commit autoupdate
 
-run-dev: run_backend run_frontend
+run-dev: backend frontend
 
-run_backend:
-	cd backend && PYTHONPATH=src poetry run uvicorn fitlife.main:app --reload --host $(HOST) --port $(PORT)
+backend:
+	cd backend && PYTHONPATH=src poetry run python src/fitlife/main.py
 
-run_frontend:
+frontend:
 	cd frontend && npm run dev
