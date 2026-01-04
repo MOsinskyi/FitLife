@@ -1,9 +1,15 @@
+from contextlib import asynccontextmanager
+
 import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.exceptions import HTTPException as StarletteHTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+from redis.asyncio import Redis
 
+from fitlife.config import settings
 from fitlife.database import router as database_router
 from fitlife.member.routers import router as member_router
 from fitlife.membership.routers import router as membership_router
@@ -11,8 +17,25 @@ from fitlife.stress_test.routers import router as stress_test_router
 from fitlife.trainer.routers import router as trainer_router
 from fitlife.workout_session.routers import router as workout_session_router
 
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    redis = Redis(
+        host=settings.redis.host,
+        port=settings.redis.port,
+        db=settings.redis.db.cache,
+    )
+    FastAPICache.init(
+        RedisBackend(redis),
+        prefix=settings.cache.prefix,
+    )
+    yield
+
+
 app = FastAPI(
-    title='FitLife API',
+    title=settings.app.name,
+    lifespan=lifespan,
+    root_path=settings.app.api_v1,
 )
 
 app.add_middleware(
