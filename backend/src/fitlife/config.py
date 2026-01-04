@@ -8,13 +8,15 @@ from pydantic_settings import BaseSettings
 load_dotenv()
 
 
-def is_not_none(value: Any) -> bool:
-    return value is not None
+def is_not_none(value: Any) -> Any:
+    if value is None:
+        return ValueError('Value cannot be None')
+    return value
 
 
 class AppConfig(BaseSettings):
     name: Annotated[str, AfterValidator(is_not_none)] = os.getenv('APP_NAME', 'FastApi')
-    api_v1: Annotated[str, AfterValidator(is_not_none)] = os.getenv('API_V1_STR', 'api/v1/')
+    api_v1: Annotated[str, AfterValidator(is_not_none)] = os.getenv('API_V1_STR', '/api/v1')
 
 
 class RedisDB(BaseModel):
