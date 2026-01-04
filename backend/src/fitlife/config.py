@@ -1,11 +1,9 @@
-import os
 from typing import Annotated, Any
 
-from dotenv import load_dotenv
 from pydantic import AfterValidator, BaseModel
 from pydantic_settings import BaseSettings
 
-load_dotenv()
+from fitlife import constants
 
 
 def is_not_none(value: Any) -> Any:
@@ -15,8 +13,8 @@ def is_not_none(value: Any) -> Any:
 
 
 class AppConfig(BaseSettings):
-    name: Annotated[str, AfterValidator(is_not_none)] = os.getenv('APP_NAME', 'FastApi')
-    api_v1: Annotated[str, AfterValidator(is_not_none)] = os.getenv('API_V1_STR', '/api/v1')
+    name: Annotated[str, AfterValidator(is_not_none)] = constants.APP_NAME
+    api_v1: Annotated[str, AfterValidator(is_not_none)] = constants.API_V1_STR
 
 
 class RedisDB(BaseModel):
@@ -24,8 +22,8 @@ class RedisDB(BaseModel):
 
 
 class RedisConfig(BaseModel):
-    host: Annotated[str, AfterValidator(is_not_none)] = os.getenv('REDIS_HOST', 'localhost')
-    port: Annotated[int, AfterValidator(is_not_none)] = os.getenv('REDIS_PORT', None)
+    host: Annotated[str, AfterValidator(is_not_none)] = constants.REDIS_HOST
+    port: Annotated[int, AfterValidator(is_not_none)] = constants.REDIS_PORT
     db: RedisDB = RedisDB()
 
 
@@ -34,7 +32,7 @@ class CacheNamespace(BaseModel):
 
 
 class CacheConfig(BaseModel):
-    prefix: Annotated[str, AfterValidator(is_not_none)] = os.getenv('CACHE_PREFIX', 'cache')
+    prefix: Annotated[str, AfterValidator(is_not_none)] = constants.CACHE_PREFIX
     namespace: CacheNamespace = CacheNamespace()
 
 
