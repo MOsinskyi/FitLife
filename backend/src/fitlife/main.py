@@ -3,7 +3,6 @@ from contextlib import asynccontextmanager
 import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.exceptions import HTTPException as StarletteHTTPException
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
@@ -38,14 +37,6 @@ app = FastAPI(
     lifespan=lifespan,
     root_path=settings.app.api_v1,
     root_path_in_servers=False,
-)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=['*'],
-    allow_methods=['*'],
-    allow_credentials=True,
-    allow_headers=['*'],
 )
 
 
