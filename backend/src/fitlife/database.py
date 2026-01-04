@@ -1,7 +1,8 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
+from redis import Redis
 from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
@@ -21,12 +22,27 @@ async def get_session():
         yield session
 
 
+def get_redis():
+    return Redis(host='localhost', port=6379)
+
+
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
 
+RedisDep = Annotated[Redis, Depends(get_redis)]
 
-async def get_all_entities(model: type[Base], session: SessionDep):
+
+async def get_all_entities(model: type[Base], session: SessionDep, redis: RedisDep, background_tasks: BackgroundTasks):
     query = select(model)
-    result = await session.execute(query)
+
+    cache_key = f'get-all-entities-{model.__name__}'
+
+    result = redis.get(cache_key)
+
+    if not result:
+        response = await session.execute(query)
+        result = response.scalars().all()
+        background_tasks.add_task(redis.set, cache_key, 120, result)
+
     return result.scalars().all()
 
 

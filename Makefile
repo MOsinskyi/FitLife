@@ -30,7 +30,10 @@ update:
 run-dev: backend frontend
 
 backend:
-	cd backend && PYTHONPATH=src poetry run python src/fitlife/main.py
+	docker-compose -f docker/docker-compose.dev.yaml down && \
+	docker-compose -f docker/docker-compose.dev.yaml up -d && \
+	cd backend && \
+	PYTHONPATH=src poetry run python src/fitlife/main.py
 
 frontend:
 	cd frontend && npm run dev

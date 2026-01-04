@@ -1,0 +1,3 @@
+-- CACHING --
+https://github.com/redis-developer/fastapi-redis-tutorial
+https://redis.io/tutorials/develop/python/fastapi/
