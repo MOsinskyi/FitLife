@@ -13,6 +13,7 @@ from fitlife.config import settings
 from fitlife.database import router as database_router
 from fitlife.member.routers import router as member_router
 from fitlife.membership.routers import router as membership_router
+from fitlife.schemas import OkResponse
 from fitlife.stress_test.routers import router as stress_test_router
 from fitlife.trainer.routers import router as trainer_router
 from fitlife.workout_session.routers import router as workout_session_router
@@ -36,6 +37,7 @@ app = FastAPI(
     title=settings.app.name,
     lifespan=lifespan,
     root_path=settings.app.api_v1,
+    root_path_in_servers=False,
 )
 
 app.add_middleware(
@@ -56,6 +58,14 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
             'msg': exc.detail,
         },
     )
+
+
+@app.get(
+    '/',
+    response_model=OkResponse,
+)
+async def home():
+    return OkResponse(msg="Server's working")
 
 
 app.include_router(member_router)
