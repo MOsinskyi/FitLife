@@ -1,13 +1,17 @@
+import time
+from collections.abc import Callable
 from contextlib import asynccontextmanager
 
 import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.exceptions import HTTPException as StarletteHTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from redis.asyncio import Redis
 
+from fitlife import constants
 from fitlife.config import settings
 from fitlife.database import router as database_router
 from fitlife.member.routers import router as member_router
@@ -25,10 +29,12 @@ async def lifespan(_: FastAPI):
         port=settings.redis.port,
         db=settings.redis.db.cache,
     )
+
     FastAPICache.init(
         RedisBackend(redis),
         prefix=settings.cache.prefix,
     )
+
     yield
 
 
@@ -38,6 +44,23 @@ app = FastAPI(
     root_path=settings.app.api_v1,
     root_path_in_servers=False,
 )
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=constants.ALLOW_ORIGINS,
+    allow_methods=constants.ALLOW_METHODS,
+    allow_credentials=constants.ALLOW_CREDENTIALS,
+    allow_headers=constants.ALLOW_HEADERS,
+)
+
+
+@app.middleware('http')
+async def process_time_middleware(request: Request, call_next: Callable):
+    start_time = time.perf_counter()
+    response = await call_next(request)
+    process_time = time.perf_counter() - start_time
+    response.headers['X-Process-Time'] = f'{process_time:.5f} seconds'
+    return response
 
 
 @app.exception_handler(StarletteHTTPException)
