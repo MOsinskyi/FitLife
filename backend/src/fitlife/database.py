@@ -1,10 +1,6 @@
 from typing import Annotated
-from uuid import UUID
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
-from redis import Redis
-from sqlalchemy import select
-from sqlalchemy.exc import NoResultFound
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from fitlife.models import Base
@@ -22,56 +18,7 @@ async def get_session():
         yield session
 
 
-def get_redis():
-    return Redis(host='localhost', port=6379)
-
-
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
-
-RedisDep = Annotated[Redis, Depends(get_redis)]
-
-
-async def get_all_entities(model: type[Base], session: SessionDep, redis: RedisDep, background_tasks: BackgroundTasks):
-    query = select(model)
-
-    cache_key = f'get-all-entities-{model.__name__}'
-
-    result = redis.get(cache_key)
-
-    if not result:
-        response = await session.execute(query)
-        result = response.scalars().all()
-        background_tasks.add_task(redis.set, cache_key, 120, result)
-
-    return result.scalars().all()
-
-
-async def get_entity_by_uuid(model: type[Base], uuid: UUID, session: SessionDep, error_detail: str):
-    query = select(model).where(model.id == uuid)
-    try:
-        result = await session.execute(query)
-        return result.scalars().one()
-    except NoResultFound:
-        raise HTTPException(detail=error_detail, status_code=status.HTTP_404_NOT_FOUND) from None
-
-
-async def add_entity(new_entity: Base, session: SessionDep, error_message: str, *inspections):
-    if any(inspections):
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=error_message)
-    else:
-        session.add(new_entity)
-        await session.commit()
-
-
-async def update_entity(exiting_entity: Base, session: SessionDep):
-    session.add(exiting_entity)
-    await session.commit()
-    await session.refresh(exiting_entity)
-
-
-async def delete_entity(exiting_entity: Base, session: SessionDep):
-    await session.delete(exiting_entity)
-    await session.commit()
 
 
 @router.post(

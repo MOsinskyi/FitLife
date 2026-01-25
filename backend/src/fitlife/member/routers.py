@@ -1,11 +1,9 @@
 from uuid import UUID
 
 from fastapi import APIRouter
-from sqlalchemy import exists, select
 from starlette import status
 
-from fitlife.database import SessionDep, add_entity, delete_entity, get_all_entities, get_entity_by_uuid, update_entity
-from fitlife.member.models import MemberModel
+from fitlife.member.dependencies import MemberServiceDep
 from fitlife.member.schemas import MemberAddSchema, MemberSchema
 from fitlife.schemas import BadResponse, OkResponse
 
@@ -31,16 +29,8 @@ title = '👨‍👩‍ Members'
         },
     },
 )
-async def add_member(member: MemberAddSchema, session: SessionDep):
-    new_member = MemberModel(
-        name=member.name,
-        phone=member.phone,
-    )
-
-    phone_exists = await session.scalar(select(exists().where(MemberModel.phone == new_member.phone)))
-
-    await add_entity(new_member, session, 'Member with the phone already exists', phone_exists)
-
+async def add_member(member: MemberAddSchema, service: MemberServiceDep):
+    await service.create_member(member)
     return OkResponse(msg='Member successfully added!')
 
 
@@ -51,8 +41,8 @@ async def add_member(member: MemberAddSchema, session: SessionDep):
     description='Get all members from the database',
     response_model=list[MemberSchema],
 )
-async def get_members(session: SessionDep):
-    result = await get_all_entities(MemberModel, session)
+async def get_members(service: MemberServiceDep):
+    result = await service.get_members()
     return result
 
 
@@ -69,8 +59,8 @@ async def get_members(session: SessionDep):
         }
     },
 )
-async def get_specific_member(member_uuid: UUID, session: SessionDep):
-    result = await get_entity_by_uuid(MemberModel, member_uuid, session, 'Member not found!')
+async def get_specific_member(member_uuid: UUID, service: MemberServiceDep):
+    result = await service.get_member(member_uuid)
     return result
 
 
@@ -90,14 +80,8 @@ async def get_specific_member(member_uuid: UUID, session: SessionDep):
         },
     },
 )
-async def update_member(member_uuid: UUID, member: MemberAddSchema, session: SessionDep):
-    exiting_member = await get_entity_by_uuid(MemberModel, member_uuid, session, 'Member not found!')
-
-    for field, value in member.model_dump(exclude_unset=True).items():
-        setattr(exiting_member, field, value)
-
-    await update_entity(exiting_member, session)
-
+async def update_member(member_uuid: UUID, member: MemberAddSchema, service: MemberServiceDep):
+    await service.update_member(member_uuid, member)
     return OkResponse(msg='Member successfully updated!')
 
 
@@ -117,9 +101,6 @@ async def update_member(member_uuid: UUID, member: MemberAddSchema, session: Ses
         },
     },
 )
-async def delete_member(member_uuid: UUID, session: SessionDep):
-    exiting_member = await get_entity_by_uuid(MemberModel, member_uuid, session, 'Member not found!')
-
-    await delete_entity(exiting_member, session)
-
+async def delete_member(member_uuid: UUID, service: MemberServiceDep):
+    await service.delete_member(member_uuid)
     return OkResponse(msg='Member successfully deleted!')

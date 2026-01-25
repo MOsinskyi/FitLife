@@ -1,14 +1,12 @@
-from fastapi import FastAPI
-from starlette.middleware.cors import CORSMiddleware
+import time
+from collections.abc import Callable
 
-from fitlife import constants
+from fastapi import Request
 
 
-async def initialize_middleware(app: FastAPI):
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=constants.ALLOW_ORIGINS,
-        allow_methods=constants.ALLOW_METHODS,
-        allow_credentials=True,
-        allow_headers=constants.ALLOW_HEADERS,
-    )
+async def process_time_middleware(request: Request, call_next: Callable):
+    start_time = time.perf_counter()
+    response = await call_next(request)
+    process_time = time.perf_counter() - start_time
+    response.headers['X-Process-Time'] = f'{process_time:.5f} seconds'
+    return response
