@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from fitlife.models import Base
@@ -28,9 +28,10 @@ SessionDep = Annotated[AsyncSession, Depends(get_session)]
     description='Recreate all tables in the database',
     response_model=OkResponse,
 )
-async def setup_database():
+async def setup_database(request: Request):
     async with engine.begin() as connection:
         await connection.run_sync(Base.metadata.drop_all)
         await connection.run_sync(Base.metadata.create_all)
 
+    request.state.logger.info('Database setup successfully')
     return OkResponse(msg='Database setup successfully')

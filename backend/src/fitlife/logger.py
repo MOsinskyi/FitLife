@@ -22,7 +22,7 @@ class AnsiColorFormatter(logging.Formatter):
         return f'{start_style}{super().format(record)}{end_style}'
 
 
-logger = logging.getLogger('uvicorn.error')
+logger = logging.getLogger(__name__)
 
 stream_handler = logging.StreamHandler()
 file_handler = logging.FileHandler(LOG_FILE_NAME)
@@ -30,7 +30,7 @@ file_handler = logging.FileHandler(LOG_FILE_NAME)
 stream_handler.setLevel(logging.DEBUG)
 file_handler.setLevel(logging.DEBUG)
 
-formatter = AnsiColorFormatter('{asctime} | {levelname:<8s} | {name:<20s} | {message:.100}', style='{')
+formatter = AnsiColorFormatter('{asctime} | {levelname:<8s} | {name:<20s} | {funcName:<30s} | {message}', style='{')
 stream_handler.setFormatter(formatter)
 file_handler.setFormatter(formatter)
 

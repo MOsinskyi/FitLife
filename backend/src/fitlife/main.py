@@ -57,8 +57,7 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
     '/',
     response_model=OkResponse,
 )
-async def home(request: Request):
-    request.state.logger.info('GET /')
+async def home():
     return OkResponse(msg='Server is working')
 
 

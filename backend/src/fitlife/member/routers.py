@@ -30,8 +30,8 @@ title = '👨‍👩‍ Members'
     },
 )
 async def add_member(member: MemberAddSchema, service: MemberServiceDep):
-    await service.create_member(member)
-    return OkResponse(msg='Member successfully added!')
+    result = await service.create_member(member)
+    return result
 
 
 @router.get(

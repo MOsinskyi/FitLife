@@ -1,9 +1,9 @@
 from uuid import UUID
 
-from fastapi import HTTPException, status
-
+from fitlife.logger import logger
 from fitlife.member.repositories import MemberRepository
 from fitlife.member.schemas import MemberAddSchema
+from fitlife.schemas import BadResponse, OkResponse
 
 
 class MemberService:
@@ -12,13 +12,31 @@ class MemberService:
 
     async def member_with_phone_number_exists(self, member: MemberAddSchema) -> bool:
         exiting_member = await self.repository.get_member_by_phone_number(member.phone)
-        return exiting_member is not None
+        result = exiting_member is not None
+        logger.debug('Result: %s', result)
+        return result
 
     async def get_members(self):
-        return await self.repository.get_all()
+        result = None
+
+        try:
+            result = await self.repository.get_all()
+            logger.info('Result: %s', result)
+        except Exception as e:
+            logger.error('Exception: %s', e)
+
+        return result
 
     async def get_member(self, member_uuid: UUID):
-        return await self.repository.get_by_id(member_uuid)
+        result = None
+
+        try:
+            result = await self.repository.get_by_id(member_uuid)
+            logger.info('Result: %s', result)
+        except Exception as e:
+            logger.error('Exception: %s', e)
+
+        return result
 
     async def update_member(self, member_uuid: UUID, data: MemberAddSchema):
         return await self.repository.update(member_uuid, data)
@@ -26,9 +44,13 @@ class MemberService:
     async def delete_member(self, member_uuid: UUID):
         return await self.repository.delete(member_uuid)
 
-    async def create_member(self, member: MemberAddSchema) -> None:
-        if await self.member_with_phone_number_exists(member):
-            HTTPException(status_code=status.HTTP_409_CONFLICT, detail='Member already exists')
-            return None
+    async def create_member(self, member: MemberAddSchema) -> OkResponse | BadResponse:
+        is_member_exists = await self.member_with_phone_number_exists(member)
 
-        return await self.repository.create(member)
+        if is_member_exists:
+            logger.info('Member already exists: %s', member)
+            return BadResponse(msg='Member already exists')
+
+        await self.repository.create(member)
+        logger.info('Member created')
+        return OkResponse(msg='Member successfully created')
