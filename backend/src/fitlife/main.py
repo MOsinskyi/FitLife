@@ -6,12 +6,14 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import HTTPException as StarletteHTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from fitlife import constants
 from fitlife.config import settings
 from fitlife.constants import APP_HOST, APP_PORT
 from fitlife.database import router as database_router
 from fitlife.member.routers import router as member_router
+from fitlife.middleware import process_time_middleware
 from fitlife.schemas import OkResponse
 
 
@@ -36,6 +38,8 @@ app.add_middleware(
     allow_credentials=constants.ALLOW_CREDENTIALS,
     allow_headers=constants.ALLOW_HEADERS,
 )
+
+app.add_middleware(BaseHTTPMiddleware, dispatch=process_time_middleware)
 
 
 @app.exception_handler(StarletteHTTPException)
