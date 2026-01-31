@@ -1,11 +1,11 @@
 from contextlib import asynccontextmanager
 
-import logger as custom_logger
 import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.exceptions import HTTPException as StarletteHTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from logger import logger
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from fitlife import constants
@@ -17,17 +17,21 @@ from fitlife.member.routers import router as member_router
 from fitlife.middleware import process_time_middleware
 from fitlife.schemas import OkResponse
 
+logger.info('%s', settings.redis.host)
+logger.info('%s', settings.redis.port)
+logger.info('%s', settings.redis.db.cache)
+logger.info('%s', settings.cache.prefix)
+logger.info('%s', settings.app.title)
+
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     await init_cache()
-    logger = custom_logger.logger
-    yield {'logger': logger}
-    del logger
+    yield
 
 
 app = FastAPI(
-    title=settings.app.name,
+    title=settings.app.title,
     lifespan=lifespan,
     root_path=settings.app.api_v1,
     root_path_in_servers=False,

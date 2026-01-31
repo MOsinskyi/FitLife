@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 stream_handler = logging.StreamHandler()
 file_handler = logging.FileHandler(LOG_FILE_NAME)
 
-stream_handler.setLevel(logging.DEBUG)
+stream_handler.setLevel(logging.INFO)
 file_handler.setLevel(logging.DEBUG)
 
 formatter = AnsiColorFormatter('{asctime} | {levelname:<8s} | {name:<20s} | {funcName:<30s} | {message}', style='{')

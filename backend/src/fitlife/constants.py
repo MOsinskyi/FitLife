@@ -8,7 +8,7 @@ ALLOW_METHODS: list[str] = os.getenv('ALLOW_METHODS', '*')
 ALLOW_HEADERS: list[str] = os.getenv('ALLOW_HEADERS', '*')
 ALLOW_CREDENTIALS: bool = bool(os.getenv('ALLOW_CREDENTIALS', True))
 
-APP_NAME: str = os.getenv('APP_NAME', 'FastAPI')
+APP_TITLE: str = os.getenv('APP_TITLE', 'FastAPI')
 VERSION: str = os.getenv('VERSION', '1.0.0')
 API_V1_STR: str = os.getenv('API_V1_STR', '/api/v1')
 APP_HOST: str = os.getenv('APP_HOST', 'localhost')

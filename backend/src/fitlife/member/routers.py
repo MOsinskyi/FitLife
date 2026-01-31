@@ -1,8 +1,11 @@
 from uuid import UUID
 
 from fastapi import APIRouter
+from fastapi_cache.decorator import cache
 from starlette import status
 
+from fitlife.cache import custom_key_builder
+from fitlife.config import settings
 from fitlife.member.dependencies import MemberServiceDep
 from fitlife.member.schemas import MemberAddSchema, MemberSchema
 from fitlife.schemas import BadResponse, OkResponse
@@ -39,6 +42,11 @@ async def add_member(member: MemberAddSchema, service: MemberServiceDep):
     tags=[title],
     description='Get all members from the database',
     response_model=list[MemberSchema],
+)
+@cache(
+    expire=60,
+    namespace=settings.cache.namespace.member,
+    key_builder=custom_key_builder,
 )
 async def get_members(service: MemberServiceDep):
     return await service.get_members()

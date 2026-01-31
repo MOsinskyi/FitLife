@@ -13,7 +13,7 @@ def is_not_none(value: Any) -> Any:
 
 
 class AppConfig(BaseSettings):
-    name: Annotated[str, AfterValidator(is_not_none)] = constants.APP_NAME
+    title: Annotated[str, AfterValidator(is_not_none)] = constants.APP_TITLE
     api_v1: Annotated[str, AfterValidator(is_not_none)] = constants.API_V1_STR
 
 

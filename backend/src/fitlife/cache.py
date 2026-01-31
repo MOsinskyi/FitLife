@@ -9,20 +9,7 @@ from starlette.requests import Request
 from starlette.responses import Response
 
 from fitlife.config import settings
-from fitlife.member.dependencies import MemberServiceDep
-
-
-async def init_cache():
-    redis = Redis(
-        host=settings.redis.host,
-        port=settings.redis.port,
-        db=settings.redis.db,
-    )
-
-    FastAPICache.init(
-        RedisBackend(redis),
-        prefix=settings.cache.prefix,
-    )
+from fitlife.member.services import MemberService
 
 
 def custom_key_builder(  # noqa: PLR0913
@@ -34,7 +21,7 @@ def custom_key_builder(  # noqa: PLR0913
     args: tuple[Any, ...],
     kwargs: dict[str, Any],
 ) -> str:
-    exclude_types = (MemberServiceDep,)
+    exclude_types = (MemberService,)
     new_kw = {}
     for key, value in kwargs.items():
         if isinstance(value, exclude_types):
@@ -44,3 +31,16 @@ def custom_key_builder(  # noqa: PLR0913
         f'{func.__module__}:{func.__name__}:{args}:{new_kw}'.encode()
     ).hexdigest()
     return f'{namespace}:{cache_key}'
+
+
+async def init_cache():
+    redis = Redis(
+        host=settings.redis.host,
+        port=settings.redis.port,
+        db=settings.redis.db.cache,
+    )
+
+    FastAPICache.init(
+        RedisBackend(redis),
+        prefix=settings.cache.prefix,
+    )
