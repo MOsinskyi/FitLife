@@ -6,9 +6,8 @@ from fitlife.cache import clear_cache
 from fitlife.config import settings
 from fitlife.logger import logger
 from fitlife.member.repositories import MemberRepository
-from fitlife.member.schemas import MemberAddSchema
 from fitlife.models import Base
-from fitlife.schemas import BadResponse, OkResponse, Response
+from fitlife.schemas import BadResponse, OkResponse, Response, UserAddSchema
 
 
 class MemberService:
@@ -17,7 +16,7 @@ class MemberService:
         self.background_tasks = background_tasks
         self.namespace = settings.cache.namespace.member
 
-    async def member_with_phone_number_exists(self, member: MemberAddSchema) -> bool:
+    async def member_with_phone_number_exists(self, member: UserAddSchema) -> bool:
         """
         Асинхронна функція, яка повертає статус - чи існує даний користувач з таким номером телефону?
         :param member: Користувач.
@@ -59,7 +58,7 @@ class MemberService:
 
         return result
 
-    async def update_member(self, member_uuid: UUID, data: MemberAddSchema) -> Response:
+    async def update_member(self, member_uuid: UUID, data: UserAddSchema) -> Response:
         """
         Асинхронна функція яка оновлює користувача за його UUID.
         :param member_uuid: UUID користувача.
@@ -86,7 +85,7 @@ class MemberService:
             logger.error('Помилка при видаленні користувача: %s', e)
             return BadResponse(msg="Member doesn't deleted")
 
-    async def create_member(self, member: MemberAddSchema) -> Response:
+    async def create_member(self, member: UserAddSchema) -> Response:
         """
         Асинхронна функція, яка створює користувача.
         :param member: Користувач з даними.
