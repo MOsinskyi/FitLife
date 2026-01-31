@@ -20,7 +20,7 @@ test-frontend:
 	cd frontend && \
 	k6 run tests/test-basic.js
 
-install: install-pre-commit install-backend install-frontend
+install: install-backend install-pre-commit install-frontend
 
 tests: test-frontend
 
