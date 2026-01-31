@@ -1,5 +1,6 @@
 import uuid
 from abc import ABC, abstractmethod
+from typing import TypeVar
 
 from pydantic import BaseModel
 from sqlalchemy import select
@@ -7,14 +8,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from fitlife.models import Base
 
+T = TypeVar('T')
+
 
 class BaseRepository(ABC):
     @abstractmethod
-    async def get_all(self) -> list[Base]:
+    async def get_all(self) -> list[T]:
         pass
 
     @abstractmethod
-    async def get_by_id(self, id_: uuid.UUID) -> Base:
+    async def get_by_id(self, id_: uuid.UUID) -> T:
         pass
 
     @abstractmethod
