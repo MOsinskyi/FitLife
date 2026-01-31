@@ -2,13 +2,13 @@ from contextlib import asynccontextmanager
 
 import logger as custom_logger
 import uvicorn
-from aioredis import Redis
 from fastapi import FastAPI, Request
 from fastapi.exceptions import HTTPException as StarletteHTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
+from redis.asyncio import Redis
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from fitlife import constants
