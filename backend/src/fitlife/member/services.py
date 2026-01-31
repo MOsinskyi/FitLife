@@ -6,6 +6,8 @@ from fitlife.member.schemas import MemberAddSchema
 from fitlife.models import Base
 from fitlife.schemas import BadResponse, OkResponse
 
+Response = OkResponse | BadResponse
+
 
 class MemberService:
     def __init__(self, repository: MemberRepository):
@@ -53,7 +55,7 @@ class MemberService:
 
         return result
 
-    async def update_member(self, member_uuid: UUID, data: MemberAddSchema) -> OkResponse | BadResponse:
+    async def update_member(self, member_uuid: UUID, data: MemberAddSchema) -> Response:
         """
         Асинхронна функція яка оновлює користувача за його UUID.
         :param member_uuid: UUID користувача.
@@ -66,7 +68,7 @@ class MemberService:
             logger.error('Помилка при оновленні користувача: %s', e)
             return BadResponse(msg="Member doesn't updated")
 
-    async def delete_member(self, member_uuid: UUID) -> OkResponse | BadResponse:
+    async def delete_member(self, member_uuid: UUID) -> Response:
         """
         Асинхронна функція, яка видаляє користувача за його UUID.
         :param member_uuid: UUID користувача.
@@ -78,7 +80,7 @@ class MemberService:
             logger.error('Помилка при видаленні користувача: %s', e)
             return BadResponse(msg="Member doesn't deleted")
 
-    async def create_member(self, member: MemberAddSchema) -> OkResponse | BadResponse:
+    async def create_member(self, member: MemberAddSchema) -> Response:
         """
         Асинхронна функція, яка створює користувача.
         :param member: Користувач з даними.
