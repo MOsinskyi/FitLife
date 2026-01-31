@@ -28,7 +28,7 @@ class RedisConfig(BaseModel):
 
 
 class CacheNamespace(BaseModel):
-    member_list: str = 'member-list'
+    member: str = 'member'
 
 
 class CacheConfig(BaseModel):
