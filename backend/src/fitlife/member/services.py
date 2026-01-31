@@ -53,20 +53,30 @@ class MemberService:
 
         return result
 
-    async def update_member(self, member_uuid: UUID, data: MemberAddSchema) -> None:
+    async def update_member(self, member_uuid: UUID, data: MemberAddSchema) -> OkResponse | BadResponse:
         """
         Асинхронна функція яка оновлює користувача за його UUID.
         :param member_uuid: UUID користувача.
         :param data: Нові дані.
         """
-        return await self.repository.update(member_uuid, data)
+        try:
+            await self.repository.update(member_uuid, data)
+            return OkResponse(msg='Member successfully updated.')
+        except Exception as e:
+            logger.error('Помилка при оновленні користувача: %s', e)
+            return BadResponse(msg="Member doesn't updated")
 
-    async def delete_member(self, member_uuid: UUID) -> None:
+    async def delete_member(self, member_uuid: UUID) -> OkResponse | BadResponse:
         """
         Асинхронна функція, яка видаляє користувача за його UUID.
         :param member_uuid: UUID користувача.
         """
-        return await self.repository.delete(member_uuid)
+        try:
+            await self.repository.delete(member_uuid)
+            return OkResponse(msg='Member successfully deleted.')
+        except Exception as e:
+            logger.error('Помилка при видаленні користувача: %s', e)
+            return BadResponse(msg="Member doesn't deleted")
 
     async def create_member(self, member: MemberAddSchema) -> OkResponse | BadResponse:
         """

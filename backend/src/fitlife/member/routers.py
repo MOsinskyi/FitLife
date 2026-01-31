@@ -30,8 +30,7 @@ title = '👨‍👩‍ Members'
     },
 )
 async def add_member(member: MemberAddSchema, service: MemberServiceDep):
-    result = await service.create_member(member)
-    return result
+    return await service.create_member(member)
 
 
 @router.get(
@@ -42,8 +41,7 @@ async def add_member(member: MemberAddSchema, service: MemberServiceDep):
     response_model=list[MemberSchema],
 )
 async def get_members(service: MemberServiceDep):
-    result = await service.get_members()
-    return result
+    return await service.get_members()
 
 
 @router.get(
@@ -60,8 +58,7 @@ async def get_members(service: MemberServiceDep):
     },
 )
 async def get_specific_member(member_uuid: UUID, service: MemberServiceDep):
-    result = await service.get_member(member_uuid)
-    return result
+    return await service.get_member(member_uuid)
 
 
 @router.put(
@@ -81,8 +78,7 @@ async def get_specific_member(member_uuid: UUID, service: MemberServiceDep):
     },
 )
 async def update_member(member_uuid: UUID, member: MemberAddSchema, service: MemberServiceDep):
-    await service.update_member(member_uuid, member)
-    return OkResponse(msg='Member successfully updated!')
+    return await service.update_member(member_uuid, member)
 
 
 @router.delete(
