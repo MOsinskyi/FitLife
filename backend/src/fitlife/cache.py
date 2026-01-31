@@ -2,6 +2,7 @@ import hashlib
 from collections.abc import Callable
 from typing import Any
 
+from fastapi import BackgroundTasks
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from redis.asyncio import Redis
@@ -43,4 +44,11 @@ async def init_cache():
     FastAPICache.init(
         RedisBackend(redis),
         prefix=settings.cache.prefix,
+    )
+
+
+async def clear_cache(background_tasks: BackgroundTasks, namespace: str):
+    background_tasks.add_task(
+        FastAPICache.clear,
+        namespace=namespace,
     )

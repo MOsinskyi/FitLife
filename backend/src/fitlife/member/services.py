@@ -1,22 +1,21 @@
 from uuid import UUID
 
 from fastapi import BackgroundTasks
-from fastapi_cache import FastAPICache
 
+from fitlife.cache import clear_cache
 from fitlife.config import settings
 from fitlife.logger import logger
 from fitlife.member.repositories import MemberRepository
 from fitlife.member.schemas import MemberAddSchema
 from fitlife.models import Base
-from fitlife.schemas import BadResponse, OkResponse
-
-Response = OkResponse | BadResponse
+from fitlife.schemas import BadResponse, OkResponse, Response
 
 
 class MemberService:
     def __init__(self, repository: MemberRepository, background_tasks: BackgroundTasks):
         self.repository = repository
         self.background_tasks = background_tasks
+        self.namespace = settings.cache.namespace.member
 
     async def member_with_phone_number_exists(self, member: MemberAddSchema) -> bool:
         """
@@ -68,17 +67,11 @@ class MemberService:
         """
         try:
             await self.repository.update(member_uuid, data)
-            await self._clear_cache()
+            await clear_cache(self.background_tasks, self.namespace)
             return OkResponse(msg='Member successfully updated.')
         except Exception as e:
             logger.error('Помилка при оновленні користувача: %s', e)
             return BadResponse(msg="Member doesn't updated")
-
-    async def _clear_cache(self):
-        self.background_tasks.add_task(
-            FastAPICache.clear,
-            namespace=settings.cache.namespace.member,
-        )
 
     async def delete_member(self, member_uuid: UUID) -> Response:
         """
@@ -87,7 +80,7 @@ class MemberService:
         """
         try:
             await self.repository.delete(member_uuid)
-            await self._clear_cache()
+            await clear_cache(self.background_tasks, self.namespace)
             return OkResponse(msg='Member successfully deleted.')
         except Exception as e:
             logger.error('Помилка при видаленні користувача: %s', e)
@@ -106,6 +99,6 @@ class MemberService:
             return BadResponse(msg='Member already exists')
 
         await self.repository.create(member)
-        await self._clear_cache()
+        await clear_cache(self.background_tasks, self.namespace)
         logger.info('Member created')
         return OkResponse(msg='Member successfully created')
