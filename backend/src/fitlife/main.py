@@ -6,12 +6,10 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import HTTPException as StarletteHTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from fastapi_cache import FastAPICache
-from fastapi_cache.backends.redis import RedisBackend
-from redis.asyncio import Redis
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from fitlife import constants
+from fitlife.cache import init_cache
 from fitlife.config import settings
 from fitlife.constants import APP_HOST, APP_PORT
 from fitlife.database import router as database_router
@@ -22,16 +20,7 @@ from fitlife.schemas import OkResponse
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    redis = Redis(
-        host=settings.redis.host,
-        port=settings.redis.port,
-        db=settings.redis.db,
-    )
-    FastAPICache.init(
-        RedisBackend(redis),
-        prefix=settings.cache.prefix,
-    )
-
+    await init_cache()
     logger = custom_logger.logger
     yield {'logger': logger}
     del logger
