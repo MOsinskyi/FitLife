@@ -5,7 +5,6 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import HTTPException as StarletteHTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from logger import logger
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from fitlife import constants
@@ -16,12 +15,6 @@ from fitlife.database import router as database_router
 from fitlife.member.routers import router as member_router
 from fitlife.middleware import process_time_middleware
 from fitlife.schemas import OkResponse
-
-logger.info('%s', settings.redis.host)
-logger.info('%s', settings.redis.port)
-logger.info('%s', settings.redis.db.cache)
-logger.info('%s', settings.cache.prefix)
-logger.info('%s', settings.app.title)
 
 
 @asynccontextmanager
