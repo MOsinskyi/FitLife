@@ -9,7 +9,11 @@ from fitlife.repositories import BaseRepository, BaseSqlAlchemyRepository
 
 class MemberRepository(BaseRepository, ABC):
     @abstractmethod
-    async def get_member_by_phone_number(self, phone_number: str):
+    async def get_member_by_phone_number(self, phone_number: str) -> models.MemberModel:
+        """
+        Асинхронна функція, яка повертає користувача за номером телефону
+        :param phone_number: Номер телефону користувача
+        """
         pass
 
 

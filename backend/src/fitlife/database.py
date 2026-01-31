@@ -1,3 +1,4 @@
+from collections.abc import AsyncGenerator
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Request
@@ -13,7 +14,10 @@ engine = create_async_engine('sqlite+aiosqlite:///fitlife.db')
 new_session = async_sessionmaker(engine, expire_on_commit=False)
 
 
-async def get_session():
+async def get_session() -> AsyncGenerator[AsyncSession, None]:
+    """
+    Асинхронна функція, яка повертає сесію бази даних.
+    """
     async with new_session() as session:
         yield session
 

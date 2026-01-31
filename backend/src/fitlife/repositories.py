@@ -12,6 +12,9 @@ from fitlife.models import Base
 class BaseRepository(ABC):
     @abstractmethod
     async def get_all(self) -> list[Base]:
+        """
+        Отримати усі сутності
+        """
         pass
 
     @abstractmethod

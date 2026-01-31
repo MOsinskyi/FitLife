@@ -7,7 +7,12 @@ from fitlife.member.repositories import MemberSqlAlchemyRepository
 from fitlife.member.services import MemberService
 
 
-async def get_member_service(session: SessionDep):
+async def get_member_service(session: SessionDep) -> MemberService:
+    """
+    Ця функція повертає асинхронний екземпляр сервісу для користувача
+    :param session: Сесія бази даних
+    :return: Сервіс користувача
+    """
     return MemberService(MemberSqlAlchemyRepository(session))
 
 
