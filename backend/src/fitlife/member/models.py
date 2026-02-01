@@ -1,10 +1,5 @@
-from sqlalchemy.orm import Mapped
-
-from fitlife.models import Base
+from fitlife.models import UserBase
 
 
-class MemberModel(Base):
+class MemberModel(UserBase):
     __tablename__ = 'members'
-
-    name: Mapped[str]
-    phone: Mapped[str]

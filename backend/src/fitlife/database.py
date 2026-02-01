@@ -1,15 +1,14 @@
 from collections.abc import AsyncGenerator
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from fitlife.models import Base
-from fitlife.schemas import OkResponse
+from fitlife.config import settings
 
 router = APIRouter()
 
-engine = create_async_engine('sqlite+aiosqlite:///fitlife.db')
+engine = create_async_engine(settings.database.url)
 
 new_session = async_sessionmaker(engine, expire_on_commit=False)
 
@@ -23,19 +22,3 @@ async def get_session() -> AsyncGenerator[AsyncSession, None]:
 
 
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
-
-
-@router.post(
-    '/setup-database',
-    summary='Setup database',
-    tags=['📊 Database'],
-    description='Recreate all tables in the database',
-    response_model=OkResponse,
-)
-async def setup_database(request: Request):
-    async with engine.begin() as connection:
-        await connection.run_sync(Base.metadata.drop_all)
-        await connection.run_sync(Base.metadata.create_all)
-
-    request.state.logger.info('Database setup successfully')
-    return OkResponse(msg='Database setup successfully')

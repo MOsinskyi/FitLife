@@ -17,6 +17,10 @@ class AppConfig(BaseSettings):
     api_v1: Annotated[str, AfterValidator(is_not_none)] = constants.API_V1_STR
 
 
+class SqliteConfig(BaseModel):
+    url: str = 'sqlite+aiosqlite:///fitlife.sqlite3'
+
+
 class RedisDB(BaseModel):
     cache: int = 0
 
@@ -29,6 +33,7 @@ class RedisConfig(BaseModel):
 
 class CacheNamespace(BaseModel):
     member: str = 'member'
+    coach: str = 'coach'
 
 
 class CacheConfig(BaseModel):
@@ -40,6 +45,7 @@ class Settings(BaseSettings):
     app: AppConfig = AppConfig()
     redis: RedisConfig = RedisConfig()
     cache: CacheConfig = CacheConfig()
+    database: SqliteConfig = SqliteConfig()
 
 
 settings = Settings()

@@ -1,13 +1,13 @@
 from uuid import UUID
 
-from fastapi import BackgroundTasks
+from fastapi import BackgroundTasks, HTTPException
 
 from fitlife.cache import clear_cache
 from fitlife.config import settings
 from fitlife.logger import logger
 from fitlife.member.repositories import MemberRepository
 from fitlife.models import Base
-from fitlife.schemas import BadResponse, OkResponse, Response, UserAddSchema
+from fitlife.schemas import OkResponse, Response, UserAddSchema
 
 
 class MemberService:
@@ -15,17 +15,6 @@ class MemberService:
         self.repository = repository
         self.background_tasks = background_tasks
         self.namespace = settings.cache.namespace.member
-
-    async def member_with_phone_number_exists(self, member: UserAddSchema) -> bool:
-        """
-        Асинхронна функція, яка повертає статус - чи існує даний користувач з таким номером телефону?
-        :param member: Користувач.
-        :return: Статус існує чи ні.
-        """
-        exiting_member = await self.repository.get_member_by_phone_number(member.phone)
-        result = exiting_member is not None
-        logger.debug('Result: %s', result)
-        return result
 
     async def get_members(self) -> list[Base] | None:
         """
@@ -48,42 +37,47 @@ class MemberService:
         :param member_uuid: UUID користувача.
         :return: Користувача, якщо такий існує інакше None
         """
-        result = None
+        await self.is_member_exists(member_uuid)
 
         try:
-            result = await self.repository.get_by_id(member_uuid)
-            logger.info('Result: %s', result)
+            return await self.repository.get_by_id(member_uuid)
         except Exception as e:
             logger.error('Exception: %s', e)
 
-        return result
-
-    async def update_member(self, member_uuid: UUID, data: UserAddSchema) -> Response:
+    async def update_member(self, member_uuid: UUID, data: UserAddSchema) -> Base:
         """
         Асинхронна функція яка оновлює користувача за його UUID.
         :param member_uuid: UUID користувача.
         :param data: Нові дані.
         """
+        await self.is_member_exists(member_uuid)
+
         try:
             await self.repository.update(member_uuid, data)
             await clear_cache(self.background_tasks, self.namespace)
-            return OkResponse(msg='Member successfully updated.')
+            return await self.get_member(member_uuid)
         except Exception as e:
             logger.error('Помилка при оновленні користувача: %s', e)
-            return BadResponse(msg="Member doesn't updated")
+            raise HTTPException(status_code=400, detail="Member doesn't updated") from None
 
     async def delete_member(self, member_uuid: UUID) -> Response:
         """
         Асинхронна функція, яка видаляє користувача за його UUID.
         :param member_uuid: UUID користувача.
         """
+        await self.is_member_exists(member_uuid)
+
         try:
             await self.repository.delete(member_uuid)
             await clear_cache(self.background_tasks, self.namespace)
             return OkResponse(msg='Member successfully deleted.')
         except Exception as e:
             logger.error('Помилка при видаленні користувача: %s', e)
-            return BadResponse(msg="Member doesn't deleted")
+            raise HTTPException(status_code=400, detail="Member doesn't deleted") from None
+
+    async def is_member_exists(self, member_uuid: UUID):
+        if not await self.repository.get_by_id(member_uuid):
+            raise HTTPException(status_code=404, detail="Member doesn't exist") from None
 
     async def create_member(self, member: UserAddSchema) -> Response:
         """
@@ -91,11 +85,11 @@ class MemberService:
         :param member: Користувач з даними.
         :return: Відповідь сервера.
         """
-        is_member_exists = await self.member_with_phone_number_exists(member)
+        if await self.repository.get_by_phone_number(member.phone_number):
+            raise HTTPException(status_code=409, detail='Member with that phone number already exists.') from None
 
-        if is_member_exists:
-            logger.info('Member already exists: %s', member)
-            return BadResponse(msg='Member already exists')
+        if await self.repository.get_by_email(member.email):
+            raise HTTPException(status_code=409, detail='Member with that email already exists.') from None
 
         await self.repository.create(member)
         await clear_cache(self.background_tasks, self.namespace)

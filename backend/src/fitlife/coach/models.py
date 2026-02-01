@@ -1,27 +1,5 @@
-from sqlalchemy import Column, String
-
-from fitlife.models import Base
+from fitlife.models import UserBase
 
 
-class CoachModel(Base):
+class CoachModel(UserBase):
     __tablename__ = 'coaches'
-
-    first_name = Column(
-        String,
-        nullable=False,
-    )
-    last_name = Column(
-        String,
-        nullable=False,
-    )
-    phone_number = Column(
-        String,
-        nullable=False,
-    )
-    email = Column(
-        String,
-    )
-    password_hash = Column(
-        String,
-        nullable=False,
-    )

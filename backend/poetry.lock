@@ -19,6 +19,25 @@ dev = ["attribution (==1.7.1)", "black (==24.3.0)", "build (>=1.2)", "coverage[t
 docs = ["sphinx (==8.1.3)", "sphinx-mdinclude (==0.6.1)"]
 
 [[package]]
+name = "alembic"
+version = "1.18.3"
+description = "A database migration tool for SQLAlchemy."
+optional = false
+python-versions = ">=3.10"
+files = [
+    {file = "alembic-1.18.3-py3-none-any.whl", hash = "sha256:12a0359bfc068a4ecbb9b3b02cf77856033abfdb59e4a5aca08b7eacd7b74ddd"},
+    {file = "alembic-1.18.3.tar.gz", hash = "sha256:1212aa3778626f2b0f0aa6dd4e99a5f99b94bd25a0c1ac0bba3be65e081e50b0"},
+]
+
+[package.dependencies]
+Mako = "*"
+SQLAlchemy = ">=1.4.23"
+typing-extensions = ">=4.12"
+
+[package.extras]
+tz = ["tzdata"]
+
+[[package]]
 name = "annotated-types"
 version = "0.7.0"
 description = "Reusable constraint types to use with typing.Annotated"
@@ -923,6 +942,25 @@ files = [
     {file = "librt-0.7.7-cp39-cp39-win_amd64.whl", hash = "sha256:264720fc288c86039c091a4ad63419a5d7cabbf1c1c9933336a957ed2483e570"},
     {file = "librt-0.7.7.tar.gz", hash = "sha256:81d957b069fed1890953c3b9c3895c7689960f233eea9a1d9607f71ce7f00b2c"},
 ]
+
+[[package]]
+name = "mako"
+version = "1.3.10"
+description = "A super-fast templating language that borrows the best ideas from the existing templating languages."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "mako-1.3.10-py3-none-any.whl", hash = "sha256:baef24a52fc4fc514a0887ac600f9f1cff3d82c61d4d700a1fa84d597b88db59"},
+    {file = "mako-1.3.10.tar.gz", hash = "sha256:99579a6f39583fa7e5630a28c3c1f440e4e97a414b80372649c0ce338da2ea28"},
+]
+
+[package.dependencies]
+MarkupSafe = ">=0.9.2"
+
+[package.extras]
+babel = ["Babel"]
+lingua = ["lingua"]
+testing = ["pytest"]
 
 [[package]]
 name = "markdown-it-py"
@@ -2530,4 +2568,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "bd0a3e2a14603e704277c5ca7843b0d3cd63970e8a0d077393a1d9f1f1517b68"
+content-hash = "69328d633d819debc6051581f78fb14361df4432439f84ebd99e873bd52080b1"
