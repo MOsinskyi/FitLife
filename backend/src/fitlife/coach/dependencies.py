@@ -1,5 +1,6 @@
+from typing import Annotated
+
 from fastapi import BackgroundTasks, Depends
-from sqlalchemy.sql.annotation import Annotated
 
 from fitlife.coach.repositories import CoachSqlAlchemyRepository
 from fitlife.coach.services import CoachService
