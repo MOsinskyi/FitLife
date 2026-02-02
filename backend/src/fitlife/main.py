@@ -9,9 +9,9 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from fitlife import constants
 from fitlife.cache import init_cache
+from fitlife.coach.routers import router as coach_router
 from fitlife.config import settings
 from fitlife.constants import APP_HOST, APP_PORT
-from fitlife.database import router as database_router
 from fitlife.member.routers import router as member_router
 from fitlife.middleware import process_time_middleware
 from fitlife.schemas import OkResponse
@@ -61,7 +61,7 @@ async def home():
 
 
 app.include_router(member_router)
-app.include_router(database_router)
+app.include_router(coach_router)
 
 
 if __name__ == '__main__':

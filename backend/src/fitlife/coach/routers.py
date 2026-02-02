@@ -5,7 +5,7 @@ from fastapi_cache.decorator import cache
 
 from fitlife.coach.dependencies import CoachServiceDep
 from fitlife.config import settings
-from fitlife.schemas import BadResponse, OkResponse, UserAddSchema
+from fitlife.schemas import BadResponse, OkResponse, UserAddSchema, UserSchema
 from fitlife.utils import custom_key_builder
 
 router = APIRouter()
@@ -15,6 +15,7 @@ title = '🏋️ Coaches'
 
 @router.post(
     '/coaches',
+    summary='Add new coach',
     status_code=status.HTTP_201_CREATED,
     tags=[title],
     description='Add new coach to the database',
@@ -27,9 +28,13 @@ title = '🏋️ Coaches'
             'model': BadResponse,
             'description': 'Coach with that phone or email already exists.',
         },
+        status.HTTP_400_BAD_REQUEST: {
+            'model': BadResponse,
+            'description': 'Some error occurred while adding coach.',
+        },
     },
 )
-async def add_coach(coach: UserAddSchema, service: CoachServiceDep) -> OkResponse:
+async def add_coach(coach: UserAddSchema, service: CoachServiceDep):
     return await service.create_user(coach)
 
 
@@ -40,7 +45,7 @@ async def add_coach(coach: UserAddSchema, service: CoachServiceDep) -> OkRespons
     description='Get all coaches from the database',
     responses={
         status.HTTP_200_OK: {
-            'model': OkResponse,
+            'model': list[UserSchema],
             'description': 'Coaches successfully retrieved.',
         },
         status.HTTP_400_BAD_REQUEST: {
@@ -54,7 +59,7 @@ async def add_coach(coach: UserAddSchema, service: CoachServiceDep) -> OkRespons
     namespace=settings.cache.namespace.coach,
     key_builder=custom_key_builder,
 )
-async def get_coaches(service: CoachServiceDep):
+async def get_coaches(service: CoachServiceDep) -> list[UserSchema]:
     return await service.get_users()
 
 
@@ -78,8 +83,8 @@ async def get_coaches(service: CoachServiceDep):
         },
     },
 )
-async def get_specific_coach(coach_id: UUID, service: CoachServiceDep):
-    return await service.get_user(coach_id)
+async def get_specific_coach(coach_uuid: UUID, service: CoachServiceDep):
+    return await service.get_user(coach_uuid)
 
 
 @router.put(
@@ -102,8 +107,8 @@ async def get_specific_coach(coach_id: UUID, service: CoachServiceDep):
         },
     },
 )
-async def update_coach(coach_id: UUID, coach: UserAddSchema, service: CoachServiceDep):
-    return await service.update_user(coach_id, coach)
+async def update_coach(coach_uuid: UUID, coach: UserAddSchema, service: CoachServiceDep):
+    return await service.update_user(coach_uuid, coach)
 
 
 @router.delete(
@@ -126,5 +131,5 @@ async def update_coach(coach_id: UUID, coach: UserAddSchema, service: CoachServi
         },
     },
 )
-async def delete_coach(coach_id: UUID, service: CoachServiceDep):
-    return await service.delete_user(coach_id)
+async def delete_coach(coach_uuid: UUID, service: CoachServiceDep):
+    return await service.delete_user(coach_uuid)
