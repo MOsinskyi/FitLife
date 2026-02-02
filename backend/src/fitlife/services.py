@@ -87,8 +87,8 @@ class UserService:
 
     async def hash_password(self, data: UserAddSchema):
         try:
-            dumb_data = data.model_dump()
-            for k, v in dumb_data.items():
+            dump_data = data.model_dump()
+            for k, v in dump_data.items():
                 if k == 'password':
                     setattr(data, k, self.security.hash_password(v))
                 continue
