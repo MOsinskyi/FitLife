@@ -32,7 +32,7 @@ title = '👨‍👩‍ Members'
     },
 )
 async def add_member(member: UserAddSchema, service: MemberServiceDep):
-    return await service.create_member(member)
+    return await service.create_user(member)
 
 
 @router.get(
@@ -48,7 +48,7 @@ async def add_member(member: UserAddSchema, service: MemberServiceDep):
     key_builder=custom_key_builder,
 )
 async def get_members(service: MemberServiceDep):
-    return await service.get_members()
+    return await service.get_users()
 
 
 @router.get(
@@ -65,7 +65,7 @@ async def get_members(service: MemberServiceDep):
     },
 )
 async def get_specific_member(member_uuid: UUID, service: MemberServiceDep):
-    return await service.get_member(member_uuid)
+    return await service.get_user(member_uuid)
 
 
 @router.put(
@@ -85,7 +85,7 @@ async def get_specific_member(member_uuid: UUID, service: MemberServiceDep):
     },
 )
 async def update_member(member_uuid: UUID, member: UserAddSchema, service: MemberServiceDep):
-    return await service.update_member(member_uuid, member)
+    return await service.update_user(member_uuid, member)
 
 
 @router.delete(
@@ -105,4 +105,4 @@ async def update_member(member_uuid: UUID, member: UserAddSchema, service: Membe
     },
 )
 async def delete_member(member_uuid: UUID, service: MemberServiceDep):
-    return await service.delete_member(member_uuid)
+    return await service.delete_user(member_uuid)

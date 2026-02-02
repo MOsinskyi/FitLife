@@ -6,7 +6,7 @@ from fitlife.coach.services import CoachService
 from fitlife.database import SessionDep
 
 
-async def get_coach_service(session: SessionDep, background_tasks: BackgroundTasks):
+async def get_coach_service(session: SessionDep, background_tasks: BackgroundTasks) -> CoachService:
     return CoachService(CoachSqlAlchemyRepository(session), background_tasks)
 
 
