@@ -24,14 +24,14 @@ class UserService:
         self.repository = repository
         self.namespace = cache_namespace
 
-    async def get_users(self) -> list[UserBase]:
+    async def get_users(self) -> list['UserBase']:
         try:
             return await self.repository.get_all()
         except Exception as e:
             logger.error('Failed to get users %s', e)
             raise HTTPException(status_code=400, detail='Failed to get users') from e
 
-    async def get_user(self, user_id: UUID) -> UserBase:
+    async def get_user(self, user_id: UUID) -> 'UserBase':
         try:
             return await self.repository.get_by_id(user_id)
         except NoResultFound as e:
