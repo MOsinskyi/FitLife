@@ -8,6 +8,7 @@ from fitlife.cache import clear_cache
 from fitlife.logger import logger
 from fitlife.repositories import UserRepository
 from fitlife.schemas import OkResponse, UserAddSchema
+from fitlife.security import SecurityDep
 
 if TYPE_CHECKING:
     from fitlife.models import UserBase
@@ -18,11 +19,13 @@ class UserService:
         self,
         repository: UserRepository,
         background_tasks: BackgroundTasks,
+        security: SecurityDep,
         cache_namespace: str = '',
     ):
         self.background_tasks = background_tasks
         self.repository = repository
         self.namespace = cache_namespace
+        self.security = security
 
     async def get_users(self) -> list['UserBase']:
         try:
@@ -72,6 +75,8 @@ class UserService:
         if await self.repository.get_by_phone_number(data.phone_number):
             raise HTTPException(status_code=409, detail='User with this phone number already exists')
 
+        await self.hash_password(data)
+
         try:
             await self.repository.create(data)
             await clear_cache(self.background_tasks, self.namespace)
@@ -79,3 +84,14 @@ class UserService:
         except Exception as e:
             logger.error('Failed to create user, error: %s', e)
             raise HTTPException(status_code=400, detail='Failed to create user') from e
+
+    async def hash_password(self, data: UserAddSchema):
+        try:
+            dumb_data = data.model_dump()
+            for k, v in dumb_data.items():
+                if k == 'password':
+                    setattr(data, k, self.security.hash_password(v))
+                continue
+        except Exception as e:
+            logger.error('Failed to create user, error: %s', e)
+            raise HTTPException(status_code=400, detail='Failed to hash password') from e
