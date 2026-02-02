@@ -5,6 +5,7 @@ from typing import Any
 from starlette.requests import Request
 from starlette.responses import Response
 
+from fitlife.coach.services import CoachService
 from fitlife.member.services import MemberService
 
 
@@ -17,7 +18,10 @@ def custom_key_builder(  # noqa: PLR0913
     args: tuple[Any, ...],
     kwargs: dict[str, Any],
 ) -> str:
-    exclude_types = (MemberService,)
+    exclude_types = (
+        MemberService,
+        CoachService,
+    )
     new_kw = {}
     for key, value in kwargs.items():
         if isinstance(value, exclude_types):
