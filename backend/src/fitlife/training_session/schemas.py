@@ -36,7 +36,9 @@ class TrainingSessionAddSchema(BaseModel):
         description='Ідентифікатор тренера, який проводить тренування.',
     )
     member_ids: list[UUID] = Field(
-        default_factory=list, title='Ідентифікатори учасників', description='Список ідентифікаторів учасників сесії.'
+        default_factory=list,
+        title='Ідентифікатори учасників',
+        description='Список ідентифікаторів учасників сесії.',
     )
 
 
