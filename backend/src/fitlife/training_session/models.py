@@ -18,19 +18,23 @@ class TrainingSession(Base):
         String,
         nullable=False,
     )
+
     description = Column(
         String,
     )
+
     max_participants = Column(
         Integer,
         default=4,
         nullable=False,
     )
+
     price = Column(
         Integer,
         default=0,
         nullable=False,
     )
+
     duration_minutes = Column(
         Integer,
         default=60,
@@ -42,6 +46,7 @@ class TrainingSession(Base):
         ForeignKey('coaches.id'),
         nullable=False,
     )
+
     coach = relationship(
         'CoachModel',
         back_populates='sessions',
