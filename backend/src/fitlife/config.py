@@ -64,6 +64,7 @@ class Settings(BaseSettings):
     )
 
     app: AppConfig = AppConfig()
+    middleware: MiddlewareConfig = MiddlewareConfig()
     redis: RedisConfig = RedisConfig()
     cache: CacheConfig = CacheConfig()
     database: SqliteConfig = SqliteConfig()

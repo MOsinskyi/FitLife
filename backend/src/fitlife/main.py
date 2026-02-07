@@ -7,11 +7,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from fitlife import constants
 from fitlife.cache import init_cache
 from fitlife.coach.routers import router as coach_router
 from fitlife.config import settings
-from fitlife.constants import APP_HOST, APP_PORT
 from fitlife.member.routers import router as member_router
 from fitlife.middleware import process_time_middleware
 from fitlife.schemas import OkResponse
@@ -32,10 +30,10 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=constants.ALLOW_ORIGINS,
-    allow_methods=constants.ALLOW_METHODS,
-    allow_credentials=constants.ALLOW_CREDENTIALS,
-    allow_headers=constants.ALLOW_HEADERS,
+    allow_origins=settings.middleware.allow_origins,
+    allow_methods=settings.middleware.allow_methods,
+    allow_credentials=settings.middleware.allow_credentials,
+    allow_headers=settings.middleware.allow_headers,
 )
 
 app.add_middleware(BaseHTTPMiddleware, dispatch=process_time_middleware)
@@ -65,4 +63,9 @@ app.include_router(coach_router)
 
 
 if __name__ == '__main__':
-    uvicorn.run('main:app', host=APP_HOST, port=APP_PORT, reload=True)
+    uvicorn.run(
+        'main:app',
+        host=settings.app.host,
+        port=settings.app.port,
+        reload=True,
+    )

@@ -1,6 +1,6 @@
 import logging
 
-from fitlife.constants import LOG_FILE_NAME
+from fitlife.config import settings
 
 
 class AnsiColorFormatter(logging.Formatter):
@@ -25,7 +25,7 @@ class AnsiColorFormatter(logging.Formatter):
 logger = logging.getLogger(__name__)
 
 stream_handler = logging.StreamHandler()
-file_handler = logging.FileHandler(LOG_FILE_NAME)
+file_handler = logging.FileHandler(settings.app.log_filename)
 
 stream_handler.setLevel(logging.INFO)
 file_handler.setLevel(logging.DEBUG)
