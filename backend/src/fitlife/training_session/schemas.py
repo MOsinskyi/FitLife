@@ -6,20 +6,20 @@ from pydantic import BaseModel, Field
 class TrainingSessionAddSchema(BaseModel):
     title: str = Field(
         title='Заголовок',
-        description='Заголовок для сесії',
+        description='Заголовок для сесії.',
         examples=[
-            'Заняття з йоги',
+            'Заняття з йоги.',
         ],
     )
     description: str = Field(
         title='Опис',
-        description='Опис для сесії',
-        examples=['Відвідайте наші ранкові заняття з йоги, які дадуть вам сил на цілий день'],
+        description='Опис для сесії.',
+        examples=['Відвідайте наші ранкові заняття з йоги, які дадуть вам сил на цілий день.'],
     )
     max_participants: int = Field(
         default=4,
         title='Кількість учасників',
-        description='Максимальна кількість учасників для сесії',
+        description='Максимальна кількість учасників для сесії.',
     )
     price: int = Field(
         default=0,
@@ -29,7 +29,14 @@ class TrainingSessionAddSchema(BaseModel):
     duration_minutes: int = Field(
         default=60,
         title='Тривалість',
-        description='Тривалість одного заняття в хвилинах',
+        description='Тривалість одного заняття в хвилинах.',
+    )
+    coach_id: UUID = Field(
+        title='Ідентифікатор тренера',
+        description='Ідентифікатор тренера, який проводить тренування.',
+    )
+    member_ids: list[UUID] = Field(
+        default_factory=list, title='Ідентифікатори учасників', description='Список ідентифікаторів учасників сесії.'
     )
 
 
