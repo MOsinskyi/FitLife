@@ -45,10 +45,10 @@ class UserService:
 
     async def update_user(self, user_id: UUID, data: UserAddSchema) -> OkResponse:
 
-        await self.get_user(user_id)
+        user = await self.get_user(user_id)
 
         try:
-            await self.repository.update(user_id, data)
+            await self.repository.update(user, data)
             await clear_cache(self.background_tasks, self.namespace)
             return OkResponse(msg='User updated successfully')
         except Exception as e:
@@ -57,10 +57,10 @@ class UserService:
 
     async def delete_user(self, user_id: UUID) -> OkResponse:
 
-        await self.get_user(user_id)
+        user = await self.get_user(user_id)
 
         try:
-            await self.repository.delete(user_id)
+            await self.repository.delete(user)
             await clear_cache(self.background_tasks, self.namespace)
             return OkResponse(msg='User deleted successfully')
         except Exception as e:

@@ -13,6 +13,7 @@ from fitlife.config import settings
 from fitlife.member.routers import router as member_router
 from fitlife.middleware import process_time_middleware
 from fitlife.schemas import OkResponse
+from fitlife.training_session.routers import router as training_session_router
 
 
 @asynccontextmanager
@@ -61,6 +62,7 @@ async def home():
 
 app.include_router(member_router)
 app.include_router(coach_router)
+app.include_router(training_session_router)
 
 
 if __name__ == '__main__':

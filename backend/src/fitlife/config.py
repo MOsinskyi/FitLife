@@ -49,6 +49,7 @@ class RedisConfig(BaseModel):
 class CacheNamespace(BaseModel):
     member: str = 'member'
     coach: str = 'coach'
+    training_session: str = 'training_session'
 
 
 class CacheConfig(BaseModel):

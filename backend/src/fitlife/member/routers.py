@@ -39,8 +39,18 @@ async def add_member(member: UserAddSchema, service: MemberServiceDep):
     '/members',
     summary='Get all members',
     tags=[title],
-    description='Get all members from the database',
+    description='Get all members from the database.',
     response_model=list[UserSchema],
+    responses={
+        status.HTTP_200_OK: {
+            'model': list[UserSchema],
+            'description': 'Members successfully retrieved.',
+        },
+        status.HTTP_400_BAD_REQUEST: {
+            'model': BadResponse,
+            'description': 'An error occurred when you tried to retrieve a members.',
+        },
+    },
 )
 @cache(
     expire=60,
@@ -101,6 +111,10 @@ async def update_member(member_uuid: UUID, member: UserAddSchema, service: Membe
         status.HTTP_404_NOT_FOUND: {
             'model': BadResponse,
             'description': 'Member not found',
+        },
+        status.HTTP_400_BAD_REQUEST: {
+            'model': BadResponse,
+            'description': 'Failed to delete member',
         },
     },
 )

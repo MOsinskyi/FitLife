@@ -7,6 +7,6 @@ class CoachModel(UserBase):
     __tablename__ = 'coaches'
 
     sessions = relationship(
-        'TrainingSession',
+        'TrainingSessionModel',
         back_populates='coach',
     )

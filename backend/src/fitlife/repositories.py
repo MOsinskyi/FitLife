@@ -6,7 +6,7 @@ from pydantic import BaseModel, EmailStr
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from fitlife.models import UserBase
+from fitlife.models import Base, UserBase
 
 T = TypeVar('T')
 
@@ -25,11 +25,11 @@ class BaseRepository(ABC):
         pass
 
     @abstractmethod
-    async def update(self, id_: uuid.UUID, data: BaseModel) -> None:
+    async def update(self, existing_model: Base, data: BaseModel) -> None:
         pass
 
     @abstractmethod
-    async def delete(self, id_: uuid.UUID) -> None:
+    async def delete(self, existing_model: Base) -> None:
         pass
 
 
@@ -63,8 +63,7 @@ class BaseSqlAlchemyRepository(BaseRepository):
         self.session.add(new_model)
         await self.session.commit()
 
-    async def update(self, id_: uuid.UUID, data: BaseModel):
-        existing_model = await self.get_by_id(id_)
+    async def update(self, existing_model: Base, data: BaseModel):
         new_values = data.model_dump()
 
         for k, v in new_values.items():
@@ -73,8 +72,7 @@ class BaseSqlAlchemyRepository(BaseRepository):
         await self.session.commit()
         await self.session.refresh(existing_model)
 
-    async def delete(self, id_: uuid.UUID):
-        existing_model = await self.get_by_id(id_)
+    async def delete(self, existing_model: Base):
         await self.session.delete(existing_model)
         await self.session.commit()
 

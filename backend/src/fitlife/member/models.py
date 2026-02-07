@@ -8,7 +8,7 @@ class MemberModel(UserBase):
     __tablename__ = 'members'
 
     sessions = relationship(
-        'TrainingSession',
+        'TrainingSessionModel',
         secondary=session_participants,
         back_populates='members',
     )

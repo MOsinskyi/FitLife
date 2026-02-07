@@ -42,7 +42,8 @@ async def add_coach(coach: UserAddSchema, service: CoachServiceDep):
     '/coaches',
     summary='Get all coaches',
     tags=[title],
-    description='Get all coaches from the database',
+    description='Get all coaches from the database.',
+    response_model=list[UserSchema],
     responses={
         status.HTTP_200_OK: {
             'model': list[UserSchema],
@@ -59,7 +60,7 @@ async def add_coach(coach: UserAddSchema, service: CoachServiceDep):
     namespace=settings.cache.namespace.coach,
     key_builder=custom_key_builder,
 )
-async def get_coaches(service: CoachServiceDep) -> list[UserSchema]:
+async def get_coaches(service: CoachServiceDep):
     return await service.get_users()
 
 

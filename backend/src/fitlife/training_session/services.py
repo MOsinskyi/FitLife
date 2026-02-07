@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING
 from uuid import UUID
 
 from fastapi import BackgroundTasks, HTTPException, Response, status
+from fastapi.responses import JSONResponse
 from sqlalchemy.exc import NoResultFound
 
 from fitlife.logger import logger
@@ -47,9 +48,14 @@ class TrainingSessionService:
         training_session = await self.get_training_session(id_)
 
         try:
-            await self.repository.update(training_session.id, data)
+            await self.repository.update(training_session, data)
             await clear_cache(self.background_tasks, self.namespace)
-            return Response(content='Training session updated successfully.')
+            return JSONResponse(
+                content={
+                    'success': True,
+                    'msg': 'Training session updated successfully.',
+                }
+            )
         except Exception as e:
             logger.error('An unknown error has occurred: %s', e)
             raise HTTPException(status_code=400, detail='Failed to update training session.') from e
@@ -59,14 +65,19 @@ class TrainingSessionService:
         training_session = await self.get_training_session(id_)
 
         try:
-            await self.repository.delete(training_session.id)
+            await self.repository.delete(training_session)
             await clear_cache(self.background_tasks, self.namespace)
-            return Response(content='User deleted successfully.')
+            return JSONResponse(
+                content={
+                    'success': True,
+                    'msg': 'User deleted successfully.',
+                }
+            )
         except Exception as e:
             logger.error('An unknown error has occurred: %s.', e)
             raise HTTPException(status_code=400, detail='Failed to delete training session.') from e
 
-    async def create_training_session(self, data: TrainingSessionAddSchema) -> Response:
+    async def create_training_session(self, data: 'TrainingSessionAddSchema') -> Response:
 
         if await self.repository.get_by_title(data.title):
             raise HTTPException(status_code=409, detail='Training session with this title already exists.') from None
@@ -74,9 +85,12 @@ class TrainingSessionService:
         try:
             await self.repository.create(data)
             await clear_cache(self.background_tasks, self.namespace)
-            return Response(
+            return JSONResponse(
                 status_code=status.HTTP_201_CREATED,
-                content='Training session created successfully.',
+                content={
+                    'success': True,
+                    'msg': 'Training session created successfully.',
+                },
             )
         except Exception as e:
             logger.error('An unknown error has occurred: %s.', e)
