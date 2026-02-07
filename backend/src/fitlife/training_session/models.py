@@ -11,7 +11,7 @@ session_participants = Table(
 )
 
 
-class TrainingSession(Base):
+class TrainingSessionModel(Base):
     __tablename__ = 'training_sessions'
 
     title = Column(
