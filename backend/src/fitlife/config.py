@@ -16,6 +16,7 @@ class AppConfig(BaseModel):
     host: str = 'localhost'
     port: int = 8000
     log_filename: str = 'fitlife.log'
+    version: str = '0.1.0'
 
 
 class SecurityConfig(BaseModel):

@@ -25,6 +25,7 @@ app = FastAPI(
     title=settings.app.name,
     lifespan=lifespan,
     root_path=settings.app.api_v1,
+    version=settings.app.version,
     root_path_in_servers=False,
 )
 
