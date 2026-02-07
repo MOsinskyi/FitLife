@@ -1,9 +1,7 @@
-from typing import Annotated, Any
+from typing import Any
 
-from pydantic import AfterValidator, BaseModel
-from pydantic_settings import BaseSettings
-
-from fitlife import constants
+from pydantic import BaseModel
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 def is_not_none(value: Any) -> Any:
@@ -12,13 +10,29 @@ def is_not_none(value: Any) -> Any:
     return value
 
 
-class AppConfig(BaseSettings):
-    title: Annotated[str, AfterValidator(is_not_none)] = constants.APP_TITLE
-    api_v1: Annotated[str, AfterValidator(is_not_none)] = constants.API_V1_STR
+class AppConfig(BaseModel):
+    name: str = 'FastAPI'
+    api_v1: str = '/api/v1'
+    host: str = 'localhost'
+    port: int = 8000
+    log_filename: str = 'fitlife.log'
+
+
+class SecurityConfig(BaseModel):
+    secret_key: str = 'xxx'
+    algorithm: str = 'xxx'
+    access_token_expire_minutes: int = 30
+
+
+class MiddlewareConfig(BaseModel):
+    allow_origins: list[str] | str = '*'
+    allow_methods: list[str] | str = '*'
+    allow_headers: list[str] | str = '*'
+    allow_credentials: bool = True
 
 
 class SqliteConfig(BaseModel):
-    url: str = 'sqlite+aiosqlite:///fitlife.sqlite3'
+    url: str = 'xxx'
 
 
 class RedisDB(BaseModel):
@@ -26,8 +40,8 @@ class RedisDB(BaseModel):
 
 
 class RedisConfig(BaseModel):
-    host: Annotated[str, AfterValidator(is_not_none)] = constants.REDIS_HOST
-    port: Annotated[int, AfterValidator(is_not_none)] = constants.REDIS_PORT
+    host: str = 'localhost'
+    port: int = 6379
     db: RedisDB = RedisDB()
 
 
@@ -37,15 +51,23 @@ class CacheNamespace(BaseModel):
 
 
 class CacheConfig(BaseModel):
-    prefix: Annotated[str, AfterValidator(is_not_none)] = constants.CACHE_PREFIX
+    prefix: str = 'fitlife'
     namespace: CacheNamespace = CacheNamespace()
 
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file='.env',
+        env_ignore_empty=True,
+        env_nested_delimiter='_',
+        env_nested_max_split=1,
+    )
+
     app: AppConfig = AppConfig()
     redis: RedisConfig = RedisConfig()
     cache: CacheConfig = CacheConfig()
     database: SqliteConfig = SqliteConfig()
+    security: SecurityConfig = SecurityConfig()
 
 
 settings = Settings()
