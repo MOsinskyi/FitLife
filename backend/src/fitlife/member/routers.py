@@ -82,7 +82,7 @@ async def get_specific_member(member_uuid: UUID, service: MemberServiceDep):
     '/members/{member_uuid}',
     summary='Update specific member',
     tags=[title],
-    description='Update specific member in the database',
+    description='Update specific member in the database.',
     responses={
         status.HTTP_200_OK: {
             'model': OkResponse,

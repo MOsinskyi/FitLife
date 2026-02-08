@@ -5,6 +5,7 @@ from uuid import UUID
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from fitlife.repositories import BaseRepository, BaseSqlAlchemyRepository
 
@@ -15,6 +16,14 @@ from .models import TrainingSessionModel
 class TrainingSessionRepository(BaseRepository, ABC):
     @abstractmethod
     async def get_by_title(self, title: str) -> TrainingSessionModel:
+        pass
+
+    @abstractmethod
+    async def create(self, data: BaseModel) -> None:
+        pass
+
+    @abstractmethod
+    async def update(self, id_: uuid.UUID, data: BaseModel) -> None:
         pass
 
 
@@ -46,7 +55,10 @@ class TrainingSessionSqlAlchemyRepository(TrainingSessionRepository, BaseSqlAlch
         await self.session.commit()
 
     async def update(self, id_: uuid.UUID, data: BaseModel) -> None:
-        existing_training_session: TrainingSessionModel = await self.get_by_id(id_)
+        query = select(self.model).where(self.model.id == id_).options(selectinload(TrainingSessionModel.members))
+        result = await self.session.execute(query)
+        existing_training_session: TrainingSessionModel = result.scalars().first()
+
         data_dict = data.model_dump()
         member_ids: list[UUID] = data_dict.pop('member_ids', [])
 

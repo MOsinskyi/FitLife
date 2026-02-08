@@ -1,0 +1,16 @@
+[31m2026-02-08 11:30:57,804 | ERROR    | fitlife.logger       | get_users                      | Failed to get users (sqlite3.OperationalError) no such table: coaches
+[SQL: SELECT coaches.first_name, coaches.last_name, coaches.phone_number, coaches.email, coaches.password, coaches.id
+FROM coaches]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)[0m
+[31m2026-02-08 11:31:33,679 | ERROR    | fitlife.logger       | get_users                      | Failed to get users (sqlite3.OperationalError) no such table: coaches
+[SQL: SELECT coaches.first_name, coaches.last_name, coaches.phone_number, coaches.email, coaches.password, coaches.id
+FROM coaches]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)[0m
+[31m2026-02-08 11:31:44,551 | ERROR    | fitlife.logger       | get_users                      | Failed to get users (sqlite3.OperationalError) no such table: coaches
+[SQL: SELECT coaches.first_name, coaches.last_name, coaches.phone_number, coaches.email, coaches.password, coaches.id
+FROM coaches]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)[0m
+[31m2026-02-08 11:35:05,351 | ERROR    | fitlife.logger       | get_training_sessions          | An unknown error has occurred: (sqlite3.OperationalError) no such table: training_sessions
+[SQL: SELECT training_sessions.title, training_sessions.description, training_sessions.max_participants, training_sessions.price, training_sessions.duration_minutes, training_sessions.coach_id, training_sessions.id
+FROM training_sessions]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)[0m

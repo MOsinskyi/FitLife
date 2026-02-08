@@ -48,7 +48,7 @@ class TrainingSessionService:
         training_session = await self.get_training_session(id_)
 
         try:
-            await self.repository.update(training_session, data)
+            await self.repository.update(training_session.id, data)
             await clear_cache(self.background_tasks, self.namespace)
             return JSONResponse(
                 content={

@@ -49,6 +49,59 @@ async def get_training_sessions(service: TrainingSessionServiceDep):
     return await service.get_training_sessions()
 
 
+@router.get(
+    '/training_sessions/{training_session_uuid}',
+    summary='Get specific training session by id',
+    tags=[title],
+    description='Get specific training session from the database by id.',
+    response_model=TrainingSessionSchema,
+    responses={
+        status.HTTP_200_OK: {
+            'model': TrainingSessionSchema,
+            'description': 'Training session successfully retrieved.',
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'model': BadResponse,
+            'description': 'Training session not found',
+        },
+        status.HTTP_400_BAD_REQUEST: {
+            'model': BadResponse,
+            'description': 'An error occurred when you tried to retrieve a training session.',
+        },
+    },
+)
+async def get_specific_training_session(training_session_uuid: UUID, service: TrainingSessionServiceDep):
+    return await service.get_training_session(training_session_uuid)
+
+
+@router.put(
+    '/training_sessions/{training_session_uuid}',
+    summary='Update specific training session',
+    tags=[title],
+    description='Update specific training session from the database.',
+    responses={
+        status.HTTP_200_OK: {
+            'model': OkResponse,
+            'description': 'Training session successfully updated.',
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'model': BadResponse,
+            'description': 'Training session not found',
+        },
+        status.HTTP_400_BAD_REQUEST: {
+            'model': BadResponse,
+            'description': 'An error occurred when you tried to update a training session.',
+        },
+    },
+)
+async def update_training_session(
+    training_session_uuid: UUID,
+    training_session: TrainingSessionAddSchema,
+    service: TrainingSessionServiceDep,
+):
+    return await service.update_training_session(training_session_uuid, training_session)
+
+
 @router.delete(
     '/training_sessions/{training_session_uuid}',
     summary='Delete training session',

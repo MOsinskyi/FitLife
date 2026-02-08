@@ -33,7 +33,7 @@ class MiddlewareConfig(BaseModel):
 
 
 class SqliteConfig(BaseModel):
-    url: str = 'xxx'
+    url: str = 'sqlite+aiosqlite:///fitlife.sqlite3'
 
 
 class RedisDB(BaseModel):
