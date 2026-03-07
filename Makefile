@@ -1,7 +1,7 @@
 .PHONY: lint, install, update, backend, frontend, run-dev, install-pre-commit, install-backend, install-frontend, tests
 
 lint:
-	pre-commit run -a
+	poetry run pre-commit run -a
 
 install-pre-commit:
 	pre-commit uninstall && \
@@ -30,8 +30,8 @@ update:
 run-dev: backend frontend
 
 backend:
-	docker-compose -f docker/docker-compose.dev.yaml down && \
-	docker-compose -f docker/docker-compose.dev.yaml up -d && \
+	docker compose -f docker/docker-compose.dev.yaml down && \
+	docker compose -f docker/docker-compose.dev.yaml up -d && \
 	cd backend && \
 	PYTHONPATH=src poetry run python src/fitlife/main.py
 
