@@ -8,6 +8,7 @@ from fitlife.auth.dependencies import CurrentUserDep
 from fitlife.config import settings
 from fitlife.member.dependencies import MemberServiceDep
 from fitlife.schemas import BadResponse, OkResponse, UserAddSchema, UserSchema
+from fitlife.security import SecurityDep
 from fitlife.utils import custom_key_builder
 
 router = APIRouter()
@@ -32,8 +33,13 @@ title = '👨‍👩‍ Members'
         },
     },
 )
-async def add_member(member: UserAddSchema, service: MemberServiceDep, current_user: CurrentUserDep):
-    return await service.create_user(member)
+async def add_member(
+    member: UserAddSchema,
+    service: MemberServiceDep,
+    current_user: CurrentUserDep,
+    security: SecurityDep,
+):
+    return await service.create_user(member, security)
 
 
 @router.get(
