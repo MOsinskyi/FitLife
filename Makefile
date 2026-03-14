@@ -1,6 +1,7 @@
 .PHONY: lint, install, update, backend, frontend, run-dev, install-pre-commit, install-backend, install-frontend, tests
 
 lint:
+	cd backend && \
 	poetry run pre-commit run -a
 
 install-pre-commit:
