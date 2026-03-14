@@ -10,6 +10,16 @@ class TokenSchema(BaseModel):
     token_type: str = 'bearer'
 
 
+class TokenPairSchema(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = 'bearer'
+
+
+class RefreshTokenSchema(BaseModel):
+    refresh_token: str
+
+
 class TokenPayload(BaseModel):
     sub: UUID | None = None
     role: str | None = None
