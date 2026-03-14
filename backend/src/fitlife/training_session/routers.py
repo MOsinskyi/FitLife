@@ -3,6 +3,7 @@ from uuid import UUID
 from fastapi import APIRouter, status
 from fastapi_cache.decorator import cache
 
+from fitlife.auth.dependencies import CurrentUserDep
 from fitlife.schemas import BadResponse, OkResponse
 
 from ..config import settings
@@ -29,7 +30,11 @@ title = '📅 Training Sessions'
         status.HTTP_409_CONFLICT: {'model': BadResponse, 'description': 'Training with title already exists.'},
     },
 )
-async def add_training_session(training_session: TrainingSessionAddSchema, service: TrainingSessionServiceDep):
+async def add_training_session(
+    training_session: TrainingSessionAddSchema,
+    service: TrainingSessionServiceDep,
+    current_user: CurrentUserDep,
+):
     return await service.create_training_session(training_session)
 
 
@@ -45,7 +50,7 @@ async def add_training_session(training_session: TrainingSessionAddSchema, servi
     namespace=settings.cache.namespace.training_session,
     key_builder=custom_key_builder,
 )
-async def get_training_sessions(service: TrainingSessionServiceDep):
+async def get_training_sessions(service: TrainingSessionServiceDep, current_user: CurrentUserDep):
     return await service.get_training_sessions()
 
 
@@ -70,7 +75,11 @@ async def get_training_sessions(service: TrainingSessionServiceDep):
         },
     },
 )
-async def get_specific_training_session(training_session_uuid: UUID, service: TrainingSessionServiceDep):
+async def get_specific_training_session(
+    training_session_uuid: UUID,
+    service: TrainingSessionServiceDep,
+    current_user: CurrentUserDep,
+):
     return await service.get_training_session(training_session_uuid)
 
 
@@ -98,6 +107,7 @@ async def update_training_session(
     training_session_uuid: UUID,
     training_session: TrainingSessionAddSchema,
     service: TrainingSessionServiceDep,
+    current_user: CurrentUserDep,
 ):
     return await service.update_training_session(training_session_uuid, training_session)
 
@@ -122,5 +132,9 @@ async def update_training_session(
         },
     },
 )
-async def delete_training_session(training_session_uuid: UUID, service: TrainingSessionServiceDep):
+async def delete_training_session(
+    training_session_uuid: UUID,
+    service: TrainingSessionServiceDep,
+    current_user: CurrentUserDep,
+):
     return await service.delete_training_session(training_session_uuid)
