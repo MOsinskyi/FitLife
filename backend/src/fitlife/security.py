@@ -10,6 +10,9 @@ from fitlife.config import settings
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
+REFRESH_TOKEN_EXPIRE_DAYS = 7
+_REFRESH_SUBJECT = 'refresh'
+
 
 class Security:
     @staticmethod
@@ -27,18 +30,35 @@ class Security:
     @staticmethod
     def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
         to_encode = data.copy()
-        if expires_delta:
-            expire = datetime.now(UTC) + expires_delta
-        else:
-            expire = datetime.now(UTC) + timedelta(minutes=settings.security.access_token_expire_minutes)
+        expire = datetime.now(UTC) + (
+            expires_delta or timedelta(minutes=settings.security.access_token_expire_minutes)
+        )
         to_encode.update({'exp': expire})
-        encoded_jwt = jwt.encode(to_encode, settings.security.secret_key, algorithm=settings.security.algorithm)
-        return encoded_jwt
+        return jwt.encode(to_encode, settings.security.secret_key, algorithm=settings.security.algorithm)
+
+    @staticmethod
+    def create_refresh_token(data: dict, expires_delta: timedelta | None = None) -> str:
+        to_encode = data.copy()
+        expire = datetime.now(UTC) + (expires_delta or timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS))
+        to_encode.update({'exp': expire, 'type': _REFRESH_SUBJECT})
+        return jwt.encode(to_encode, settings.security.secret_key, algorithm=settings.security.algorithm)
 
     @staticmethod
     def decode_access_token(token: str) -> dict:
         try:
             payload = jwt.decode(token, settings.security.secret_key, algorithms=[settings.security.algorithm])
+            if payload.get('type') == _REFRESH_SUBJECT:
+                return {}
+            return payload
+        except JWTError:
+            return {}
+
+    @staticmethod
+    def decode_refresh_token(token: str) -> dict:
+        try:
+            payload = jwt.decode(token, settings.security.secret_key, algorithms=[settings.security.algorithm])
+            if payload.get('type') != _REFRESH_SUBJECT:
+                return {}
             return payload
         except JWTError:
             return {}
