@@ -1,21 +1,23 @@
 from datetime import timedelta
+from typing import Annotated
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload
 
 from fitlife.auth.dependencies import CurrentUserDep
 from fitlife.auth.schemas import (
     CoachRegisterSchema,
-    LoginSchema,
     MemberRegisterSchema,
     RefreshTokenSchema,
     TokenPairSchema,
     UserResponseSchema,
 )
+from fitlife.coach.dependencies import CoachServiceDep
 from fitlife.coach.models import CoachModel
 from fitlife.config import settings
 from fitlife.database import SessionDep
+from fitlife.member.dependencies import MemberServiceDep
 from fitlife.member.models import MemberModel
 from fitlife.schemas import BadResponse
 from fitlife.security import SecurityDep
@@ -142,22 +144,17 @@ async def register_coach(
         },
     },
 )
-async def login(credentials: LoginSchema, session: SessionDep, security: SecurityDep) -> TokenPairSchema:
-    result = await session.execute(
-        select(MemberModel)
-        .options(selectinload(MemberModel.sessions))
-        .where(MemberModel.phone_number == credentials.phone_number),
-    )
-    user = result.scalar_one_or_none()
+async def login(
+    credentials: Annotated[OAuth2PasswordRequestForm, Depends()],
+    security: SecurityDep,
+    member_service: MemberServiceDep,
+    coach_service: CoachServiceDep,
+) -> TokenPairSchema:
+    user = await member_service.get_user_by_phone_number(credentials.username)
     user_type = 'member'
 
     if user is None:
-        result = await session.execute(
-            select(CoachModel)
-            .options(selectinload(CoachModel.sessions))
-            .where(CoachModel.phone_number == credentials.phone_number),
-        )
-        user = result.scalar_one_or_none()
+        user = await coach_service.get_user_by_phone_number(credentials.username)
         user_type = 'coach'
 
     if user is None or not security.verify_password(credentials.password, str(user.password)):

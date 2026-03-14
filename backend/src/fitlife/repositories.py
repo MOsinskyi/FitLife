@@ -85,7 +85,7 @@ class UserSqlAlchemyRepository(UserRepository, BaseSqlAlchemyRepository):
     async def get_by_phone_number(self, phone_number: str) -> T:
         query = select(self.model).where(self.model.phone_number == phone_number)
         response = await self.session.execute(query)
-        return response.scalars().first()
+        return response.scalar_one_or_none()
 
     async def get_by_email(self, email: EmailStr) -> T:
         query = select(self.model).where(self.model.email == email)
