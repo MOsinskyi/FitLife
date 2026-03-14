@@ -24,6 +24,7 @@ class UserAuthSchema(BaseModel):
 class UserAddSchema(UserAuthSchema):
     first_name: str
     last_name: str
+    role: str
 
 
 class UserSchema(BaseModel):
