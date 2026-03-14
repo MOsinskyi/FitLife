@@ -4,6 +4,7 @@ from fastapi import APIRouter
 from fastapi_cache.decorator import cache
 from starlette import status
 
+from fitlife.auth.dependencies import CurrentUserDep
 from fitlife.config import settings
 from fitlife.member.dependencies import MemberServiceDep
 from fitlife.schemas import BadResponse, OkResponse, UserAddSchema, UserSchema
@@ -31,7 +32,7 @@ title = '👨‍👩‍ Members'
         },
     },
 )
-async def add_member(member: UserAddSchema, service: MemberServiceDep):
+async def add_member(member: UserAddSchema, service: MemberServiceDep, current_user: CurrentUserDep):
     return await service.create_user(member)
 
 
@@ -57,7 +58,7 @@ async def add_member(member: UserAddSchema, service: MemberServiceDep):
     namespace=settings.cache.namespace.member,
     key_builder=custom_key_builder,
 )
-async def get_members(service: MemberServiceDep):
+async def get_members(service: MemberServiceDep, current_user: CurrentUserDep):
     return await service.get_users()
 
 
@@ -74,7 +75,7 @@ async def get_members(service: MemberServiceDep):
         }
     },
 )
-async def get_specific_member(member_uuid: UUID, service: MemberServiceDep):
+async def get_specific_member(member_uuid: UUID, service: MemberServiceDep, current_user: CurrentUserDep):
     return await service.get_user(member_uuid)
 
 
@@ -94,7 +95,12 @@ async def get_specific_member(member_uuid: UUID, service: MemberServiceDep):
         },
     },
 )
-async def update_member(member_uuid: UUID, member: UserAddSchema, service: MemberServiceDep):
+async def update_member(
+    member_uuid: UUID,
+    member: UserAddSchema,
+    service: MemberServiceDep,
+    current_user: CurrentUserDep,
+):
     return await service.update_user(member_uuid, member)
 
 
@@ -118,5 +124,5 @@ async def update_member(member_uuid: UUID, member: UserAddSchema, service: Membe
         },
     },
 )
-async def delete_member(member_uuid: UUID, service: MemberServiceDep):
+async def delete_member(member_uuid: UUID, service: MemberServiceDep, current_user: CurrentUserDep):
     return await service.delete_user(member_uuid)
