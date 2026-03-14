@@ -20,6 +20,8 @@ class TrainingSessionAddSchema(BaseModel):
         default=4,
         title='Кількість учасників',
         description='Максимальна кількість учасників для сесії.',
+        ge=1,
+        le=20,
     )
     price: int = Field(
         default=0,
@@ -30,6 +32,8 @@ class TrainingSessionAddSchema(BaseModel):
         default=60,
         title='Тривалість',
         description='Тривалість одного заняття в хвилинах.',
+        ge=15,
+        le=180,
     )
     coach_id: UUID = Field(
         title='Ідентифікатор тренера',
