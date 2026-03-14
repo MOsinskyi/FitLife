@@ -30,3 +30,4 @@ class UserBase(Base):
         String(255),
         nullable=False,
     )
+    role = Column(String, nullable=False, default='member')
