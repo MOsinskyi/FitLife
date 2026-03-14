@@ -42,7 +42,7 @@ class TrainingSessionModel(Base):
     )
 
     coach_id = Column(
-        UUID,
+        UUID(as_uuid=True),
         ForeignKey('coaches.id'),
         nullable=False,
     )
