@@ -7,6 +7,7 @@ from fitlife.auth.dependencies import CurrentUserDep
 from fitlife.coach.dependencies import CoachServiceDep
 from fitlife.config import settings
 from fitlife.schemas import BadResponse, OkResponse, UserAddSchema, UserSchema
+from fitlife.security import SecurityDep
 from fitlife.utils import custom_key_builder
 
 router = APIRouter()
@@ -35,8 +36,13 @@ title = '🏋️ Coaches'
         },
     },
 )
-async def add_coach(coach: UserAddSchema, service: CoachServiceDep, current_user: CurrentUserDep):
-    return await service.create_user(coach)
+async def add_coach(
+    coach: UserAddSchema,
+    service: CoachServiceDep,
+    current_user: CurrentUserDep,
+    security: SecurityDep,
+):
+    return await service.create_user(coach, security)
 
 
 @router.get(
