@@ -1,7 +1,12 @@
+from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
+import bcrypt
 from fastapi import Depends
+from jose import JWTError, jwt
 from passlib.context import CryptContext
+
+from fitlife.config import settings
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
@@ -9,11 +14,30 @@ pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 class Security:
     @staticmethod
     def hash_password(password: str) -> str:
-        return pwd_context.hash(password)
+        return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
     @staticmethod
-    def verify_password(plain_password: str, hashed_password: str) -> bool:
-        return pwd_context.verify(plain_password, hashed_password)
+    def verify_password(password: str, hashed_password: str) -> bool:
+        return bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8'))
+
+    @staticmethod
+    def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
+        to_encode = data.copy()
+        if expires_delta:
+            expire = datetime.now(UTC) + expires_delta
+        else:
+            expire = datetime.now(UTC) + timedelta(minutes=settings.security.access_token_expire_minutes)
+        to_encode.update({'exp': expire})
+        encoded_jwt = jwt.encode(to_encode, settings.security.secret_key, algorithm=settings.security.algorithm)
+        return encoded_jwt
+
+    @staticmethod
+    def decode_access_token(token: str) -> dict:
+        try:
+            payload = jwt.decode(token, settings.security.secret_key, algorithms=[settings.security.algorithm])
+            return payload
+        except JWTError:
+            return {}
 
 
 async def get_security_service() -> Security:
