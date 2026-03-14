@@ -23,6 +23,7 @@ class SecurityConfig(BaseModel):
     secret_key: str = 'xxx'
     algorithm: str = 'xxx'
     access_token_expire_minutes: int = 30
+    hash_encoding: str = 'utf-8'
 
 
 class MiddlewareConfig(BaseModel):

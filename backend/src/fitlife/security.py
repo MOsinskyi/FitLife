@@ -14,11 +14,15 @@ pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 class Security:
     @staticmethod
     def hash_password(password: str) -> str:
-        return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        return bcrypt.hashpw(password.encode(settings.security.hash_encoding), bcrypt.gensalt()).decode(
+            settings.security.hash_encoding
+        )
 
     @staticmethod
     def verify_password(password: str, hashed_password: str) -> bool:
-        return bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8'))
+        return bcrypt.checkpw(
+            password.encode(settings.security.hash_encoding), hashed_password.encode(settings.security.hash_encoding)
+        )
 
     @staticmethod
     def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
