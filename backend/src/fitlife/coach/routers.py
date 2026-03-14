@@ -3,6 +3,7 @@ from uuid import UUID
 from fastapi import APIRouter, status
 from fastapi_cache.decorator import cache
 
+from fitlife.auth.dependencies import CurrentUserDep
 from fitlife.coach.dependencies import CoachServiceDep
 from fitlife.config import settings
 from fitlife.schemas import BadResponse, OkResponse, UserAddSchema, UserSchema
@@ -34,7 +35,7 @@ title = '🏋️ Coaches'
         },
     },
 )
-async def add_coach(coach: UserAddSchema, service: CoachServiceDep):
+async def add_coach(coach: UserAddSchema, service: CoachServiceDep, current_user: CurrentUserDep):
     return await service.create_user(coach)
 
 
@@ -60,7 +61,7 @@ async def add_coach(coach: UserAddSchema, service: CoachServiceDep):
     namespace=settings.cache.namespace.coach,
     key_builder=custom_key_builder,
 )
-async def get_coaches(service: CoachServiceDep):
+async def get_coaches(service: CoachServiceDep, current_user: CurrentUserDep):
     return await service.get_users()
 
 
@@ -84,7 +85,7 @@ async def get_coaches(service: CoachServiceDep):
         },
     },
 )
-async def get_specific_coach(coach_uuid: UUID, service: CoachServiceDep):
+async def get_specific_coach(coach_uuid: UUID, service: CoachServiceDep, current_user: CurrentUserDep):
     return await service.get_user(coach_uuid)
 
 
@@ -108,7 +109,7 @@ async def get_specific_coach(coach_uuid: UUID, service: CoachServiceDep):
         },
     },
 )
-async def update_coach(coach_uuid: UUID, coach: UserAddSchema, service: CoachServiceDep):
+async def update_coach(coach_uuid: UUID, coach: UserAddSchema, service: CoachServiceDep, current_user: CurrentUserDep):
     return await service.update_user(coach_uuid, coach)
 
 
@@ -132,5 +133,5 @@ async def update_coach(coach_uuid: UUID, coach: UserAddSchema, service: CoachSer
         },
     },
 )
-async def delete_coach(coach_uuid: UUID, service: CoachServiceDep):
+async def delete_coach(coach_uuid: UUID, service: CoachServiceDep, current_user: CurrentUserDep):
     return await service.delete_user(coach_uuid)
