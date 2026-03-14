@@ -67,7 +67,7 @@ class UserService:
             logger.error('Failed to delete user with uuid: %s, error: %s', user_id, e)
             raise HTTPException(status_code=400, detail='Failed to delete user') from e
 
-    async def create_user(self, data: UserAddSchema) -> OkResponse:
+    async def create_user(self, data: UserAddSchema, security: SecurityDep) -> OkResponse:
 
         if await self.repository.get_by_email(data.email):
             raise HTTPException(status_code=409, detail='User with this email already exists')
@@ -75,7 +75,7 @@ class UserService:
         if await self.repository.get_by_phone_number(data.phone_number):
             raise HTTPException(status_code=409, detail='User with this phone number already exists')
 
-        await self.hash_password(data)
+        await self.hash_password(data, security)
 
         try:
             await self.repository.create(data)
@@ -85,12 +85,13 @@ class UserService:
             logger.error('Failed to create user, error: %s', e)
             raise HTTPException(status_code=400, detail='Failed to create user') from e
 
-    async def hash_password(self, data: UserAddSchema):
+    @staticmethod
+    async def hash_password(data: UserAddSchema, security: SecurityDep):
         try:
             dump_data = data.model_dump()
             for k, v in dump_data.items():
                 if k == 'password':
-                    setattr(data, k, self.security.hash_password(v))
+                    setattr(data, k, security.hash_password(v))
                 continue
         except Exception as e:
             logger.error('Failed to create user, error: %s', e)
