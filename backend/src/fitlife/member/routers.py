@@ -4,7 +4,7 @@ from fastapi import APIRouter
 from fastapi_cache.decorator import cache
 from starlette import status
 
-from fitlife.auth.dependencies import CurrentUserDep
+from fitlife.auth.dependencies import CurrentCoachDep, CurrentUserDep
 from fitlife.config import settings
 from fitlife.member.dependencies import MemberServiceDep
 from fitlife.schemas import BadResponse, OkResponse, UserAddSchema, UserSchema
@@ -21,11 +21,15 @@ title = '👨‍👩‍ Members'
     summary='Add new member',
     status_code=status.HTTP_201_CREATED,
     tags=[title],
-    description='Add new member to the database',
+    description='Add new member to the database. Coach only.',
     responses={
         status.HTTP_201_CREATED: {
             'model': OkResponse,
             'description': 'Member successfully created',
+        },
+        status.HTTP_403_FORBIDDEN: {
+            'model': BadResponse,
+            'description': 'Coaches only',
         },
         status.HTTP_409_CONFLICT: {
             'model': BadResponse,
@@ -36,7 +40,7 @@ title = '👨‍👩‍ Members'
 async def add_member(
     member: UserAddSchema,
     service: MemberServiceDep,
-    current_user: CurrentUserDep,
+    current_user: CurrentCoachDep,  # coach only
     security: SecurityDep,
 ):
     return await service.create_user(member, security)
@@ -46,7 +50,7 @@ async def add_member(
     '/members',
     summary='Get all members',
     tags=[title],
-    description='Get all members from the database.',
+    description='Get all members from the database. Any authenticated user.',
     response_model=list[UserSchema],
     responses={
         status.HTTP_200_OK: {
@@ -55,7 +59,7 @@ async def add_member(
         },
         status.HTTP_400_BAD_REQUEST: {
             'model': BadResponse,
-            'description': 'An error occurred when you tried to retrieve a members.',
+            'description': 'An error occurred when you tried to retrieve members.',
         },
     },
 )
@@ -70,9 +74,9 @@ async def get_members(service: MemberServiceDep, current_user: CurrentUserDep):
 
 @router.get(
     '/members/{member_uuid}',
-    summary='Get specific member by index',
+    summary='Get specific member by id',
     tags=[title],
-    description='Get specific member from the database',
+    description='Get specific member from the database. Any authenticated user.',
     response_model=UserSchema,
     responses={
         status.HTTP_404_NOT_FOUND: {
@@ -89,11 +93,15 @@ async def get_specific_member(member_uuid: UUID, service: MemberServiceDep, curr
     '/members/{member_uuid}',
     summary='Update specific member',
     tags=[title],
-    description='Update specific member in the database.',
+    description='Update specific member in the database. Coach only.',
     responses={
         status.HTTP_200_OK: {
             'model': OkResponse,
             'description': 'Member successfully updated',
+        },
+        status.HTTP_403_FORBIDDEN: {
+            'model': BadResponse,
+            'description': 'Coaches only',
         },
         status.HTTP_404_NOT_FOUND: {
             'model': BadResponse,
@@ -105,7 +113,7 @@ async def update_member(
     member_uuid: UUID,
     member: UserAddSchema,
     service: MemberServiceDep,
-    current_user: CurrentUserDep,
+    current_user: CurrentCoachDep,  # coach only
 ):
     return await service.update_user(member_uuid, member)
 
@@ -114,11 +122,15 @@ async def update_member(
     '/members/{member_uuid}',
     summary='Delete specific member',
     tags=[title],
-    description='Delete specific member in the database',
+    description='Delete specific member in the database. Coach only.',
     responses={
         status.HTTP_200_OK: {
             'model': OkResponse,
             'description': 'Member successfully deleted',
+        },
+        status.HTTP_403_FORBIDDEN: {
+            'model': BadResponse,
+            'description': 'Coaches only',
         },
         status.HTTP_404_NOT_FOUND: {
             'model': BadResponse,
@@ -130,5 +142,5 @@ async def update_member(
         },
     },
 )
-async def delete_member(member_uuid: UUID, service: MemberServiceDep, current_user: CurrentUserDep):
+async def delete_member(member_uuid: UUID, service: MemberServiceDep, current_user: CurrentCoachDep):  # coach only
     return await service.delete_user(member_uuid)
