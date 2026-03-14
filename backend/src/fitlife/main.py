@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
+from fitlife.auth.routers import router as auth_router
 from fitlife.cache import init_cache
 from fitlife.coach.routers import router as coach_router
 from fitlife.config import settings
@@ -60,6 +61,7 @@ async def home():
     return OkResponse(msg='Server is working')
 
 
+app.include_router(auth_router)
 app.include_router(member_router)
 app.include_router(coach_router)
 app.include_router(training_session_router)
