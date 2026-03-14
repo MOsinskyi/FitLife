@@ -9,7 +9,8 @@ from fitlife.auth.schemas import (
     CoachRegisterSchema,
     LoginSchema,
     MemberRegisterSchema,
-    TokenSchema,
+    RefreshTokenSchema,
+    TokenPairSchema,
     UserResponseSchema,
 )
 from fitlife.coach.models import CoachModel
@@ -132,8 +133,8 @@ async def register_coach(
     tags=[title],
     responses={
         status.HTTP_200_OK: {
-            'model': TokenSchema,
-            'description': 'Successfully logged in',
+            'model': TokenPairSchema,
+            'description': 'Successfully logged in — returns access + refresh tokens',
         },
         status.HTTP_401_UNAUTHORIZED: {
             'model': BadResponse,
@@ -141,7 +142,7 @@ async def register_coach(
         },
     },
 )
-async def login(credentials: LoginSchema, session: SessionDep, security: SecurityDep) -> TokenSchema:
+async def login(credentials: LoginSchema, session: SessionDep, security: SecurityDep) -> TokenPairSchema:
     result = await session.execute(
         select(MemberModel)
         .options(selectinload(MemberModel.sessions))
@@ -165,12 +166,55 @@ async def login(credentials: LoginSchema, session: SessionDep, security: Securit
             detail='Invalid phone number or password',
         )
 
-    access_token_expires = timedelta(minutes=settings.security.access_token_expire_minutes)
+    token_data = {'sub': str(user.id), 'role': user_type}
+
     access_token = security.create_access_token(
-        data={'sub': str(user.id), 'role': user_type}, expires_delta=access_token_expires
+        data=token_data,
+        expires_delta=timedelta(minutes=settings.security.access_token_expire_minutes),
+    )
+    refresh_token = security.create_refresh_token(data=token_data)
+
+    return TokenPairSchema(access_token=access_token, refresh_token=refresh_token)
+
+
+@router.post(
+    '/auth/token/refresh',
+    summary='Refresh access token',
+    tags=[title],
+    responses={
+        status.HTTP_200_OK: {
+            'model': TokenPairSchema,
+            'description': 'New access + refresh token pair (old refresh token is invalidated by rotation)',
+        },
+        status.HTTP_401_UNAUTHORIZED: {
+            'model': BadResponse,
+            'description': 'Invalid or expired refresh token',
+        },
+    },
+)
+async def refresh_token(body: RefreshTokenSchema, security: SecurityDep) -> TokenPairSchema:
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail='Invalid or expired refresh token',
+        headers={'WWW-Authenticate': 'Bearer'},
     )
 
-    return TokenSchema(access_token=access_token)
+    payload = security.decode_refresh_token(body.refresh_token)
+    user_id: str | None = payload.get('sub')
+    role: str | None = payload.get('role')
+
+    if not user_id or not role:
+        raise credentials_exception
+
+    token_data = {'sub': user_id, 'role': role}
+
+    new_access_token = security.create_access_token(
+        data=token_data,
+        expires_delta=timedelta(minutes=settings.security.access_token_expire_minutes),
+    )
+    new_refresh_token = security.create_refresh_token(data=token_data)
+
+    return TokenPairSchema(access_token=new_access_token, refresh_token=new_refresh_token)
 
 
 @router.get(
