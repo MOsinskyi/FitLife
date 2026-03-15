@@ -3,10 +3,10 @@ from uuid import UUID
 from fastapi import APIRouter, status
 from fastapi_cache.decorator import cache
 
-from fitlife.auth.dependencies import CurrentCoachDep, CurrentUserDep
+from fitlife.auth.dependencies import CurrentCoachDep
 from fitlife.coach.dependencies import CoachServiceDep
 from fitlife.config import settings
-from fitlife.schemas import BadResponse, OkResponse, UserCredentialsSchema, UserRegisterSchema
+from fitlife.schemas import BadResponse, OkResponse, UserRegisterSchema, UserSchema
 from fitlife.utils import custom_key_builder
 
 router = APIRouter()
@@ -19,10 +19,10 @@ title = '🏋️ Coaches'
     summary='Get all coaches',
     tags=[title],
     description='Get all coaches from the database. Any authenticated user.',
-    response_model=list[UserCredentialsSchema],
+    response_model=list[UserSchema],
     responses={
         status.HTTP_200_OK: {
-            'model': list[UserCredentialsSchema],
+            'model': list[UserSchema],
             'description': 'Coaches successfully retrieved.',
         },
         status.HTTP_400_BAD_REQUEST: {
@@ -36,7 +36,7 @@ title = '🏋️ Coaches'
     namespace=settings.cache.namespace.coach,
     key_builder=custom_key_builder,
 )
-async def get_coaches(service: CoachServiceDep, current_user: CurrentUserDep):
+async def get_coaches(service: CoachServiceDep):
     return await service.get_users()
 
 
@@ -56,7 +56,7 @@ async def get_coaches(service: CoachServiceDep, current_user: CurrentUserDep):
         },
     },
 )
-async def get_specific_coach(coach_uuid: UUID, service: CoachServiceDep, current_user: CurrentUserDep):
+async def get_specific_coach(coach_uuid: UUID, service: CoachServiceDep):
     return await service.get_user(coach_uuid)
 
 
