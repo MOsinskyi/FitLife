@@ -4,10 +4,10 @@ from fastapi import APIRouter
 from fastapi_cache.decorator import cache
 from starlette import status
 
-from fitlife.auth.dependencies import CurrentCoachDep, CurrentUserDep
+from fitlife.auth.dependencies import CurrentCoachDep
 from fitlife.config import settings
 from fitlife.member.dependencies import MemberServiceDep
-from fitlife.schemas import BadResponse, OkResponse, UserCredentialsSchema, UserRegisterSchema
+from fitlife.schemas import BadResponse, OkResponse, UserRegisterSchema, UserSchema
 from fitlife.utils import custom_key_builder
 
 router = APIRouter()
@@ -20,10 +20,10 @@ title = '👨‍👩‍ Members'
     summary='Get all members',
     tags=[title],
     description='Get all members from the database. Any authenticated user.',
-    response_model=list[UserCredentialsSchema],
+    response_model=list[UserSchema],
     responses={
         status.HTTP_200_OK: {
-            'model': list[UserCredentialsSchema],
+            'model': list[UserSchema],
             'description': 'Members successfully retrieved.',
         },
         status.HTTP_400_BAD_REQUEST: {
@@ -37,7 +37,7 @@ title = '👨‍👩‍ Members'
     namespace=settings.cache.namespace.member,
     key_builder=custom_key_builder,
 )
-async def get_members(service: MemberServiceDep, current_user: CurrentUserDep):
+async def get_members(service: MemberServiceDep, current_user: CurrentCoachDep):
     return await service.get_users()
 
 
@@ -46,7 +46,7 @@ async def get_members(service: MemberServiceDep, current_user: CurrentUserDep):
     summary='Get specific member by id',
     tags=[title],
     description='Get specific member from the database. Any authenticated user.',
-    response_model=UserCredentialsSchema,
+    response_model=UserSchema,
     responses={
         status.HTTP_404_NOT_FOUND: {
             'model': BadResponse,
@@ -54,7 +54,7 @@ async def get_members(service: MemberServiceDep, current_user: CurrentUserDep):
         }
     },
 )
-async def get_specific_member(member_uuid: UUID, service: MemberServiceDep, current_user: CurrentUserDep):
+async def get_specific_member(member_uuid: UUID, service: MemberServiceDep, current_user: CurrentCoachDep):
     return await service.get_user(member_uuid)
 
 
