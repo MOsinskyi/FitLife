@@ -24,6 +24,7 @@ title = '🔐 Authentication'
     '/auth/register/member',
     summary='Register new member',
     status_code=status.HTTP_200_OK,
+    response_model=UserSchema,
     tags=[title],
     responses={
         status.HTTP_200_OK: {
@@ -46,6 +47,7 @@ async def register_member(
     '/auth/register/coach',
     summary='Register new coach',
     status_code=status.HTTP_200_OK,
+    response_model=UserSchema,
     tags=[title],
     responses={
         status.HTTP_200_OK: {
@@ -68,6 +70,7 @@ async def register_coach(
 @router.post(
     '/auth/login',
     summary='Login user',
+    response_model=TokenPairSchema,
     tags=[title],
     responses={
         status.HTTP_200_OK: {
@@ -85,7 +88,7 @@ async def login(
     security: SecurityDep,
     member_service: MemberServiceDep,
     coach_service: CoachServiceDep,
-) -> TokenPairSchema:
+):
     user = await member_service.get_user_by_phone_number(credentials.username)
     user_type = 'member'
 
@@ -113,6 +116,7 @@ async def login(
 @router.post(
     '/auth/token/refresh',
     summary='Refresh access token',
+    response_model=TokenPairSchema,
     tags=[title],
     responses={
         status.HTTP_200_OK: {
@@ -158,17 +162,12 @@ async def refresh_token(body: RefreshTokenSchema, security: SecurityDep) -> Toke
     responses={
         status.HTTP_200_OK: {
             'model': UserSchema,
-            'description': 'Successfully retrieved current user',
+            'description': 'Successfully retrieved current user.',
+        },
+        status.HTTP_401_UNAUTHORIZED: {
+            'description': 'Not authenticated.',
         },
     },
 )
-async def get_current_user_endpoint(current_user: CurrentUserDep) -> UserSchema:
-    user_data = {
-        'id': current_user.id,
-        'first_name': str(current_user.first_name) if current_user.first_name else '',
-        'last_name': str(current_user.last_name) if current_user.last_name else '',
-        'email': current_user.email,
-        'phone_number': str(current_user.phone_number) if current_user.phone_number else '',
-        'role': str(current_user.role) if current_user.role else '',
-    }
-    return UserSchema(**user_data)
+async def get_current_user_endpoint(current_user: CurrentUserDep):
+    return current_user
