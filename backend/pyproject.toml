@@ -38,6 +38,15 @@ preview = true
 target-version = "py312"
 line-length = 119
 indent-width = 4
+force-exclude = true
+
+exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    "tests",
+]
 
 [tool.ruff.lint]
 select = [
@@ -49,14 +58,6 @@ select = [
     "C4", # Comprehension
     "UP", # pyupgrade
     "PL", # Pylint
-]
-
-exclude = [
-    ".git",
-    "__pycache__",
-    "build",
-    "dist",
-    "tests",
 ]
 
 [tool.ruff.format]
