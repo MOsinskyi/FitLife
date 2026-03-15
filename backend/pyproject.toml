@@ -74,6 +74,7 @@ strict = true
 exclude = [
     "venv/",
     "build/",
+    "tests",
 ]
 
 [build-system]
