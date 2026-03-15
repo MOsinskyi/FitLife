@@ -50,6 +50,7 @@ jobs:
       - name: Run Pytest
         env:
           ENVIRONMENT: test
+          PYTHONPATH: src
         run: poetry run pytest
 
   frontend-ci:
