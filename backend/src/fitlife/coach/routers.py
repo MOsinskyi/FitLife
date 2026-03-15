@@ -6,8 +6,7 @@ from fastapi_cache.decorator import cache
 from fitlife.auth.dependencies import CurrentCoachDep, CurrentUserDep
 from fitlife.coach.dependencies import CoachServiceDep
 from fitlife.config import settings
-from fitlife.schemas import BadResponse, OkResponse, UserAddSchema, UserSchema
-from fitlife.security import SecurityDep
+from fitlife.schemas import BadResponse, OkResponse, UserCredentialsSchema, UserRegisterSchema
 from fitlife.utils import custom_key_builder
 
 router = APIRouter()
@@ -15,49 +14,15 @@ router = APIRouter()
 title = '🏋️ Coaches'
 
 
-@router.post(
-    '/coaches',
-    summary='Add new coach',
-    status_code=status.HTTP_201_CREATED,
-    tags=[title],
-    description='Add new coach to the database. Coach only.',
-    responses={
-        status.HTTP_201_CREATED: {
-            'model': OkResponse,
-            'description': 'Coach successfully created.',
-        },
-        status.HTTP_403_FORBIDDEN: {
-            'model': BadResponse,
-            'description': 'Coaches only.',
-        },
-        status.HTTP_409_CONFLICT: {
-            'model': BadResponse,
-            'description': 'Coach with that phone or email already exists.',
-        },
-        status.HTTP_400_BAD_REQUEST: {
-            'model': BadResponse,
-            'description': 'Some error occurred while adding coach.',
-        },
-    },
-)
-async def add_coach(
-    coach: UserAddSchema,
-    service: CoachServiceDep,
-    current_user: CurrentCoachDep,  # coach only
-    security: SecurityDep,
-):
-    return await service.create_user(coach, security)
-
-
 @router.get(
     '/coaches',
     summary='Get all coaches',
     tags=[title],
     description='Get all coaches from the database. Any authenticated user.',
-    response_model=list[UserSchema],
+    response_model=list[UserCredentialsSchema],
     responses={
         status.HTTP_200_OK: {
-            'model': list[UserSchema],
+            'model': list[UserCredentialsSchema],
             'description': 'Coaches successfully retrieved.',
         },
         status.HTTP_400_BAD_REQUEST: {
@@ -117,7 +82,7 @@ async def get_specific_coach(coach_uuid: UUID, service: CoachServiceDep, current
 )
 async def update_coach(
     coach_uuid: UUID,
-    coach: UserAddSchema,
+    coach: UserRegisterSchema,
     service: CoachServiceDep,
     current_user: CurrentCoachDep,  # coach only
 ):

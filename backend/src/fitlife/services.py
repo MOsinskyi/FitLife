@@ -7,7 +7,7 @@ from fastapi import BackgroundTasks, HTTPException
 from fitlife.cache import clear_cache
 from fitlife.logger import logger
 from fitlife.repositories import UserRepository
-from fitlife.schemas import OkResponse, UserAddSchema
+from fitlife.schemas import OkResponse, UserRegisterSchema, UserSchema
 from fitlife.security import SecurityDep
 
 if TYPE_CHECKING:
@@ -54,7 +54,7 @@ class UserService:
         return user
 
     @servicemethod
-    async def update_user(self, user_id: UUID, data: UserAddSchema) -> OkResponse:
+    async def update_user(self, user_id: UUID, data: UserRegisterSchema) -> OkResponse:
         user = await self.get_user(user_id)
         await self.repository.update(user, data)
         await clear_cache(self.background_tasks, self.namespace)
@@ -71,7 +71,7 @@ class UserService:
         return OkResponse(msg='User deleted successfully')
 
     @servicemethod
-    async def create_user(self, data: UserAddSchema, security: SecurityDep) -> OkResponse:
+    async def create_user(self, data: UserRegisterSchema, security: SecurityDep) -> UserSchema:
 
         if await self.repository.get_by_email(data.email):
             raise HTTPException(status_code=409, detail='User with this email already exists')
@@ -81,16 +81,23 @@ class UserService:
 
         await self.hash_password(data, security)
 
-        await self.repository.create(data)
+        user = await self.repository.create(data)
         await clear_cache(self.background_tasks, self.namespace)
-        return OkResponse(msg='User created successfully')
+        return UserSchema(
+            id=user.id,
+            email=user.email,
+            phone_number=user.phone_number,
+            role=user.role,
+            first_name=user.first_name,
+            last_name=user.last_name,
+        )
 
     @servicemethod
     async def get_user_by_phone_number(self, phone_number: str):
         return await self.repository.get_by_phone_number(phone_number)
 
     @staticmethod
-    async def hash_password(data: UserAddSchema, security: SecurityDep):
+    async def hash_password(data: UserRegisterSchema, security: SecurityDep):
         dump_data = data.model_dump()
         for k, v in dump_data.items():
             if k == 'password':

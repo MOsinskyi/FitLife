@@ -7,8 +7,7 @@ from starlette import status
 from fitlife.auth.dependencies import CurrentCoachDep, CurrentUserDep
 from fitlife.config import settings
 from fitlife.member.dependencies import MemberServiceDep
-from fitlife.schemas import BadResponse, OkResponse, UserAddSchema, UserSchema
-from fitlife.security import SecurityDep
+from fitlife.schemas import BadResponse, OkResponse, UserCredentialsSchema, UserRegisterSchema
 from fitlife.utils import custom_key_builder
 
 router = APIRouter()
@@ -16,45 +15,15 @@ router = APIRouter()
 title = '👨‍👩‍ Members'
 
 
-@router.post(
-    '/members',
-    summary='Add new member',
-    status_code=status.HTTP_201_CREATED,
-    tags=[title],
-    description='Add new member to the database. Coach only.',
-    responses={
-        status.HTTP_201_CREATED: {
-            'model': OkResponse,
-            'description': 'Member successfully created',
-        },
-        status.HTTP_403_FORBIDDEN: {
-            'model': BadResponse,
-            'description': 'Coaches only',
-        },
-        status.HTTP_409_CONFLICT: {
-            'model': BadResponse,
-            'description': 'Member with phone number already exists',
-        },
-    },
-)
-async def add_member(
-    member: UserAddSchema,
-    service: MemberServiceDep,
-    current_user: CurrentCoachDep,  # coach only
-    security: SecurityDep,
-):
-    return await service.create_user(member, security)
-
-
 @router.get(
     '/members',
     summary='Get all members',
     tags=[title],
     description='Get all members from the database. Any authenticated user.',
-    response_model=list[UserSchema],
+    response_model=list[UserCredentialsSchema],
     responses={
         status.HTTP_200_OK: {
-            'model': list[UserSchema],
+            'model': list[UserCredentialsSchema],
             'description': 'Members successfully retrieved.',
         },
         status.HTTP_400_BAD_REQUEST: {
@@ -77,7 +46,7 @@ async def get_members(service: MemberServiceDep, current_user: CurrentUserDep):
     summary='Get specific member by id',
     tags=[title],
     description='Get specific member from the database. Any authenticated user.',
-    response_model=UserSchema,
+    response_model=UserCredentialsSchema,
     responses={
         status.HTTP_404_NOT_FOUND: {
             'model': BadResponse,
@@ -111,7 +80,7 @@ async def get_specific_member(member_uuid: UUID, service: MemberServiceDep, curr
 )
 async def update_member(
     member_uuid: UUID,
-    member: UserAddSchema,
+    member: UserRegisterSchema,
     service: MemberServiceDep,
     current_user: CurrentCoachDep,  # coach only
 ):

@@ -2,6 +2,7 @@ from fastapi import BackgroundTasks
 
 from fitlife.coach.repositories import CoachRepository
 from fitlife.config import settings
+from fitlife.schemas import UserRegisterSchema
 from fitlife.security import SecurityDep
 from fitlife.services import UserService
 
@@ -14,3 +15,10 @@ class CoachService(UserService):
             cache_namespace=settings.cache.namespace.coach,
             security=security,
         )
+
+    async def create_coach(self, data: UserRegisterSchema):
+        data_dict = data.model_dump()
+        data_dict['role'] = 'coach'
+        data = UserRegisterSchema(**data_dict)
+
+        return await super().create_user(data, self.security)

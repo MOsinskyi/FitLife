@@ -21,7 +21,7 @@ class BaseRepository(ABC):
         pass
 
     @abstractmethod
-    async def create(self, data: BaseModel) -> None:
+    async def create(self, data: BaseModel) -> T:
         pass
 
     @abstractmethod
@@ -62,6 +62,7 @@ class BaseSqlAlchemyRepository(BaseRepository):
         new_model = self.model(**data.model_dump())
         self.session.add(new_model)
         await self.session.commit()
+        return new_model
 
     async def update(self, existing_model: Base, data: BaseModel):
         new_values = data.model_dump()

@@ -1,6 +1,6 @@
-from uuid import UUID, uuid4
+from uuid import UUID
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, Field
 
 from fitlife.schemas import PHONE_PATTERN
 
@@ -26,30 +26,5 @@ class TokenPayload(BaseModel):
 
 
 class LoginSchema(BaseModel):
-    phone_number: str = Field(pattern=PHONE_PATTERN)
+    username: str = Field(pattern=PHONE_PATTERN)
     password: str
-
-
-class MemberRegisterSchema(BaseModel):
-    first_name: str
-    last_name: str
-    email: EmailStr | None
-    phone_number: str = Field(pattern=PHONE_PATTERN)
-    password: str
-
-
-class CoachRegisterSchema(BaseModel):
-    first_name: str
-    last_name: str
-    email: EmailStr | None
-    phone_number: str = Field(pattern=PHONE_PATTERN)
-    password: str
-
-
-class UserResponseSchema(BaseModel):
-    id: UUID = Field(default_factory=uuid4)
-    first_name: str
-    last_name: str
-    email: EmailStr | None
-    phone_number: str = Field(pattern=PHONE_PATTERN)
-    role: str
