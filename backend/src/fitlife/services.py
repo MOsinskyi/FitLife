@@ -63,7 +63,6 @@ class UserService:
 
     @servicemethod
     async def delete_user(self, user_id: UUID) -> OkResponse:
-
         user = await self.get_user(user_id)
 
         await self.repository.delete(user)
@@ -72,7 +71,6 @@ class UserService:
 
     @servicemethod
     async def create_user(self, data: UserRegisterSchema, security: SecurityDep) -> UserSchema:
-
         if await self.repository.get_by_email(data.email):
             raise HTTPException(status_code=409, detail='User with this email already exists')
 

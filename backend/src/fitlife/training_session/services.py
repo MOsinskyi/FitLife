@@ -44,7 +44,6 @@ class TrainingSessionService:
         return obj
 
     async def update_training_session(self, id_: UUID, data: 'TrainingSessionAddSchema') -> Response:
-
         training_session = await self.get_training_session(id_)
 
         if not training_session:
@@ -64,7 +63,6 @@ class TrainingSessionService:
             raise HTTPException(status_code=400, detail='Failed to update training session.') from e
 
     async def delete_training_session(self, id_: UUID) -> Response:
-
         training_session = await self.get_training_session(id_)
 
         try:
@@ -81,7 +79,6 @@ class TrainingSessionService:
             raise HTTPException(status_code=400, detail='Failed to delete training session.') from e
 
     async def create_training_session(self, data: 'TrainingSessionAddSchema') -> Response:
-
         if await self.repository.get_by_title(data.title):
             raise HTTPException(status_code=409, detail='Training session with this title already exists.') from None
 
@@ -100,7 +97,6 @@ class TrainingSessionService:
             raise HTTPException(status_code=400, detail='Failed to create training session.') from e
 
     async def book_training_session(self, training_session_uuid: UUID, member_uuid: UUID):
-
         if not await self.repository.get_by_id(training_session_uuid):
             raise HTTPException(status_code=404, detail='Training session not found.')
 
