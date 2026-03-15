@@ -21,9 +21,13 @@ test-frontend:
 	cd frontend && \
 	k6 run tests/test-basic.js
 
+test-backend:
+	cd backend && \
+	PYTHONPATH=src poetry run pytest
+
 install: install-backend install-pre-commit install-frontend
 
-tests: test-frontend
+tests: test-backend test-frontend
 
 update:
 	pre-commit autoupdate
