@@ -2,7 +2,7 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, EmailStr, Field
 
-PHONE_PATTERN = r'^+380(50|63|66|67|68|73|91|92|93|94|95|96|97|98|99)\d{7}$'
+PHONE_PATTERN = r'^\+380\d{9}$'
 
 
 class OkResponse(BaseModel):
