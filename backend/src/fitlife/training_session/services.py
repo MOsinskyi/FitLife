@@ -3,11 +3,11 @@ from uuid import UUID
 
 from fastapi import BackgroundTasks, HTTPException, Response, status
 from fastapi.responses import JSONResponse
-from sqlalchemy.exc import NoResultFound
 
 from fitlife.logger import logger
 
 from ..cache import clear_cache
+from ..services import servicemethod
 from .repositories import TrainingSessionRepository
 
 if TYPE_CHECKING:
@@ -30,22 +30,25 @@ class TrainingSessionService:
         try:
             return await self.repository.get_all()
         except Exception as e:
-            logger.error('An unknown error has occurred: %s', e)
+            logger.error('An unknown error has occurred: %s', e, exc_info=True)
             raise HTTPException(status_code=400, detail='Failed to get training sessions.') from e
 
+    @servicemethod
     async def get_training_session(self, id_: UUID) -> 'TrainingSessionModel':
-        try:
-            return await self.repository.get_by_id(id_)
-        except NoResultFound:
+        obj = await self.repository.get_by_id(id_)
+
+        if not obj:
             logger.error('Сесії не знайдено')
             raise HTTPException(status_code=404, detail='Training session not found.') from None
-        except Exception as e:
-            logger.error('An unknown error has occurred: %s', e)
-            raise HTTPException(status_code=400, detail='Failed to get training session.') from e
+
+        return obj
 
     async def update_training_session(self, id_: UUID, data: 'TrainingSessionAddSchema') -> Response:
 
         training_session = await self.get_training_session(id_)
+
+        if not training_session:
+            raise HTTPException(status_code=404, detail='Training session not found.')
 
         try:
             await self.repository.update(training_session.id, data)
@@ -95,3 +98,16 @@ class TrainingSessionService:
         except Exception as e:
             logger.error('An unknown error has occurred: %s.', e)
             raise HTTPException(status_code=400, detail='Failed to create training session.') from e
+
+    async def book_training_session(self, training_session_uuid: UUID, member_uuid: UUID):
+
+        if not await self.repository.get_by_id(training_session_uuid):
+            raise HTTPException(status_code=404, detail='Training session not found.')
+
+        if await self.repository.is_member_in_training_session(training_session_uuid, member_uuid):
+            raise HTTPException(status_code=409, detail='Member already booked this training session.')
+
+        training_session = await self.repository.add_member_to_training_session(training_session_uuid, member_uuid)
+        await clear_cache(self.background_tasks, self.namespace)
+
+        return training_session

@@ -3,7 +3,7 @@ from uuid import UUID
 from fastapi import APIRouter, status
 from fastapi_cache.decorator import cache
 
-from fitlife.auth.dependencies import CurrentCoachDep, CurrentUserDep
+from fitlife.auth.dependencies import CurrentCoachDep, CurrentMemberDep
 from fitlife.schemas import BadResponse, OkResponse
 
 from ..config import settings
@@ -17,7 +17,7 @@ title = '📅 Training Sessions'
 
 
 @router.post(
-    '/training_sessions',
+    '/training-sessions',
     summary='Add new training session.',
     status_code=status.HTTP_201_CREATED,
     tags=[title],
@@ -45,8 +45,32 @@ async def add_training_session(
     return await service.create_training_session(training_session)
 
 
+@router.post(
+    '/training-sessions/{uuid}/book',
+    summary='Book training session.',
+    status_code=status.HTTP_200_OK,
+    response_model=TrainingSessionSchema,
+    tags=[title],
+    description='Book training session. Member only.',
+    responses={
+        status.HTTP_200_OK: {
+            'model': TrainingSessionSchema,
+            'description': 'Training session successfully booked.',
+        },
+        status.HTTP_403_FORBIDDEN: {
+            'description': 'User is not allowed to book this training session.',
+        },
+        status.HTTP_404_NOT_FOUND: {
+            'description': 'Training session not found.',
+        },
+    },
+)
+async def book_training_session(uuid: UUID, member: CurrentMemberDep, service: TrainingSessionServiceDep):
+    return await service.book_training_session(uuid, member.id)
+
+
 @router.get(
-    '/training_sessions',
+    '/training-sessions',
     summary='Get all training sessions.',
     tags=[title],
     description='Get all training sessions from the database. Any authenticated user.',
@@ -57,12 +81,12 @@ async def add_training_session(
     namespace=settings.cache.namespace.training_session,
     key_builder=custom_key_builder,
 )
-async def get_training_sessions(service: TrainingSessionServiceDep, current_user: CurrentUserDep):
+async def get_training_sessions(service: TrainingSessionServiceDep):
     return await service.get_training_sessions()
 
 
 @router.get(
-    '/training_sessions/{training_session_uuid}',
+    '/training-sessions/{training_session_uuid}',
     summary='Get specific training session by id',
     tags=[title],
     description='Get specific training session from the database by id. Any authenticated user.',
@@ -81,13 +105,12 @@ async def get_training_sessions(service: TrainingSessionServiceDep, current_user
 async def get_specific_training_session(
     training_session_uuid: UUID,
     service: TrainingSessionServiceDep,
-    current_user: CurrentUserDep,
 ):
     return await service.get_training_session(training_session_uuid)
 
 
 @router.put(
-    '/training_sessions/{training_session_uuid}',
+    '/training-sessions/{training_session_uuid}',
     summary='Update specific training session',
     tags=[title],
     description='Update specific training session from the database. Coach only.',
@@ -116,7 +139,7 @@ async def update_training_session(
 
 
 @router.delete(
-    '/training_sessions/{training_session_uuid}',
+    '/training-sessions/{training_session_uuid}',
     summary='Delete training session',
     tags=[title],
     description='Delete specific training session from database. Coach only.',
