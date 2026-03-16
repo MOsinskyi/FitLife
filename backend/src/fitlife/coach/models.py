@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 
 from fitlife.models import UserBase
@@ -21,6 +21,15 @@ class CoachModel(UserBase):
         server_default='&#x1F3CB;',
         name='Emoji',
         comment='HTML entity (hex)',
+    )
+
+    experience = Column(
+        Integer,
+        nullable=False,
+        default=1,
+        server_default='1',
+        name='Досвід',
+        comment='Потрібно ввести досвід в роках',
     )
 
     sessions = relationship(
