@@ -13,7 +13,7 @@ class CoachCredentialsSchema(UserCredentialsSchema):
     experience: int = Field(default=1, title='Досвід', ge=1)
     experience_title: str = Field(default='рік')
 
-    def validate_speciality(self, value: str, handle: Callable):  # noqa: PLR6301
+    def validate_speciality(self, value: str, handle: Callable):  # noqa
         assert value not in SPECIALITIES, f'Invalid speciality, Valid specialities: {SPECIALITIES}'
 
         result = handle(value)
