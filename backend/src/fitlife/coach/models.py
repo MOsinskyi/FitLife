@@ -12,7 +12,6 @@ class CoachModel(UserBase):
         nullable=False,
         server_default='Силові тренування',
         name='Спеціальність',
-        comment='Силові тренування, Функціональний фітнес, Йога та стретчинг, Кардіо та HIIT',
     )
 
     emoji_entity = Column(
@@ -30,6 +29,13 @@ class CoachModel(UserBase):
         server_default='1',
         name='Досвід',
         comment='Потрібно ввести досвід в роках',
+    )
+
+    experience_title = Column(
+        String,
+        nullable=False,
+        default='рік',
+        server_default='рік',
     )
 
     sessions = relationship(
