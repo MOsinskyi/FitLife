@@ -26,6 +26,10 @@ class UserRegisterSchema(UserCredentialsSchema):
     password: str
 
 
+class UserRegisterWithRoleSchema(UserRegisterSchema):
+    role: str
+
+
 class UserSchema(UserCredentialsSchema):
     id: UUID = Field(default_factory=uuid4)
     role: str
