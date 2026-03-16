@@ -2,7 +2,7 @@ from fastapi import BackgroundTasks
 
 from fitlife.config import settings
 from fitlife.member.repositories import MemberRepository
-from fitlife.schemas import UserRegisterSchema
+from fitlife.schemas import UserRegisterSchema, UserRegisterWithRoleSchema
 from fitlife.security import SecurityDep
 from fitlife.services import UserService
 
@@ -19,6 +19,6 @@ class MemberService(UserService):
     async def create_member(self, data: UserRegisterSchema):
         data_dict = data.model_dump()
         data_dict['role'] = 'member'
-        data = UserRegisterSchema(**data_dict)
+        data = UserRegisterWithRoleSchema(**data_dict)
 
         return await super().create_user(data, self.security)
