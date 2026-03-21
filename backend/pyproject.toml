@@ -64,6 +64,7 @@ select = [
 [tool.ruff.format]
 indent-style = "space"
 quote-style = "single"
+skip-magic-trailing-comma = false
 
 [tool.mypy]
 python_version = "3.12"
