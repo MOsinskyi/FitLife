@@ -18,6 +18,7 @@ sys.path.insert(0, join(backend_root, 'src'))
 from fitlife.config import settings  # noqa
 from fitlife.models import Base, UserBase  # noqa
 from fitlife.members.models import MemberModel  # noqa
+from fitlife.coaches.models import CoachModel  # noqa
 
 target_metadata = Base.metadata
 
