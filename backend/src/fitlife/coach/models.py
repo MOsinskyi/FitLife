@@ -11,15 +11,12 @@ class CoachModel(UserBase):
         String,
         nullable=False,
         server_default='Силові тренування',
-        name='Спеціальність',
     )
 
-    emoji_entity = Column(
+    emoji_char = Column(
         String,
         nullable=False,
-        server_default='&#x1F3CB;',
-        name='Emoji',
-        comment='HTML entity (hex)',
+        server_default='🏋️',
     )
 
     experience = Column(
@@ -27,7 +24,6 @@ class CoachModel(UserBase):
         nullable=False,
         default=1,
         server_default='1',
-        name='Досвід',
         comment='Потрібно ввести досвід в роках',
     )
 
