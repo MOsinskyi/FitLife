@@ -1,5 +1,5 @@
 from fitlife.models import UserBase
 
 
-class Member(UserBase):
+class MemberModel(UserBase):
     pass

@@ -17,7 +17,7 @@ class UserRegisterSchema(UserCreateSchema):
     password: str = Field(min_length=8, default='', description='Password must be at least 8 characters long')
 
 
-class UserUpdateSchema:
+class UserUpdateSchema(BaseModel):
     first_name: str | None = None
     last_name: str | None = None
     phone_number: str | None = None
