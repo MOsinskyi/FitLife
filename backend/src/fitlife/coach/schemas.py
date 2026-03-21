@@ -2,14 +2,14 @@ from collections.abc import Callable
 
 from pydantic import Field
 
-from fitlife.schemas import UserCredentialsSchema, UserRegisterSchema, UserSchema
+from fitlife.schemas import UserCredentialsSchema, UserRegisterSchema, UserRegisterWithRoleSchema, UserSchema
 
 SPECIALITIES = ['Силові тренування', 'Функціональний фітнес', 'Йога та стретчинг', 'Кардіо та HIIT', 'Медитація']
 
 
 class CoachCredentialsSchema(UserCredentialsSchema):
     speciality: str = Field(default=SPECIALITIES[0], title='Спеціальність', examples=SPECIALITIES)
-    emoji_entity: str = Field(default='&#x1F3CB;', title='Emoji', description='HTML entity (hex)')
+    emoji_char: str = Field(default='🏋️‍', title='Emoji')
     experience: int = Field(default=1, title='Досвід', ge=1)
     experience_title: str = Field(default='рік')
 
@@ -21,9 +21,13 @@ class CoachCredentialsSchema(UserCredentialsSchema):
         return result
 
 
+class CoachRegisterWithRoleSchema(UserRegisterWithRoleSchema, CoachCredentialsSchema):
+    pass
+
+
 class CoachRegisterSchema(UserRegisterSchema, CoachCredentialsSchema):
     pass
 
 
 class CoachSchema(UserSchema, CoachCredentialsSchema):
-    pass
+    session_count: int = Field(default=0)

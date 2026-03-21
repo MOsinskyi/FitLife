@@ -5,9 +5,9 @@ from fastapi_cache.decorator import cache
 
 from fitlife.auth.dependencies import CurrentCoachDep
 from fitlife.coach.dependencies import CoachServiceDep
-from fitlife.coach.schemas import CoachSchema
+from fitlife.coach.schemas import CoachRegisterSchema, CoachSchema
 from fitlife.config import settings
-from fitlife.schemas import BadResponse, OkResponse, UserRegisterSchema
+from fitlife.schemas import BadResponse, OkResponse
 from fitlife.utils import custom_key_builder
 
 router = APIRouter()
@@ -84,7 +84,7 @@ async def get_specific_coach(coach_uuid: UUID, service: CoachServiceDep):
 )
 async def update_coach(
     coach_uuid: UUID,
-    coach: UserRegisterSchema,
+    coach: CoachRegisterSchema,
     service: CoachServiceDep,
     current_user: CurrentCoachDep,  # coach only
 ):
