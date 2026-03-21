@@ -29,3 +29,11 @@ class BaseUserRepository[T](ABC):
     @abstractmethod
     async def delete_user(self, user_id: UUID) -> None:
         pass
+
+    @abstractmethod
+    async def get_user_by_phone(self, phone: str) -> T | None:
+        pass
+
+    @abstractmethod
+    async def get_user_by_email(self, email: str) -> T | None:
+        pass

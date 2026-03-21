@@ -2,7 +2,9 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
-MOBILE_PHONE_PATTERN = r'^(?:\+38)?(?:\(044\)[ .-]?[0-9]{3}[ .-]?[0-9]{2}[ .-]?[0-9]{2}|044[ .-]?[0-9]{3}[ .-]?[0-9]{2}[ .-]?[0-9]{2}|044[0-9]{7})$'  # noqa
+MOBILE_PHONE_PATTERN = (
+    r'/\+38\s\(0(39|50|63|66|67|68|70|73|90|91|92|93|94|95|96|97|98|99)\)\s[\d]{3}-[\d]{2}-[\d]{2}/g'  # noqa
+)
 EMAIL_PATTERN = r'/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/'
 
 
