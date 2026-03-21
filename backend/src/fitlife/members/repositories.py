@@ -9,6 +9,16 @@ from .models import MemberModel
 
 
 class MemberRepository(BaseUserRepository[MemberModel]):
+    async def get_user_by_email(self, email: str) -> MemberModel | None:
+        stmt = select(MemberModel).where(MemberModel.email == email)
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()
+
+    async def get_user_by_phone(self, phone: str) -> MemberModel | None:
+        stmt = select(MemberModel).where(MemberModel.phone_number == phone)
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()
+
     async def get_user_by_id(self, user_id: UUID) -> MemberModel | None:
         stmt = select(MemberModel).where(MemberModel.id == user_id)
         result = await self.session.execute(stmt)
