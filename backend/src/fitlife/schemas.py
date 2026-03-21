@@ -1,3 +1,5 @@
+from uuid import UUID, uuid4
+
 from pydantic import BaseModel, Field
 
 MOBILE_PHONE_PATTERN = r'^(?:\+38)?(?:\(044\)[ .-]?[0-9]{3}[ .-]?[0-9]{2}[ .-]?[0-9]{2}|044[ .-]?[0-9]{3}[ .-]?[0-9]{2}[ .-]?[0-9]{2}|044[0-9]{7})$'  # noqa
@@ -9,4 +11,12 @@ class UserCreateSchema(BaseModel):
     last_name: str = Field(default='Doe')
     phone_number: str = Field(pattern=MOBILE_PHONE_PATTERN)
     email: str | None = Field(pattern=EMAIL_PATTERN, default='john.doe@example.com')
-    password: str = Field(min_length=8, default='')
+
+
+class UserRegisterSchema(UserCreateSchema):
+    password: str = Field(min_length=8, default='', description='Password must be at least 8 characters long')
+
+
+class UserSchema(UserCreateSchema):
+    id: UUID = Field(default=uuid4)
+    role: str = Field(default='member', examples=['member', 'coach'])
