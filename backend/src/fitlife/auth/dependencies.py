@@ -6,13 +6,14 @@ from fastapi.security import OAuth2PasswordBearer
 from passlib.exc import InvalidTokenError
 
 from fitlife.exceptions import InvalidCredentialsException
+from fitlife.members.dependencies import MemberRepositoryDep
+from fitlife.models import UserBase
+from fitlife.security import SecurityDep
 
 from .services import AuthService
 
 if TYPE_CHECKING:
-    from fitlife.members.dependencies import MemberRepositoryDep
-    from fitlife.models import UserBase
-    from fitlife.security import SecurityDep
+    pass
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/auth/login')
 

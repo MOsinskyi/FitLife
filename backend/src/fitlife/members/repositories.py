@@ -38,7 +38,7 @@ class MemberRepository(BaseUserRepository[MemberModel]):
         smtp = (
             update(MemberModel)
             .where(MemberModel.id == user_id)
-            .values(**data.model_dump(exclude_unset=True))
+            .values(**data.model_dump(exclude_unset=True, exclude_none=True, exclude_defaults=True))
             .returning(MemberModel)
         )
         result = await self.session.execute(smtp)

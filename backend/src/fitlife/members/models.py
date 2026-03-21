@@ -2,4 +2,4 @@ from fitlife.models import UserBase
 
 
 class MemberModel(UserBase):
-    pass
+    __tablename__ = 'members'

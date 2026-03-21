@@ -46,6 +46,10 @@ class MemberService:
         return user
 
     async def delete_member_profile(self, member_id: UUID) -> None:
+        user = await self.repository.get_user_by_id(member_id)
+        if not user:
+            raise ValueError('Member not found')
+
         await self.repository.delete_user(member_id)
 
     async def get_all_members(self) -> list[MemberModel]:
