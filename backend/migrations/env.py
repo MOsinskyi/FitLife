@@ -15,10 +15,8 @@ if config.config_file_name is not None:
 backend_root = dirname(dirname(abspath(__file__)))
 sys.path.insert(0, join(backend_root, 'src'))
 
-from fitlife.coach.models import CoachModel  # noqa
 from fitlife.config import settings  # noqa
-from fitlife.member.models import MemberModel  # noqa
-from fitlife.models import Base  # noqa
+from fitlife.models import Base, UserBase  # noqa
 
 target_metadata = Base.metadata
 

@@ -1,18 +1,22 @@
 from datetime import UTC, datetime
-from uuid import UUID, uuid4
+from uuid import uuid4
 
-from sqlalchemy import Column, String
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy import UUID, Column, DateTime, String
+from sqlalchemy.orm import DeclarativeBase
 
 
 class Base(DeclarativeBase):
-    id: Mapped[UUID] = mapped_column(
+    id = Column(
+        UUID(as_uuid=True),
         primary_key=True,
         default=uuid4,
     )
-
-    created_at: Mapped[datetime] = mapped_column(default=datetime.now(UTC))
-    updated_on: Mapped[datetime] = mapped_column(
+    created_at = Column(
+        DateTime(timezone=True),
+        default=datetime.now(UTC),
+    )
+    updated_at = Column(
+        DateTime(timezone=True),
         default=datetime.now(UTC),
         onupdate=datetime.now(UTC),
     )
@@ -24,19 +28,26 @@ class UserBase(Base):
     first_name = Column(
         String,
         nullable=False,
+        default='',
     )
     last_name = Column(
         String,
         nullable=False,
+        default='',
     )
     phone_number = Column(
         String,
         nullable=False,
+        default='',
     )
-    email = Column(String)
+    email = Column(
+        String,
+        default='',
+    )
     password = Column(
-        String(255),
+        String,
         nullable=False,
+        default='',
     )
     role = Column(
         String,
