@@ -3,14 +3,17 @@ import './App.css'
 
 const API_BASE = 'http://127.0.0.1:8000'
 
-const COACH_EMOJIS = ['🏋️‍♀️', '⚡', '🧘‍♀️', '🔥', '💪', '🎯', '🏃‍♂️', '🤸']
-
 interface Coach {
   id: string
   first_name: string
   last_name: string
   email: string | null
   phone_number: string
+  specialty: string
+  emoji_char: string
+  experience: number
+  experience_title: string
+  session_count: number
   role: string
 }
 
@@ -241,7 +244,7 @@ export default function App() {
                 style={{ transitionDelay: `${i * 100}ms` }}
               >
                 <div className="coach-avatar">
-                  {COACH_EMOJIS[i % COACH_EMOJIS.length]}
+                  {c.emoji_char}
                 </div>
                 <div className="coach-info">
                   <h3>{c.first_name} {c.last_name}</h3>
