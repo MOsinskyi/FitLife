@@ -7,14 +7,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from fitlife.auth.routers import router as auth_router
 from fitlife.cache import init_cache
-from fitlife.coach.routers import router as coach_router
 from fitlife.config import settings
-from fitlife.member.routers import router as member_router
 from fitlife.middleware import process_time_middleware
-from fitlife.schemas import OkResponse
-from fitlife.training_session.routers import router as training_session_router
 
 
 @asynccontextmanager
@@ -51,20 +46,6 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
             'msg': exc.detail,
         },
     )
-
-
-@app.get(
-    '/',
-    response_model=OkResponse,
-)
-async def home():
-    return OkResponse(msg='Server is working')
-
-
-app.include_router(auth_router)
-app.include_router(member_router)
-app.include_router(coach_router)
-app.include_router(training_session_router)
 
 
 if __name__ == '__main__':

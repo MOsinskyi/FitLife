@@ -12,9 +12,6 @@ new_session = async_sessionmaker(engine, expire_on_commit=False)
 
 
 async def get_session() -> AsyncGenerator[AsyncSession, None]:
-    """
-    Асинхронна функція, яка повертає сесію бази даних.
-    """
     async with new_session() as session:
         yield session
 

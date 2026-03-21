@@ -5,32 +5,20 @@ from sqlalchemy import Column, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
-class Base(
-    DeclarativeBase,
-):
+class Base(DeclarativeBase):
     id: Mapped[UUID] = mapped_column(
         primary_key=True,
         default=uuid4,
     )
 
-    created_at: Mapped[datetime] = mapped_column(
-        default=datetime.now(
-            UTC,
-        ),
-    )
+    created_at: Mapped[datetime] = mapped_column(default=datetime.now(UTC))
     updated_on: Mapped[datetime] = mapped_column(
-        default=datetime.now(
-            UTC,
-        ),
-        onupdate=datetime.now(
-            UTC,
-        ),
+        default=datetime.now(UTC),
+        onupdate=datetime.now(UTC),
     )
 
 
-class UserBase(
-    Base,
-):
+class UserBase(Base):
     __abstract__ = True
 
     first_name = Column(
@@ -45,13 +33,9 @@ class UserBase(
         String,
         nullable=False,
     )
-    email = Column(
-        String,
-    )
+    email = Column(String)
     password = Column(
-        String(
-            255,
-        ),
+        String(255),
         nullable=False,
     )
     role = Column(
