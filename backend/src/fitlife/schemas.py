@@ -17,6 +17,14 @@ class UserRegisterSchema(UserCreateSchema):
     password: str = Field(min_length=8, default='', description='Password must be at least 8 characters long')
 
 
+class UserUpdateSchema:
+    first_name: str | None = None
+    last_name: str | None = None
+    phone_number: str | None = None
+    email: str | None = None
+    password: str | None = None
+
+
 class UserSchema(UserCreateSchema):
     id: UUID = Field(default=uuid4)
     role: str = Field(default='member', examples=['member', 'coach'])
