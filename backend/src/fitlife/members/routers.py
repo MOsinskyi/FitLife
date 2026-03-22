@@ -2,9 +2,9 @@ from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, status
 
+from fitlife.exceptions import UserAlreadyExists
 from fitlife.schemas import UserRegisterSchema, UserSchema, UserUpdateSchema
 
-from ..exceptions import UserAlreadyExists
 from .dependencies import MemberServiceDep
 
 member_router = APIRouter(prefix='/members', tags=['👨‍👩‍👧‍👦 Members'])

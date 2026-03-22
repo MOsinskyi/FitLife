@@ -6,7 +6,7 @@ from fitlife.exceptions import UserAlreadyExists
 from .models import MemberModel
 
 if TYPE_CHECKING:
-    from fitlife.schemas import UserRegisterSchema, UserUpdateSchema
+    from fitlife.schemas import UserRegisterSchema, UserRoles, UserUpdateSchema
     from fitlife.security import Security
 
     from .repositories import MemberRepository
@@ -34,7 +34,7 @@ class MemberService:
 
         user = await self.repository.create_user(new_user)
 
-        user.role = 'member'
+        user.role = UserRoles.MEMBER.value
         user.password = self.security.hash_password(user_data.password)
 
         return user
