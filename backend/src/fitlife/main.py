@@ -9,6 +9,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from fitlife.auth.routers import auth_router
 from fitlife.cache import init_cache
+from fitlife.coaches.routers import coach_router
 from fitlife.config import settings
 from fitlife.members.routers import member_router
 from fitlife.middleware import process_time_middleware
@@ -50,8 +51,9 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
     )
 
 
-app.include_router(member_router)
 app.include_router(auth_router)
+app.include_router(member_router)
+app.include_router(coach_router)
 
 if __name__ == '__main__':
     uvicorn.run(

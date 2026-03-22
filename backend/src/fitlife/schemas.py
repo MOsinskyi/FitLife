@@ -1,10 +1,17 @@
+import enum
 from datetime import UTC, datetime
+from typing import Annotated
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
 MOBILE_PHONE_PATTERN = r'^\+380\d{9}$'  # noqa
 EMAIL_PATTERN = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+
+
+class UserRoles(enum.Enum):
+    MEMBER = 'member'
+    COACH = 'coach'
 
 
 class UserCreateSchema(BaseModel):
@@ -26,7 +33,7 @@ class UserUpdateSchema(BaseModel):
 
 
 class UserSchema(UserCreateSchema):
-    id: UUID = Field(examples=[uuid4()])
-    role: str = Field(examples=['member', 'coach'])
+    id: UUID = Field(examples=[uuid4().hex])
+    role: Annotated[UserRoles, Field(examples=['member', 'coach'])]
     created_at: datetime = Field(examples=[datetime.now(UTC)])
     updated_at: datetime = Field(examples=[datetime.now(UTC)])
