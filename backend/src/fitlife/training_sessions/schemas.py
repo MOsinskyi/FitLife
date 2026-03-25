@@ -39,6 +39,17 @@ class TrainingSessionCreateSchema(BaseModel):
     participants: Annotated[list[UUID], Field(default=[])]
 
 
+class TrainingSessionUpdateSchema(BaseModel):
+    title: str | None = None
+    description: str | None = None
+    start_time: datetime | None = None
+    end_time: datetime | None = None
+    status: SessionStatus | None = None
+    max_participants: int | None = None
+    coach: UUID | None = None
+    participants: list[UUID] | None = []
+
+
 class TrainingSessionSchema(TrainingSessionCreateSchema):
     id: Annotated[UUID, Field(default_factory=uuid4)]
     coach: CoachSchema | None
