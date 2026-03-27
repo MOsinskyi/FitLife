@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import Mapped, relationship
 
 from fitlife.models import UserBase
+from fitlife.training_sessions.models import TrainingSession
 
 
 class CoachModel(UserBase):
@@ -26,3 +28,5 @@ class CoachModel(UserBase):
         nullable=False,
         default='',
     )
+
+    sessions: Mapped[list['TrainingSession']] = relationship(back_populates='coach')
