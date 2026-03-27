@@ -2,11 +2,12 @@ from typing import TYPE_CHECKING
 from uuid import UUID
 
 from fitlife.exceptions import UserAlreadyExists
+from fitlife.schemas import UserRoles
 
 from .models import MemberModel
 
 if TYPE_CHECKING:
-    from fitlife.schemas import UserRegisterSchema, UserRoles, UserUpdateSchema
+    from fitlife.schemas import UserRegisterSchema, UserUpdateSchema
     from fitlife.security import Security
 
     from .repositories import MemberRepository
