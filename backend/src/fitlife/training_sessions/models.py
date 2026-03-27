@@ -1,6 +1,6 @@
 import enum
 from datetime import datetime, time
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 from uuid import UUID
 
 from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, Time
@@ -8,9 +8,11 @@ from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
-from fitlife.coaches.models import CoachModel
-from fitlife.members.models import MemberModel
 from fitlife.models import Base
+
+if TYPE_CHECKING:
+    from fitlife.coaches.models import CoachModel
+    from fitlife.members.models import MemberModel
 
 
 class SessionStatus(enum.StrEnum):

@@ -1,4 +1,4 @@
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime, time
 from typing import Annotated
 from uuid import UUID, uuid4
 
@@ -31,8 +31,8 @@ class TrainingSessionCreateSchema(BaseModel):
     description: Annotated[
         str, Field(default="Інтенсивне кругове тренування на всі групи м'язів. Підходить для новачків.")
     ]
-    start_time: Annotated[datetime, Field(default=datetime.now(UTC))]
-    end_time: Annotated[datetime, Field(default=datetime.now(UTC) + timedelta(hours=1))]
+    start_time: Annotated[time, Field(default='10:00')]
+    end_time: Annotated[time, Field(default='11:00')]
     status: Annotated[SessionStatus, Field(default=SessionStatus.SCHEDULED)]
     max_participants: Annotated[int, Field(default=12, ge=1, le=12)]
     coach: UUID
