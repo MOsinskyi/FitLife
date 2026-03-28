@@ -19,12 +19,10 @@ class TrainingSessionService:
         self._member_repository = member_repository
 
     async def create_training_session(self, data: TrainingSessionCreateSchema) -> TrainingSession:
-        # Validate coach exists
         coach = await self._coach_repository.get_user_by_id(data.coach)
         if not coach:
             raise ValueError(f'Coach with id {data.coach} not found')
 
-        # Create training session
         training_session = TrainingSession(
             title=data.title,
             description=data.description,
@@ -37,7 +35,6 @@ class TrainingSessionService:
 
         created_session = await self._training_session_repository.create_training_session(training_session)
 
-        # Add participants if provided
         if data.participants:
             await self.add_participants_to_session(created_session.id, data.participants)
 
@@ -74,12 +71,10 @@ class TrainingSessionService:
         await self._training_session_repository.delete_training_session(session_id)
 
     async def add_participants_to_session(self, session_id: UUID, member_ids: list[UUID]) -> TrainingSession:
-        # Validate session exists
         training_session = await self._training_session_repository.get_training_session_by_id(session_id)
         if not training_session:
             raise ValueError(f'Training session with id {session_id} not found')
 
-        # Check if session is full
         current_participants = len(training_session.participants)
         if current_participants + len(member_ids) > training_session.max_participants:
             raise ValueError(
@@ -87,30 +82,25 @@ class TrainingSessionService:
                 f'Session has {current_participants}/{training_session.max_participants} participants'
             )
 
-        # Validate all members exist
         for member_id in member_ids:
             member = await self._member_repository.get_user_by_id(member_id)
             if not member:
                 raise ValueError(f'Member with id {member_id} not found')
 
-            # Check if member is already participating
             is_already_participant = any(p.member_id == member_id for p in training_session.participants)
             if is_already_participant:
                 raise ValueError(f'Member with id {member_id} is already participating in this session')
 
-            # Add participant
             participant = SessionParticipant(member_id=member_id, session_id=session_id)
             training_session.participants.append(participant)
 
         return await self._training_session_repository.get_training_session_by_id(session_id)
 
     async def remove_participant_from_session(self, session_id: UUID, member_id: UUID) -> TrainingSession:
-        # Validate session exists
         training_session = await self._training_session_repository.get_training_session_by_id(session_id)
         if not training_session:
             raise ValueError(f'Training session with id {session_id} not found')
 
-        # Find and remove participant
         participant_to_remove = None
         for participant in training_session.participants:
             if participant.member_id == member_id:
@@ -125,7 +115,6 @@ class TrainingSessionService:
         return await self._training_session_repository.get_training_session_by_id(session_id)
 
     async def get_sessions_by_coach(self, coach_id: UUID) -> list[TrainingSession]:
-        # Validate coach exists
         coach = await self._coach_repository.get_user_by_id(coach_id)
         if not coach:
             raise ValueError(f'Coach with id {coach_id} not found')
@@ -134,7 +123,6 @@ class TrainingSessionService:
         return [session for session in all_sessions if session.coach_id == coach_id]
 
     async def get_sessions_by_member(self, member_id: UUID) -> list[TrainingSession]:
-        # Validate member exists
         member = await self._member_repository.get_user_by_id(member_id)
         if not member:
             raise ValueError(f'Member with id {member_id} not found')

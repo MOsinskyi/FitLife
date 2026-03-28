@@ -21,7 +21,8 @@ fastapi-cache2 = "^0.2.2"
 email-validator = "^2.3.0"
 alembic = "^1.18.3"
 bcrypt = "4.0.1"
-fastapi-admin = "^1.0.4"
+sqladmin = {extras = ["full"], version = "^0.23.0"}
+itsdangerous = "^2.2.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.0"

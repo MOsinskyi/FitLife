@@ -58,6 +58,11 @@ class CacheConfig(BaseModel):
     namespace: CacheNamespace = CacheNamespace()
 
 
+class AdminConfig(BaseModel):
+    title: str = 'FitLife Admin'
+    enabled: bool = True
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file='.env',
@@ -72,6 +77,7 @@ class Settings(BaseSettings):
     cache: CacheConfig = CacheConfig()
     database: SqliteConfig = SqliteConfig()
     security: SecurityConfig = SecurityConfig()
+    admin: AdminConfig = AdminConfig()
 
 
 settings = Settings()
