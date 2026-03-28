@@ -5,8 +5,9 @@ from typing import Any
 from starlette.requests import Request
 from starlette.responses import Response
 
-from fitlife.coach.services import CoachService
-from fitlife.member.services import MemberService
+from fitlife.coaches.services import CoachService
+from fitlife.members.services import MemberService
+from fitlife.training_sessions.services import TrainingSessionService
 
 
 def custom_key_builder(  # noqa: PLR0913
@@ -21,6 +22,7 @@ def custom_key_builder(  # noqa: PLR0913
     exclude_types = (
         MemberService,
         CoachService,
+        TrainingSessionService,
     )
     new_kw = {}
     for key, value in kwargs.items():
