@@ -4,3 +4,6 @@ https://redis.io/tutorials/develop/python/fastapi/
 https://github.com/long2ice/fastapi-cache
 https://github.com/mahenzon/fastapi-users-intro/tree/master
 https://github.com/Netflix/dispatch
+
+-- ADMIN --
+https://aminalaee.github.io/sqladmin/

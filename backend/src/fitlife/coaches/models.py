@@ -30,3 +30,6 @@ class CoachModel(UserBase):
     )
 
     sessions: Mapped[list['TrainingSession']] = relationship(back_populates='coach')
+
+    def __str__(self):
+        return f'{self.emoji} {self.first_name} {self.last_name} - {self.specialization}'

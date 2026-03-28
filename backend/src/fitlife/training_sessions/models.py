@@ -38,6 +38,9 @@ class TrainingSession(Base):
         back_populates='session', cascade='all, delete-orphan'
     )
 
+    def __str__(self):
+        return f'{self.title} ({self.start_time.strftime("%H:%M")} - {self.end_time.strftime("%H:%M")})'
+
 
 class SessionParticipant(Base):
     __tablename__ = 'session_participants'
@@ -49,3 +52,6 @@ class SessionParticipant(Base):
 
     member: Mapped['MemberModel'] = relationship(back_populates='participations')
     session: Mapped['TrainingSession'] = relationship(back_populates='participants')
+
+    def __str__(self):
+        return f'Participant: {self.member_id}'

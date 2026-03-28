@@ -94,8 +94,7 @@ class TrainingSessionAdmin(ModelView, model=TrainingSession):
         TrainingSession.start_time,
         TrainingSession.end_time,
         TrainingSession.status,
-        TrainingSession.max_participants,
-        TrainingSession.coach_id,
+        TrainingSession.coach,
         TrainingSession.created_at,
     ]
 
@@ -109,7 +108,17 @@ class TrainingSessionAdmin(ModelView, model=TrainingSession):
         TrainingSession.created_at,
     ]
 
-    form_excluded_columns = [TrainingSession.participants, TrainingSession.coach]
+    # Include coach and participants in the form
+    form_columns = [
+        'title',
+        'description',
+        'start_time',
+        'end_time',
+        'status',
+        'max_participants',
+        'coach',
+        'participants',
+    ]
 
     can_create = True
     can_edit = True
@@ -123,12 +132,16 @@ class SessionParticipantAdmin(ModelView, model=SessionParticipant):
     icon = 'fa-solid fa-user-check'
 
     column_list = [
-        SessionParticipant.member_id,
-        SessionParticipant.session_id,
+        SessionParticipant.member,
+        SessionParticipant.session,
         SessionParticipant.joined_at,
     ]
 
-    form_excluded_columns = [SessionParticipant.member, SessionParticipant.session]
+    # Include member and session in form
+    form_columns = [
+        'member',
+        'session',
+    ]
 
     can_create = True
     can_edit = False
