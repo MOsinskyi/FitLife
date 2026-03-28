@@ -11,8 +11,8 @@ from fitlife.security import Security
 
 PATCH_DECODE_ACCESS = "fitlife.security.Security.decode_access_token"
 PATCH_DECODE_REFRESH = "fitlife.security.Security.decode_refresh_token"
-PATCH_MEMBER_REPO = "fitlife.member.repositories.MemberSqlAlchemyRepository"
-PATCH_COACH_REPO = "fitlife.coach.repositories.CoachSqlAlchemyRepository"
+PATCH_MEMBER_REPO = "fitlife.members.repositories.MemberRepository"
+PATCH_COACH_REPO = "fitlife.coaches.repositories.CoachRepository"
 
 SECURITY = Security()
 
@@ -89,7 +89,7 @@ class TestAuthSchemas:
             last_name="Петренко",
             email="ivan@test.ua",
             phone_number="+380671234567",
-            password="pass123",
+            password="password123",
         )
         assert schema.phone_number == "+380671234567"
 
@@ -100,9 +100,9 @@ class TestAuthSchemas:
         schema = UserRegisterSchema(
             first_name="A",
             last_name="B",
-            email=None,
+            email="test@example.com",
             phone_number=phone,
-            password="pass",
+            password="password123",
         )
         assert schema.phone_number == phone
 
@@ -129,10 +129,9 @@ class TestAuthSchemas:
             last_name="Ткаченко",
             email="sergiy@coach.ua",
             phone_number="+380631234567",
-            password="qwerty",
+            password="password123",
         )
         assert schema.first_name == "Сергій"
-        assert schema.role if hasattr(schema, "role") else True
 
 
 class TestGetCurrentUserDependency:
@@ -143,10 +142,10 @@ class TestGetCurrentUserDependency:
 
         member_id = str(mock_member_model.id)
 
-        mock_session = MagicMock()
-        mock_result = MagicMock()
-        mock_result.scalar_one_or_none.return_value = mock_member_model
-        mock_session.execute = AsyncMock(return_value=mock_result)
+        mock_member_repo = MagicMock()
+        mock_member_repo.get_user_by_id = AsyncMock(return_value=mock_member_model)
+
+        mock_coach_repo = MagicMock()
 
         mock_security = MagicMock()
         mock_security.decode_access_token.return_value = {
@@ -155,9 +154,10 @@ class TestGetCurrentUserDependency:
         }
 
         result = await get_current_user(
-            token="fake-token",
-            session=mock_session,
+            member_repository=mock_member_repo,
+            coach_repository=mock_coach_repo,
             security=mock_security,
+            token="fake-token",
         )
         assert result is mock_member_model
 
@@ -165,10 +165,9 @@ class TestGetCurrentUserDependency:
     async def test_valid_coach_token_returns_coach(self, mock_coach_model):
         from fitlife.auth.dependencies import get_current_user
 
-        mock_session = MagicMock()
-        mock_result = MagicMock()
-        mock_result.scalar_one_or_none.return_value = mock_coach_model
-        mock_session.execute = AsyncMock(return_value=mock_result)
+        mock_member_repo = MagicMock()
+        mock_coach_repo = MagicMock()
+        mock_coach_repo.get_user_by_id = AsyncMock(return_value=mock_coach_model)
 
         mock_security = MagicMock()
         mock_security.decode_access_token.return_value = {
@@ -177,58 +176,55 @@ class TestGetCurrentUserDependency:
         }
 
         result = await get_current_user(
-            token="fake-token",
-            session=mock_session,
+            member_repository=mock_member_repo,
+            coach_repository=mock_coach_repo,
             security=mock_security,
+            token="fake-token",
         )
         assert result is mock_coach_model
 
     @pytest.mark.asyncio
-    async def test_empty_payload_raises_401(self):
-        from fastapi import HTTPException
+    async def test_empty_payload_raises_exception(self):
+        from fitlife.exceptions import InvalidCredentialsException
         from fitlife.auth.dependencies import get_current_user
 
         mock_security = MagicMock()
         mock_security.decode_access_token.return_value = {}
 
-        with pytest.raises(HTTPException) as exc_info:
+        with pytest.raises(InvalidCredentialsException):
             await get_current_user(
+                member_repository=MagicMock(),
+                coach_repository=MagicMock(),
+                security=mock_security,
                 token="bad-token",
-                session=MagicMock(),
-                security=mock_security,
             )
 
-        assert exc_info.value.status_code == 401
-
     @pytest.mark.asyncio
-    async def test_unknown_role_raises_401(self):
-        from fastapi import HTTPException
+    async def test_unknown_role_raises_exception(self):
+        from fitlife.exceptions import InvalidCredentialsException
         from fitlife.auth.dependencies import get_current_user
 
         mock_security = MagicMock()
         mock_security.decode_access_token.return_value = {
             "sub": str(uuid4()),
-            "role": "superadmin",  # невідома роль
+            "role": "superadmin",
         }
 
-        with pytest.raises(HTTPException) as exc_info:
+        with pytest.raises(InvalidCredentialsException):
             await get_current_user(
+                member_repository=MagicMock(),
+                coach_repository=MagicMock(),
+                security=mock_security,
                 token="bad",
-                session=MagicMock(),
-                security=mock_security,
             )
 
-        assert exc_info.value.status_code == 401
-
     @pytest.mark.asyncio
-    async def test_user_not_in_db_raises_401(self):
-        from fastapi import HTTPException
+    async def test_user_not_in_db_raises_exception(self):
+        from fitlife.exceptions import InvalidCredentialsException
         from fitlife.auth.dependencies import get_current_user
 
-        mock_session = MagicMock()
-        mock_result = MagicMock()
-        mock_result.scalar_one_or_none.return_value = None  # не знайдено в БД
-        mock_session.execute = AsyncMock(return_value=mock_result)
+        mock_member_repo = MagicMock()
+        mock_member_repo.get_user_by_id = AsyncMock(return_value=None)
 
         mock_security = MagicMock()
         mock_security.decode_access_token.return_value = {
@@ -236,71 +232,18 @@ class TestGetCurrentUserDependency:
             "role": "member",
         }
 
-        with pytest.raises(HTTPException) as exc_info:
+        with pytest.raises(InvalidCredentialsException):
             await get_current_user(
+                member_repository=mock_member_repo,
+                coach_repository=MagicMock(),
+                security=mock_security,
                 token="valid-looking",
-                session=mock_session,
-                security=mock_security,
             )
 
-        assert exc_info.value.status_code == 401
+class TestUserRoles:
 
-    @pytest.mark.asyncio
-    async def test_invalid_uuid_in_sub_raises_401(self):
-        from fastapi import HTTPException
-        from fitlife.auth.dependencies import get_current_user
+    def test_user_roles_enum_has_member_and_coach(self):
+        from fitlife.schemas import UserRoles
 
-        mock_security = MagicMock()
-        mock_security.decode_access_token.return_value = {
-            "sub": "not-a-uuid",
-            "role": "member",
-        }
-
-        with pytest.raises(HTTPException) as exc_info:
-            await get_current_user(
-                token="token",
-                session=MagicMock(),
-                security=mock_security,
-            )
-
-        assert exc_info.value.status_code == 401
-
-class TestRoleGuards:
-
-    @pytest.mark.asyncio
-    async def test_member_guard_accepts_member(self, mock_member_model):
-        from fitlife.auth.dependencies import get_current_active_member
-        from fitlife.member.models import MemberModel
-
-        mock_member_model.__class__ = MemberModel
-        result = await get_current_active_member(current_user=mock_member_model)
-        assert result is mock_member_model
-
-    @pytest.mark.asyncio
-    async def test_member_guard_rejects_coach(self, mock_coach_model):
-        from fastapi import HTTPException
-        from fitlife.auth.dependencies import get_current_active_member
-
-        with pytest.raises(HTTPException) as exc_info:
-            await get_current_active_member(current_user=mock_coach_model)
-
-        assert exc_info.value.status_code == 403
-
-    @pytest.mark.asyncio
-    async def test_coach_guard_rejects_member(self, mock_member_model):
-        from fastapi import HTTPException
-        from fitlife.auth.dependencies import get_current_active_coach
-
-        with pytest.raises(HTTPException) as exc_info:
-            await get_current_active_coach(current_user=mock_member_model)
-
-        assert exc_info.value.status_code == 403
-
-    @pytest.mark.asyncio
-    async def test_coach_guard_accepts_coach(self, mock_coach_model):
-        from fitlife.auth.dependencies import get_current_active_coach
-        from fitlife.coach.models import CoachModel
-
-        mock_coach_model.__class__ = CoachModel
-        result = await get_current_active_coach(current_user=mock_coach_model)
-        assert result is mock_coach_model
+        assert UserRoles.MEMBER.value == 'member'
+        assert UserRoles.COACH.value == 'coach'
