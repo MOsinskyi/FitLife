@@ -17,6 +17,13 @@ BASE_VALID_PAYLOAD = {
 }
 
 
+def get_mock_background_tasks():
+    """Create a mock BackgroundTasks instance"""
+    mock_bg = MagicMock()
+    mock_bg.add_task = MagicMock()
+    return mock_bg
+
+
 class TestTrainingSessionService:
     @pytest.mark.asyncio
     async def test_create_training_session_success(self):
@@ -38,6 +45,8 @@ class TestTrainingSessionService:
             training_session_repository=ts_repo,
             coach_repository=coach_repo,
             member_repository=member_repo,
+            background_tasks=get_mock_background_tasks(),
+            cache_namespace='test_training_session',
         )
 
         schema = TrainingSessionCreateSchema(**BASE_VALID_PAYLOAD)
@@ -58,6 +67,8 @@ class TestTrainingSessionService:
             training_session_repository=ts_repo,
             coach_repository=coach_repo,
             member_repository=member_repo,
+            background_tasks=get_mock_background_tasks(),
+            cache_namespace='test_training_session',
         )
 
         schema = TrainingSessionCreateSchema(**BASE_VALID_PAYLOAD)
@@ -84,6 +95,8 @@ class TestTrainingSessionService:
             training_session_repository=ts_repo,
             coach_repository=coach_repo,
             member_repository=member_repo,
+            background_tasks=get_mock_background_tasks(),
+            cache_namespace='test_training_session',
         )
 
         result = await service.get_training_session(session_id)
@@ -102,6 +115,8 @@ class TestTrainingSessionService:
             training_session_repository=ts_repo,
             coach_repository=coach_repo,
             member_repository=member_repo,
+            background_tasks=get_mock_background_tasks(),
+            cache_namespace='test_training_session',
         )
 
         with pytest.raises(ValueError) as exc_info:
@@ -124,6 +139,8 @@ class TestTrainingSessionService:
             training_session_repository=ts_repo,
             coach_repository=coach_repo,
             member_repository=member_repo,
+            background_tasks=get_mock_background_tasks(),
+            cache_namespace='test_training_session',
         )
 
         result = await service.get_all_training_sessions()
@@ -148,6 +165,8 @@ class TestTrainingSessionService:
             training_session_repository=ts_repo,
             coach_repository=coach_repo,
             member_repository=member_repo,
+            background_tasks=get_mock_background_tasks(),
+            cache_namespace='test_training_session',
         )
 
         await service.delete_training_session(session_id)
@@ -178,6 +197,8 @@ class TestTrainingSessionService:
             training_session_repository=ts_repo,
             coach_repository=coach_repo,
             member_repository=member_repo,
+            background_tasks=get_mock_background_tasks(),
+            cache_namespace='test_training_session',
         )
 
         result = await service.add_participants_to_session(session_id, [member_id])
@@ -206,6 +227,8 @@ class TestTrainingSessionService:
             training_session_repository=ts_repo,
             coach_repository=coach_repo,
             member_repository=member_repo,
+            background_tasks=get_mock_background_tasks(),
+            cache_namespace='test_training_session',
         )
 
         with pytest.raises(ValueError) as exc_info:

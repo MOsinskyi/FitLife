@@ -10,6 +10,13 @@ from fitlife.security import Security
 SECURITY = Security()
 
 
+def get_mock_background_tasks():
+    """Create a mock BackgroundTasks instance"""
+    mock_bg = MagicMock()
+    mock_bg.add_task = MagicMock()
+    return mock_bg
+
+
 class TestCoachRegistration:
     @pytest.mark.asyncio
     async def test_register_coach_success(self):
@@ -26,7 +33,12 @@ class TestCoachRegistration:
         security = MagicMock()
         security.hash_password = MagicMock(return_value='hashed_password')
 
-        service = CoachService(repository=repo, security=security)
+        service = CoachService(
+            repository=repo,
+            security=security,
+            background_tasks=get_mock_background_tasks(),
+            cache_namespace='test_coach',
+        )
 
         schema = CoachRegisterSchema(
             first_name='Тарас',
@@ -56,7 +68,12 @@ class TestCoachRegistration:
         repo.get_user_by_phone = AsyncMock(return_value=None)
 
         security = MagicMock()
-        service = CoachService(repository=repo, security=security)
+        service = CoachService(
+            repository=repo,
+            security=security,
+            background_tasks=get_mock_background_tasks(),
+            cache_namespace='test_coach',
+        )
 
         schema = CoachRegisterSchema(
             first_name='Test',
@@ -83,7 +100,12 @@ class TestCoachRegistration:
         repo.get_user_by_email = AsyncMock(return_value=None)
 
         security = MagicMock()
-        service = CoachService(repository=repo, security=security)
+        service = CoachService(
+            repository=repo,
+            security=security,
+            background_tasks=get_mock_background_tasks(),
+            cache_namespace='test_coach',
+        )
 
         schema = CoachRegisterSchema(
             first_name='Test',
@@ -114,7 +136,12 @@ class TestCoachCRUD:
         repo.get_users = AsyncMock(return_value=[coach1, coach2])
 
         security = MagicMock()
-        service = CoachService(repository=repo, security=security)
+        service = CoachService(
+            repository=repo,
+            security=security,
+            background_tasks=get_mock_background_tasks(),
+            cache_namespace='test_coach',
+        )
         result = await service.get_all_coaches()
 
         assert isinstance(result, list)
@@ -130,7 +157,12 @@ class TestCoachCRUD:
         repo.get_user_by_id = AsyncMock(return_value=mock_coach)
 
         security = MagicMock()
-        service = CoachService(repository=repo, security=security)
+        service = CoachService(
+            repository=repo,
+            security=security,
+            background_tasks=get_mock_background_tasks(),
+            cache_namespace='test_coach',
+        )
         result = await service.get_coach_profile(coach_id)
 
         assert result == mock_coach
@@ -141,7 +173,12 @@ class TestCoachCRUD:
         repo.get_user_by_id = AsyncMock(return_value=None)
 
         security = MagicMock()
-        service = CoachService(repository=repo, security=security)
+        service = CoachService(
+            repository=repo,
+            security=security,
+            background_tasks=get_mock_background_tasks(),
+            cache_namespace='test_coach',
+        )
 
         with pytest.raises(ValueError) as exc_info:
             await service.get_coach_profile(uuid4())
@@ -158,7 +195,12 @@ class TestCoachCRUD:
         repo.update_user = AsyncMock(return_value=mock_coach)
 
         security = MagicMock()
-        service = CoachService(repository=repo, security=security)
+        service = CoachService(
+            repository=repo,
+            security=security,
+            background_tasks=get_mock_background_tasks(),
+            cache_namespace='test_coach',
+        )
 
         schema = CoachUpdateSchema(
             specialization=Specializations.CROSSFIT,
@@ -181,7 +223,12 @@ class TestCoachCRUD:
         repo.delete_user = AsyncMock(return_value=None)
 
         security = MagicMock()
-        service = CoachService(repository=repo, security=security)
+        service = CoachService(
+            repository=repo,
+            security=security,
+            background_tasks=get_mock_background_tasks(),
+            cache_namespace='test_coach',
+        )
 
         await service.delete_coach(coach_id)
 

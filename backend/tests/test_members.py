@@ -10,6 +10,13 @@ from fitlife.security import Security
 SECURITY = Security()
 
 
+def get_mock_background_tasks():
+    """Create a mock BackgroundTasks instance"""
+    mock_bg = MagicMock()
+    mock_bg.add_task = MagicMock()
+    return mock_bg
+
+
 class TestMemberRegistration:
     @pytest.mark.asyncio
     async def test_register_member_success(self):
@@ -26,7 +33,12 @@ class TestMemberRegistration:
         security = MagicMock()
         security.hash_password = MagicMock(return_value='hashed_password')
 
-        service = MemberService(repository=repo, security=security)
+        service = MemberService(
+            repository=repo,
+            security=security,
+            background_tasks=get_mock_background_tasks(),
+            cache_namespace='test_member',
+        )
 
         schema = UserRegisterSchema(
             first_name='Олена',
@@ -54,7 +66,12 @@ class TestMemberRegistration:
         repo.get_user_by_phone = AsyncMock(return_value=None)
 
         security = MagicMock()
-        service = MemberService(repository=repo, security=security)
+        service = MemberService(
+            repository=repo,
+            security=security,
+            background_tasks=get_mock_background_tasks(),
+            cache_namespace='test_member',
+        )
 
         schema = UserRegisterSchema(
             first_name='Test',
@@ -79,7 +96,12 @@ class TestMemberRegistration:
         repo.get_user_by_email = AsyncMock(return_value=None)
 
         security = MagicMock()
-        service = MemberService(repository=repo, security=security)
+        service = MemberService(
+            repository=repo,
+            security=security,
+            background_tasks=get_mock_background_tasks(),
+            cache_namespace='test_member',
+        )
 
         schema = UserRegisterSchema(
             first_name='Test',
@@ -108,7 +130,12 @@ class TestMemberCRUD:
         repo.get_users = AsyncMock(return_value=[member1, member2])
 
         security = MagicMock()
-        service = MemberService(repository=repo, security=security)
+        service = MemberService(
+            repository=repo,
+            security=security,
+            background_tasks=get_mock_background_tasks(),
+            cache_namespace='test_member',
+        )
         result = await service.get_all_members()
 
         assert isinstance(result, list)
@@ -124,7 +151,12 @@ class TestMemberCRUD:
         repo.get_user_by_id = AsyncMock(return_value=mock_member)
 
         security = MagicMock()
-        service = MemberService(repository=repo, security=security)
+        service = MemberService(
+            repository=repo,
+            security=security,
+            background_tasks=get_mock_background_tasks(),
+            cache_namespace='test_member',
+        )
         result = await service.get_member_profile(member_id)
 
         assert result == mock_member
@@ -135,7 +167,12 @@ class TestMemberCRUD:
         repo.get_user_by_id = AsyncMock(return_value=None)
 
         security = MagicMock()
-        service = MemberService(repository=repo, security=security)
+        service = MemberService(
+            repository=repo,
+            security=security,
+            background_tasks=get_mock_background_tasks(),
+            cache_namespace='test_member',
+        )
 
         with pytest.raises(ValueError) as exc_info:
             await service.get_member_profile(uuid4())
@@ -152,7 +189,12 @@ class TestMemberCRUD:
         repo.update_user = AsyncMock(return_value=mock_member)
 
         security = MagicMock()
-        service = MemberService(repository=repo, security=security)
+        service = MemberService(
+            repository=repo,
+            security=security,
+            background_tasks=get_mock_background_tasks(),
+            cache_namespace='test_member',
+        )
 
         schema = UserUpdateSchema(
             first_name='Нове ім\'я',
@@ -175,7 +217,12 @@ class TestMemberCRUD:
         repo.delete_user = AsyncMock(return_value=None)
 
         security = MagicMock()
-        service = MemberService(repository=repo, security=security)
+        service = MemberService(
+            repository=repo,
+            security=security,
+            background_tasks=get_mock_background_tasks(),
+            cache_namespace='test_member',
+        )
 
         await service.delete_member_profile(member_id)
 
