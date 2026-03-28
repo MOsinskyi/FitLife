@@ -1,10 +1,13 @@
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, status
+from fastapi_cache.decorator import cache
 
 from fitlife.exceptions import UserAlreadyExists
 from fitlife.schemas import UserRegisterSchema, UserSchema, UserUpdateSchema
 
+from ..config import settings
+from ..utils import custom_key_builder
 from .dependencies import MemberServiceDep
 
 member_router = APIRouter(prefix='/members', tags=['👨‍👩‍👧‍👦 Members'])
@@ -44,6 +47,11 @@ async def get_member(user_id: UUID, service: MemberServiceDep):
             'model': list[UserSchema],
         },
     },
+)
+@cache(
+    expire=60,
+    namespace=settings.cache.namespace.member,
+    key_builder=custom_key_builder,
 )
 async def get_members(service: MemberServiceDep):
     return await service.get_all_members()

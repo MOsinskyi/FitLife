@@ -1,9 +1,12 @@
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, status
+from fastapi_cache.decorator import cache
 
 from fitlife.exceptions import UserAlreadyExists
 
+from ..config import settings
+from ..utils import custom_key_builder
 from .dependencies import CoachServiceDep
 from .schemas import CoachRegisterSchema, CoachSchema, CoachUpdateSchema
 
@@ -44,6 +47,11 @@ async def get_coach(user_id: UUID, service: CoachServiceDep):
             'model': list[CoachSchema],
         },
     },
+)
+@cache(
+    expire=60,
+    namespace=settings.cache.namespace.coach,
+    key_builder=custom_key_builder,
 )
 async def get_coaches(service: CoachServiceDep):
     return await service.get_all_coaches()

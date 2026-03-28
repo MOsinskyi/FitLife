@@ -1,13 +1,16 @@
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, status
+from fastapi_cache.decorator import cache
 
+from fitlife.config import settings
 from fitlife.training_sessions.dependencies import TrainingSessionServiceDep
 from fitlife.training_sessions.schemas import (
     TrainingSessionCreateSchema,
     TrainingSessionSchema,
     TrainingSessionUpdateSchema,
 )
+from fitlife.utils import custom_key_builder
 
 training_session_router = APIRouter(prefix='/training-sessions', tags=['🏋️ Training Sessions'])
 
@@ -47,6 +50,11 @@ async def create_training_session(data: TrainingSessionCreateSchema, service: Tr
             'model': list[TrainingSessionSchema],
         },
     },
+)
+@cache(
+    expire=60,
+    namespace=settings.cache.namespace.training_session,
+    key_builder=custom_key_builder,
 )
 async def get_all_training_sessions(service: TrainingSessionServiceDep):
     return await service.get_all_training_sessions()
@@ -193,6 +201,11 @@ async def remove_participant(session_id: UUID, member_id: UUID, service: Trainin
         },
     },
 )
+@cache(
+    expire=60,
+    namespace=settings.cache.namespace.training_session,
+    key_builder=custom_key_builder,
+)
 async def get_sessions_by_coach(coach_id: UUID, service: TrainingSessionServiceDep):
     try:
         return await service.get_sessions_by_coach(coach_id)
@@ -216,6 +229,11 @@ async def get_sessions_by_coach(coach_id: UUID, service: TrainingSessionServiceD
             'description': 'Member not found',
         },
     },
+)
+@cache(
+    expire=60,
+    namespace=settings.cache.namespace.training_session,
+    key_builder=custom_key_builder,
 )
 async def get_sessions_by_member(member_id: UUID, service: TrainingSessionServiceDep):
     try:

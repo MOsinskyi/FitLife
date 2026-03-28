@@ -1,7 +1,8 @@
 from typing import Annotated
 
-from fastapi import Depends
+from fastapi import BackgroundTasks, Depends
 
+from fitlife.config import settings
 from fitlife.database import SessionDep
 from fitlife.security import SecurityDep
 
@@ -9,15 +10,21 @@ from .repositories import CoachRepository
 from .services import CoachService
 
 
-def get_member_repository(session: SessionDep) -> CoachRepository:
+def get_coach_repository(session: SessionDep) -> CoachRepository:
     return CoachRepository(session)
 
 
-CoachRepositoryDep = Annotated[CoachRepository, Depends(get_member_repository)]
+CoachRepositoryDep = Annotated[CoachRepository, Depends(get_coach_repository)]
 
 
-def get_member_service(repository: CoachRepositoryDep, security: SecurityDep) -> CoachService:
-    return CoachService(repository, security)
+def get_coach_service(
+    repository: CoachRepositoryDep,
+    security: SecurityDep,
+    background_tasks: BackgroundTasks,
+) -> CoachService:
+    cache_namespace: str = settings.cache.namespace.coach
+
+    return CoachService(repository, security, background_tasks, cache_namespace)
 
 
-CoachServiceDep = Annotated[CoachService, Depends(get_member_service)]
+CoachServiceDep = Annotated[CoachService, Depends(get_coach_service)]

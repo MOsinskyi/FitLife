@@ -1,5 +1,8 @@
 from uuid import UUID
 
+from fastapi import BackgroundTasks
+
+from fitlife.cache import clear_cache
 from fitlife.coaches.repositories import CoachRepository
 from fitlife.members.repositories import MemberRepository
 from fitlife.training_sessions.models import SessionParticipant, TrainingSession
@@ -13,10 +16,14 @@ class TrainingSessionService:
         training_session_repository: TrainingSessionRepository,
         coach_repository: CoachRepository,
         member_repository: MemberRepository,
+        background_tasks: BackgroundTasks,
+        cache_namespace: str,
     ):
         self._training_session_repository = training_session_repository
         self._coach_repository = coach_repository
         self._member_repository = member_repository
+        self._background_tasks = background_tasks
+        self._cache_namespace = cache_namespace
 
     async def create_training_session(self, data: TrainingSessionCreateSchema) -> TrainingSession:
         coach = await self._coach_repository.get_user_by_id(data.coach)
@@ -34,6 +41,8 @@ class TrainingSessionService:
         )
 
         created_session = await self._training_session_repository.create_training_session(training_session)
+
+        await clear_cache(self._background_tasks, self._cache_namespace)
 
         if data.participants:
             await self.add_participants_to_session(created_session.id, data.participants)
@@ -59,6 +68,8 @@ class TrainingSessionService:
             if not coach:
                 raise ValueError(f'Coach with id {data.coach} not found')
 
+        await clear_cache(self._background_tasks, self._cache_namespace)
+
         await self._training_session_repository.update_training_session(session_id, data)
 
         return await self._training_session_repository.get_training_session_by_id(session_id)
@@ -67,6 +78,8 @@ class TrainingSessionService:
         training_session = await self._training_session_repository.get_training_session_by_id(session_id)
         if not training_session:
             raise ValueError(f'Training session with id {session_id} not found')
+
+        await clear_cache(self._background_tasks, self._cache_namespace)
 
         await self._training_session_repository.delete_training_session(session_id)
 
@@ -94,6 +107,8 @@ class TrainingSessionService:
             participant = SessionParticipant(member_id=member_id, session_id=session_id)
             training_session.participants.append(participant)
 
+        await clear_cache(self._background_tasks, self._cache_namespace)
+
         return await self._training_session_repository.get_training_session_by_id(session_id)
 
     async def remove_participant_from_session(self, session_id: UUID, member_id: UUID) -> TrainingSession:
@@ -111,6 +126,8 @@ class TrainingSessionService:
             raise ValueError(f'Member with id {member_id} is not participating in this session')
 
         training_session.participants.remove(participant_to_remove)
+
+        await clear_cache(self._background_tasks, self._cache_namespace)
 
         return await self._training_session_repository.get_training_session_by_id(session_id)
 
