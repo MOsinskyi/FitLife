@@ -1,4 +1,8 @@
+from typing import Any
+
 from sqladmin import Admin, ModelView
+from sqlalchemy.orm import selectinload
+from starlette.requests import Request
 
 from fitlife.coaches.models import CoachModel
 from fitlife.members.models import MemberModel
@@ -108,6 +112,25 @@ class TrainingSessionAdmin(ModelView, model=TrainingSession):
         TrainingSession.created_at,
     ]
 
+    # Eager load coach and participants with their members
+    column_select_related_list = ['coach']
+
+    # Override how we fetch data to include eager loading of participants and their members
+    async def get_query(self, request, stmt):
+        stmt = stmt.options(
+            selectinload(TrainingSession.coach),
+            selectinload(TrainingSession.participants).selectinload(SessionParticipant.member),
+        )
+        return await super().get_query(request, stmt)
+
+    async def get_model_objects(self, stmt):
+        """Override to ensure eager loading when fetching model objects for forms"""
+        stmt = stmt.options(
+            selectinload(TrainingSession.coach),
+            selectinload(TrainingSession.participants).selectinload(SessionParticipant.member),
+        )
+        return await super().get_model_objects(stmt)
+
     # Include coach and participants in the form
     form_columns = [
         'title',
@@ -137,7 +160,16 @@ class SessionParticipantAdmin(ModelView, model=SessionParticipant):
         SessionParticipant.joined_at,
     ]
 
-    # Include member and session in form
+    column_select_related_list = ['member', 'session']
+
+    column_labels = {
+        SessionParticipant.member: 'Member',
+        SessionParticipant.session: 'Training Session',
+    }
+
+    async def get_object_for_details(self, request: Request) -> Any:
+        await super().get_object_for_details(request)
+
     form_columns = [
         'member',
         'session',

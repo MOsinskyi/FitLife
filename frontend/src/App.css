@@ -96,6 +96,24 @@ h1, h2, h3 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.04em; line
   transition: color .2s, background .2s;
 }
 .nav-links a:hover { color: var(--text); background: var(--surface); }
+.user-greeting {
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 6px 12px;
+}
+.link-button {
+  background: none;
+  border: none;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 0;
+  cursor: pointer;
+  transition: color .2s;
+}
+.link-button:hover { color: var(--accent); }
 
 /* ── BUTTONS ── */
 .btn-primary {
