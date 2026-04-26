@@ -33,8 +33,13 @@ class MiddlewareConfig(BaseModel):
     allow_credentials: bool = True
 
 
-class SqliteConfig(BaseModel):
-    url: str = 'sqlite+aiosqlite:///fitlife.sqlite3'
+class PostgresConfig(BaseModel):
+    user: str = 'postgres'
+    password: str = ''
+    db: str = 'fitlife'
+    host: str = 'localhost'
+    port: int = 5432
+    url: str = f'"postgresql+asyncpg://{user}:{password}@{host}:{port}/{db}"'
 
 
 class RedisDB(BaseModel):
@@ -65,7 +70,7 @@ class AdminConfig(BaseModel):
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file='.env',
+        env_file='.env.dev',
         env_ignore_empty=True,
         env_nested_delimiter='_',
         env_nested_max_split=1,
@@ -75,7 +80,7 @@ class Settings(BaseSettings):
     middleware: MiddlewareConfig = MiddlewareConfig()
     redis: RedisConfig = RedisConfig()
     cache: CacheConfig = CacheConfig()
-    database: SqliteConfig = SqliteConfig()
+    postgres: PostgresConfig = PostgresConfig()
     security: SecurityConfig = SecurityConfig()
     admin: AdminConfig = AdminConfig()
 

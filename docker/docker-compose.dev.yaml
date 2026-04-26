@@ -8,6 +8,19 @@ services:
     volumes:
       - cache:/data
 
+  db:
+    image: postgres:16-alpine
+    container_name: fitlife_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: fitlife
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   backend:
     build:
       context: ../backend
@@ -15,14 +28,13 @@ services:
     container_name: fitlife_backend
     volumes:
       - ../backend:/app
-      - ../fitlife.db:/app/fitlife.db
-      - ../fitlife.sqlite3:/app/fitlife.sqlite3
     ports:
       - "8000:8000"
     env_file:
       - ../backend/.env.dev
     depends_on:
       - redis
+      - db
 
   frontend:
     build:
@@ -39,4 +51,6 @@ services:
 
 volumes:
   cache:
+    driver: local
+  postgres_data:
     driver: local
