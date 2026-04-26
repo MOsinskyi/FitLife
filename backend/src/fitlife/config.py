@@ -1,6 +1,7 @@
+import os
 from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -39,7 +40,20 @@ class PostgresConfig(BaseModel):
     db: str = 'fitlife'
     host: str = 'localhost'
     port: int = 5432
-    url: str = f"postgresql+asyncpg://{user}:{password}@{host}:{port}/{db}"
+
+    @computed_field
+    @property
+    def effective_host(self) -> str:
+        if self.host == 'db' and not os.path.exists('/.dockerenv'):
+            return 'localhost'
+        if self.host == 'localhost' and os.path.exists('/.dockerenv'):
+            return 'db'
+        return self.host
+
+    @computed_field
+    @property
+    def url(self) -> str:
+        return f"postgresql+asyncpg://{self.user}:{self.password}@{self.effective_host}:{self.port}/{self.db}"
 
 
 class RedisDB(BaseModel):
@@ -50,6 +64,15 @@ class RedisConfig(BaseModel):
     host: str = 'localhost'
     port: int = 6379
     db: RedisDB = RedisDB()
+
+    @computed_field
+    @property
+    def effective_host(self) -> str:
+        if self.host == 'redis' and not os.path.exists('/.dockerenv'):
+            return 'localhost'
+        if self.host == 'localhost' and os.path.exists('/.dockerenv'):
+            return 'redis'
+        return self.host
 
 
 class CacheNamespace(BaseModel):

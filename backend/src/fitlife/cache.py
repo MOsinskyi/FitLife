@@ -8,7 +8,7 @@ from fitlife.config import settings
 
 async def init_cache():
     redis = Redis(
-        host=settings.redis.host,
+        host=settings.redis.effective_host,
         port=settings.redis.port,
         db=settings.redis.db.cache,
     )
