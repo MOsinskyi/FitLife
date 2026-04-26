@@ -39,7 +39,7 @@ class PostgresConfig(BaseModel):
     db: str = 'fitlife'
     host: str = 'localhost'
     port: int = 5432
-    url: str = f'"postgresql+asyncpg://{user}:{password}@{host}:{port}/{db}"'
+    url: str = f"postgresql+asyncpg://{user}:{password}@{host}:{port}/{db}"
 
 
 class RedisDB(BaseModel):
