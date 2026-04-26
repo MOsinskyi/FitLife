@@ -8,6 +8,35 @@ services:
     volumes:
       - cache:/data
 
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: fitlife_backend
+    volumes:
+      - ../backend:/app
+      - ../fitlife.db:/app/fitlife.db
+      - ../fitlife.sqlite3:/app/fitlife.sqlite3
+    ports:
+      - "8000:8000"
+    env_file:
+      - ../backend/.env.dev
+    depends_on:
+      - redis
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: fitlife_frontend
+    volumes:
+      - ../frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
 volumes:
   cache:
     driver: local
