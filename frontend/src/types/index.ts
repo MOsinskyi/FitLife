@@ -79,3 +79,13 @@ export interface CoachRegisterRequest extends MemberRegisterRequest {
 export interface ApiError {
   detail: string
 }
+
+export interface Gallery {
+  id: string
+  image_url: string
+  title: string
+  description: string
+  display_order: number
+  created_at: string
+  updated_at: string
+}
