@@ -78,6 +78,9 @@ export default function Home() {
             <a href="#coaches" onClick={() => setMenuOpen(false)}>Тренери</a>
             {isAuthenticated ? (
               <>
+                {user?.role === 'admin' && (
+                  <Link to="/register/coach" className="nav-link-special" onClick={() => setMenuOpen(false)}>+ Додати тренера</Link>
+                )}
                 <span className="user-greeting">Привіт, {user?.first_name}!</span>
                 <button className="btn-ghost" onClick={handleLogout}>Вийти</button>
               </>
