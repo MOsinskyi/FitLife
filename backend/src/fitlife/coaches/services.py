@@ -11,6 +11,7 @@ from .models import CoachModel
 
 if TYPE_CHECKING:
     from fitlife.security import Security
+    from fitlife.specializations.repositories import SpecializationRepository
 
     from .repositories import CoachRepository
     from .schemas import CoachRegisterSchema, CoachUpdateSchema
@@ -20,11 +21,13 @@ class CoachService:
     def __init__(
         self,
         repository: 'CoachRepository',
+        specialization_repository: 'SpecializationRepository',
         security: 'Security',
         background_tasks: BackgroundTasks,
         cache_namespace: str,
     ):
         self._repository = repository
+        self._specialization_repository = specialization_repository
         self._security = security
         self._background_tasks = background_tasks
         self._cache_namespace = cache_namespace
@@ -36,7 +39,12 @@ class CoachService:
         return user
 
     async def register_coach(self, user_data: 'CoachRegisterSchema') -> CoachModel:
-        new_user = CoachModel(**user_data.model_dump())
+        # Extract specialization_ids before creating the model
+        data = user_data.model_dump()
+        specialization_ids = data.pop('specialization_ids', [])
+        password = data.pop('password')
+        
+        new_user = CoachModel(**data)
 
         if await self._repository.get_user_by_phone(new_user.phone_number):
             raise UserAlreadyExists('User with this phone number already exists')
@@ -44,22 +52,38 @@ class CoachService:
         if await self._repository.get_user_by_email(new_user.email):
             raise UserAlreadyExists('User with this email already exists')
 
+        # Link specializations
+        if specialization_ids:
+            specializations = await self._specialization_repository.get_by_ids(specialization_ids)
+            new_user.specializations = specializations
+
         user = await self._repository.create_user(new_user)
 
         user.role = UserRoles.COACH.value
-        user.password = self._security.hash_password(user_data.password)
+        user.password = self._security.hash_password(password)
 
         await clear_cache(self._background_tasks, self._cache_namespace)
 
         return user
 
     async def update_coach_profile(self, member_id: UUID, user_data: 'CoachUpdateSchema') -> CoachModel:
-        user = await self._repository.update_user(member_id, user_data)
-
-        await clear_cache(self._background_tasks, self._cache_namespace)
-
+        data = user_data.model_dump(exclude_unset=True, exclude_none=True, exclude_defaults=True)
+        specialization_ids = data.pop('specialization_ids', None)
+        
+        # We need the user object to update relationships
+        user = await self._repository.get_user_by_id(member_id)
         if not user:
             raise ValueError('Coach not found')
+            
+        if specialization_ids is not None:
+            specializations = await self._specialization_repository.get_by_ids(specialization_ids)
+            user.specializations = specializations
+            
+        # Update other fields
+        for key, value in data.items():
+            setattr(user, key, value)
+
+        await clear_cache(self._background_tasks, self._cache_namespace)
         return user
 
     async def delete_coach(self, member_id: UUID) -> None:
