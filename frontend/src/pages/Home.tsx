@@ -293,8 +293,10 @@ export default function Home() {
                 <div className="coach-info">
                   <h3>{c.first_name} {c.last_name}</h3>
                   <div className="coach-specialties">
-                    {c.specializations.map((spec, idx) => (
-                      <span key={idx} className="coach-specialty">{spec}</span>
+                    {c.specializations.map((spec) => (
+                      <span key={spec.id} className="coach-specialty">
+                        {spec.emoji} {spec.name}
+                      </span>
                     ))}
                   </div>
                   <div className="coach-meta">
