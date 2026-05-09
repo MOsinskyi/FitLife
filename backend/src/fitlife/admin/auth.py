@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
 
-from fitlife.coaches.models import CoachModel
+from fitlife.admin.models import AdminModel
 from fitlife.config import settings
 from fitlife.database import new_session
 from fitlife.schemas import UserRoles
@@ -23,15 +23,15 @@ class AdminAuth(AuthenticationBackend):
             return False
 
         async with new_session() as session:
-            coach = await self._get_coach_by_email(session, email)
+            admin = await self._get_admin_by_email(session, email)
 
-            if not coach:
+            if not admin:
                 return False
 
-            if not Security.verify_password(password, coach.password):
+            if not Security.verify_password(password, admin.password):
                 return False
 
-            token = Security.create_access_token(data={'sub': str(coach.id), 'email': coach.email, 'role': coach.role})
+            token = Security.create_access_token(data={'sub': str(admin.id), 'email': admin.email, 'role': admin.role})
 
             request.session.update({'token': token})
 
@@ -49,7 +49,7 @@ class AdminAuth(AuthenticationBackend):
             return False
 
         payload = Security.decode_access_token(token)
-        if not payload or payload.get('role') != UserRoles.COACH.value:
+        if not payload or payload.get('role') != UserRoles.ADMIN.value:
             return False
 
         user_id = UUID(payload.get('sub'))
@@ -57,23 +57,24 @@ class AdminAuth(AuthenticationBackend):
             return False
 
         async with new_session() as session:
-            coach = await self._get_coach_by_id(session, user_id)
-            if not coach:
+            admin = await self._get_admin_by_id(session, user_id)
+            if not admin:
                 return False
 
         return True
 
     @staticmethod
-    async def _get_coach_by_email(session: AsyncSession, email: str) -> CoachModel | None:
-        stmt = select(CoachModel).where(CoachModel.email == email)
+    async def _get_admin_by_email(session: AsyncSession, email: str) -> AdminModel | None:
+        stmt = select(AdminModel).where(AdminModel.email == email)
         result = await session.execute(stmt)
         return result.scalar_one_or_none()
 
     @staticmethod
-    async def _get_coach_by_id(session: AsyncSession, coach_id: UUID) -> CoachModel | None:
-        stmt = select(CoachModel).where(CoachModel.id == coach_id)
+    async def _get_admin_by_id(session: AsyncSession, admin_id: UUID) -> AdminModel | None:
+        stmt = select(AdminModel).where(AdminModel.id == admin_id)
         result = await session.execute(stmt)
         return result.scalar_one_or_none()
+
 
 
 authentication_backend = AdminAuth(secret_key=settings.security.secret_key)
