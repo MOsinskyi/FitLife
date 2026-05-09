@@ -11,6 +11,7 @@ from fitlife.models import UserBase
 from fitlife.security import SecurityDep
 
 from ..coaches.dependencies import CoachRepositoryDep
+from ..admin.dependencies import AdminRepositoryDep
 from ..schemas import UserRoles
 from .services import AuthService
 
@@ -23,14 +24,16 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/auth/login')
 async def get_authentication_service(
     member_repository: MemberRepositoryDep,
     coach_repository: CoachRepositoryDep,
+    admin_repository: AdminRepositoryDep,
     security: SecurityDep,
 ):
-    return AuthService(member_repository, coach_repository, security)
+    return AuthService(member_repository, coach_repository, admin_repository, security)
 
 
 async def get_current_user(
     member_repository: MemberRepositoryDep,
     coach_repository: CoachRepositoryDep,
+    admin_repository: AdminRepositoryDep,
     security: SecurityDep,
     token: str = Depends(oauth2_scheme),
 ) -> 'UserBase':
@@ -49,6 +52,8 @@ async def get_current_user(
         user = await member_repository.get_user_by_id(UUID(user_id))
     elif role == UserRoles.COACH.value:
         user = await coach_repository.get_user_by_id(UUID(user_id))
+    elif role == UserRoles.ADMIN.value:
+        user = await admin_repository.get_user_by_id(UUID(user_id))
     else:
         raise InvalidCredentialsException('Invalid role')
 
