@@ -38,12 +38,20 @@ export default function RegisterCoach() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [specialization, setSpecialization] = useState<Specialization>(Specialization.STRENGTH_TRAINING)
+  const [specializations, setSpecializations] = useState<Specialization[]>([Specialization.STRENGTH_TRAINING])
   const [experience, setExperience] = useState(1)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  const selectedOption = specializationOptions.find(opt => opt.value === specialization)
+  const handleSpecializationChange = (spec: Specialization) => {
+    if (specializations.includes(spec)) {
+      if (specializations.length > 1) {
+        setSpecializations(specializations.filter(s => s !== spec))
+      }
+    } else {
+      setSpecializations([...specializations, spec])
+    }
+  }
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -59,7 +67,15 @@ export default function RegisterCoach() {
       return
     }
 
+    if (specializations.length === 0) {
+      setError('Оберіть хоча б одну спеціалізацію')
+      return
+    }
+
     setLoading(true)
+
+    // Use the emoji of the first specialization as the main coach emoji
+    const firstSpecOption = specializationOptions.find(opt => opt.value === specializations[0])
 
     try {
       await registerCoach({
@@ -68,8 +84,8 @@ export default function RegisterCoach() {
         phone_number: phoneNumber,
         email: email || null,
         password,
-        specialization,
-        emoji: selectedOption?.emoji || Emoji.STRENGTH_TRAINING,
+        specializations,
+        emoji: firstSpecOption?.emoji || Emoji.STRENGTH_TRAINING,
         experience,
         experience_label: getExperienceLabel(experience),
       })
@@ -149,37 +165,35 @@ export default function RegisterCoach() {
             </div>
           </div>
 
-          <div className="form-row">
-            <div className="form-field">
-              <label htmlFor="specialization">Спеціалізація</label>
-              <select
-                id="specialization"
-                value={specialization}
-                onChange={(e) => setSpecialization(e.target.value as Specialization)}
-                required
-              >
-                {specializationOptions.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.emoji} {opt.label}
-                  </option>
-                ))}
-              </select>
+          <div className="form-field">
+            <label>Спеціалізації</label>
+            <div className="checkbox-grid">
+              {specializationOptions.map((opt) => (
+                <label key={opt.value} className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={specializations.includes(opt.value)}
+                    onChange={() => handleSpecializationChange(opt.value)}
+                  />
+                  <span>{opt.emoji} {opt.label}</span>
+                </label>
+              ))}
             </div>
+          </div>
 
-            <div className="form-field">
-              <label htmlFor="experience">
-                Досвід роботи: {experience} {getExperienceLabel(experience)}
-              </label>
-              <input
-                id="experience"
-                type="range"
-                min="1"
-                max="30"
-                value={experience}
-                onChange={(e) => setExperience(Number(e.target.value))}
-                required
-              />
-            </div>
+          <div className="form-field">
+            <label htmlFor="experience">
+              Досвід роботи: {experience} {getExperienceLabel(experience)}
+            </label>
+            <input
+              id="experience"
+              type="range"
+              min="1"
+              max="30"
+              value={experience}
+              onChange={(e) => setExperience(Number(e.target.value))}
+              required
+            />
           </div>
 
           <div className="form-row">
