@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { apiClient } from '../services/api'
-import type { Coach } from '../types'
+import type { Coach, Gallery } from '../types'
 import '../App.css'
 
 const benefits = [
@@ -24,6 +24,9 @@ export default function Home() {
   const [coachesLoading, setCoachesLoading] = useState(true)
   const [coachesError, setCoachesError] = useState<string | null>(null)
 
+  const [gallery, setGallery] = useState<Gallery[]>([])
+  const [galleryLoading, setGalleryLoading] = useState(true)
+
   const fetchCoaches = async () => {
     setCoachesLoading(true)
     setCoachesError(null)
@@ -37,8 +40,21 @@ export default function Home() {
     }
   }
 
+  const fetchGallery = async () => {
+    setGalleryLoading(true)
+    try {
+      const data = await apiClient.getGallery()
+      setGallery(data)
+    } catch (e) {
+      console.error('Failed to fetch gallery', e)
+    } finally {
+      setGalleryLoading(false)
+    }
+  }
+
   useEffect(() => {
     fetchCoaches()
+    fetchGallery()
   }, [])
 
   useEffect(() => {
@@ -75,6 +91,7 @@ export default function Home() {
           <div className={`nav-links ${menuOpen ? 'open' : ''}`}>
             <a href="#about" onClick={() => setMenuOpen(false)}>Про нас</a>
             <a href="#benefits" onClick={() => setMenuOpen(false)}>Переваги</a>
+            <a href="#gallery" onClick={() => setMenuOpen(false)}>Галерея</a>
             <a href="#coaches" onClick={() => setMenuOpen(false)}>Тренери</a>
             {isAuthenticated ? (
               <>
@@ -143,6 +160,35 @@ export default function Home() {
           <div className="hero-center-icon">⚡</div>
         </div>
       </section>
+
+      {/* GALLERY */}
+      {gallery.length > 0 && (
+        <section className="gallery section" id="gallery">
+          <div className="gallery-inner">
+            <div className="section-tag">Галерея</div>
+            <h2 className="section-title">Життя у FitLife</h2>
+            <p className="section-sub">Зазирни в нашу атмосферу та надихнись на зміни</p>
+
+            <div className="gallery-grid">
+              {gallery.map((item, i) => (
+                <div
+                  key={item.id}
+                  id={`gallery-${i}`}
+                  data-animate
+                  className={`gallery-card fade-up ${isVisible(`gallery-${i}`) ? 'in' : ''}`}
+                  style={{ transitionDelay: `${i * 100}ms` }}
+                >
+                  <img src={item.image_url} alt={item.title} className="gallery-img" />
+                  <div className="gallery-overlay">
+                    <h3>{item.title}</h3>
+                    <p>{item.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ABOUT */}
       <section className="about section" id="about">
@@ -299,6 +345,7 @@ export default function Home() {
               <strong>Навігація</strong>
               <a href="#about">Про нас</a>
               <a href="#benefits">Переваги</a>
+              <a href="#gallery">Галерея</a>
               <a href="#coaches">Тренери</a>
             </div>
             <div>
