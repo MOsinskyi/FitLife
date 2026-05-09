@@ -25,7 +25,7 @@ class Emojis(enum.Enum):
 
 
 class CoachCreateSchema(base.UserCreateSchema):
-    specialization: Annotated[Specializations, Field(default=Specializations.STRENGTH_TRAINING)]
+    specializations: Annotated[list[Specializations], Field(default_factory=lambda: [Specializations.STRENGTH_TRAINING])]
     emoji: Annotated[Emojis, Field(default=Emojis.STRENGTH_TRAINING)]
     experience: Annotated[int, Field(default=1, ge=1)]
     experience_label: Annotated[str, Field(default='рік')]
@@ -38,7 +38,7 @@ class CoachRegisterSchema(base.UserRegisterSchema, CoachCreateSchema):
 
 
 class CoachUpdateSchema(base.UserUpdateSchema):
-    specialization: Specializations | None = None
+    specializations: list[Specializations] | None = None
     emoji: Emojis | None = None
     experience: int | None = None
     experience_label: str | None = None
