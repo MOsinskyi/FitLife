@@ -8,6 +8,7 @@ from fitlife.admin.models import AdminModel
 from fitlife.coaches.models import CoachModel
 from fitlife.gallery.models import GalleryModel
 from fitlife.members.models import MemberModel
+from fitlife.specializations.models import SpecializationModel
 from fitlife.training_sessions.models import SessionParticipant, TrainingSession
 
 
@@ -118,6 +119,26 @@ class CoachAdmin(ModelView, model=CoachModel):
 
     column_details_exclude_list = [CoachModel.password]
     form_excluded_columns = [CoachModel.password, CoachModel.sessions]
+
+    can_create = True
+    can_edit = True
+    can_delete = True
+    can_view_details = True
+
+
+class SpecializationAdmin(ModelView, model=SpecializationModel):
+    name = 'Specialization'
+    name_plural = 'Specializations'
+    icon = 'fa-solid fa-tags'
+
+    column_list = [
+        SpecializationModel.id,
+        SpecializationModel.name,
+        SpecializationModel.emoji,
+        SpecializationModel.created_at,
+    ]
+
+    column_searchable_list = [SpecializationModel.name]
 
     can_create = True
     can_edit = True
@@ -260,6 +281,7 @@ def setup_admin(app, engine, authentication_backend):
     admin.add_view(AdminAdmin)
     admin.add_view(MemberAdmin)
     admin.add_view(CoachAdmin)
+    admin.add_view(SpecializationAdmin)
     admin.add_view(TrainingSessionAdmin)
     admin.add_view(SessionParticipantAdmin)
     admin.add_view(GalleryAdmin)
