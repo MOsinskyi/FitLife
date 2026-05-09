@@ -77,9 +77,7 @@ export default function Login() {
         <div className="auth-footer">
           <p>
             Ще не маєте акаунту?{' '}
-            <Link to="/register/member">Зареєструватися як учасник</Link>
-            {' '}або{' '}
-            <Link to="/register/coach">як тренер</Link>
+            <Link to="/register/member">Зареєструватися</Link>
           </p>
         </div>
       </div>
