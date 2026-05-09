@@ -150,9 +150,6 @@ export default function RegisterMember() {
           <p>
             Вже маєте акаунт? <Link to="/login">Увійти</Link>
           </p>
-          <p>
-            Хочете стати тренером? <Link to="/register/coach">Зареєструватися як тренер</Link>
-          </p>
         </div>
       </div>
     </div>
