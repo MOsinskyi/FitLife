@@ -12,6 +12,7 @@ EMAIL_PATTERN = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
 class UserRoles(enum.Enum):
     MEMBER = 'member'
     COACH = 'coach'
+    ADMIN = 'admin'
 
 
 class UserCreateSchema(BaseModel):
