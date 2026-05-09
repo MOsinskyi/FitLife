@@ -475,15 +475,20 @@ h1, h2, h3 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.04em; line
   border: 1px solid var(--border);
 }
 .coach-info h3 { font-family: 'Manrope', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.coach-specialties {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
 .coach-specialty {
   display: inline-block;
-  font-size: 12px;
+  font-size: 11px;
   color: var(--accent);
   background: rgba(232,255,71,0.08);
   padding: 3px 10px;
   border-radius: 100px;
   font-weight: 600;
-  margin-bottom: 12px;
 }
 .coach-meta { display: flex; flex-direction: column; gap: 4px; }
 .coach-meta span { font-size: 12px; color: var(--muted); }
