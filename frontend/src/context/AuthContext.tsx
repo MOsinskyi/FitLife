@@ -49,9 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const registerCoach = async (data: CoachRegisterRequest) => {
-    const newUser = await apiClient.registerCoach(data)
-    await login({ username: data.phone_number, password: data.password })
-    setUser(newUser)
+    await apiClient.registerCoach(data)
   }
 
   const logout = () => {
