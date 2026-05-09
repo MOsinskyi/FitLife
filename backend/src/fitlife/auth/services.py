@@ -7,6 +7,7 @@ from .schemas import TokenSchema
 if TYPE_CHECKING:
     from fitlife.coaches.repositories import CoachRepository
     from fitlife.members.repositories import MemberRepository
+    from fitlife.admin.repositories import AdminRepository
     from fitlife.security import Security
 
 
@@ -15,10 +16,12 @@ class AuthService:
         self,
         member_repository: 'MemberRepository',
         coach_repository: 'CoachRepository',
+        admin_repository: 'AdminRepository',
         security: 'Security',
     ):
         self.member_repository = member_repository
         self.coach_repository = coach_repository
+        self.admin_repository = admin_repository
         self.security = security
 
     async def authenticate_user(self, phone_number: str, password: str) -> TokenSchema:
@@ -26,6 +29,9 @@ class AuthService:
 
         if not user:
             user = await self.coach_repository.get_user_by_phone(phone_number)
+
+        if not user:
+            user = await self.admin_repository.get_user_by_phone(phone_number)
 
         if not user:
             raise ValueError('User not found')
