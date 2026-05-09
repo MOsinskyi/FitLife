@@ -6,6 +6,7 @@ from starlette.requests import Request
 
 from fitlife.admin.models import AdminModel
 from fitlife.coaches.models import CoachModel
+from fitlife.gallery.models import GalleryModel
 from fitlife.members.models import MemberModel
 from fitlife.training_sessions.models import SessionParticipant, TrainingSession
 
@@ -220,6 +221,35 @@ class SessionParticipantAdmin(ModelView, model=SessionParticipant):
     can_view_details = True
 
 
+class GalleryAdmin(ModelView, model=GalleryModel):
+    name = 'Gallery'
+    name_plural = 'Gallery'
+    icon = 'fa-solid fa-image'
+
+    column_list = [
+        GalleryModel.id,
+        GalleryModel.image_url,
+        GalleryModel.title,
+        GalleryModel.display_order,
+        GalleryModel.created_at,
+    ]
+
+    column_searchable_list = [
+        GalleryModel.title,
+        GalleryModel.description,
+    ]
+
+    column_sortable_list = [
+        GalleryModel.display_order,
+        GalleryModel.created_at,
+    ]
+
+    can_create = True
+    can_edit = True
+    can_delete = True
+    can_view_details = True
+
+
 def setup_admin(app, engine, authentication_backend):
     admin = Admin(
         app,
@@ -234,5 +264,6 @@ def setup_admin(app, engine, authentication_backend):
     admin.add_view(CoachAdmin)
     admin.add_view(TrainingSessionAdmin)
     admin.add_view(SessionParticipantAdmin)
+    admin.add_view(GalleryAdmin)
 
     return admin
