@@ -129,7 +129,8 @@ h1, h2, h3 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.04em; line
   transition: transform .15s, box-shadow .2s, opacity .2s;
   letter-spacing: 0.02em;
 }
-.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(232,255,71,0.35); color: var(--muted) !important; }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(232,255,71,0.35); color: var(--text) !important; }
+.btn-primary.large:hover { color: #000 !important; }
 .btn-primary.large { padding: 15px 32px; font-size: 15px; border-radius: 12px; }
 .btn-primary.full-width { width: 100%; margin-top: 4px; }
 .btn-ghost {
