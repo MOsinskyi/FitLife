@@ -6,6 +6,7 @@ import type {
   User,
   Coach,
   ApiError,
+  Gallery,
 } from '../types'
 
 const API_BASE_URL = 'http://localhost:8000/api/v1'
@@ -83,6 +84,14 @@ class ApiClient {
     })
 
     return this.handleResponse<Coach[]>(response)
+  }
+
+  async getGallery(): Promise<Gallery[]> {
+    const response = await fetch(`${API_BASE_URL}/gallery`, {
+      headers: this.getAuthHeaders(),
+    })
+
+    return this.handleResponse<Gallery[]>(response)
   }
 
   logout(): void {
