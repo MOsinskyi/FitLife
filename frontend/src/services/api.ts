@@ -7,6 +7,7 @@ import type {
   Coach,
   ApiError,
   Gallery,
+  Specialization,
 } from '../types'
 
 const API_BASE_URL = 'http://localhost:8000/api/v1'
@@ -92,6 +93,14 @@ class ApiClient {
     })
 
     return this.handleResponse<Gallery[]>(response)
+  }
+
+  async getSpecializations(): Promise<Specialization[]> {
+    const response = await fetch(`${API_BASE_URL}/specializations`, {
+      headers: this.getAuthHeaders(),
+    })
+
+    return this.handleResponse<Specialization[]>(response)
   }
 
   logout(): void {
