@@ -45,7 +45,7 @@ export interface Member extends User {
 
 export interface Coach extends User {
   role: 'coach'
-  specialization: Specialization
+  specializations: Specialization[]
   emoji: Emoji
   experience: number
   experience_label: string
@@ -70,7 +70,7 @@ export interface MemberRegisterRequest {
 }
 
 export interface CoachRegisterRequest extends MemberRegisterRequest {
-  specialization: Specialization
+  specializations: Specialization[]
   emoji: Emoji
   experience: number
   experience_label: string
