@@ -4,9 +4,48 @@ from sqladmin import Admin, ModelView
 from sqlalchemy.orm import selectinload
 from starlette.requests import Request
 
+from fitlife.admin.models import AdminModel
 from fitlife.coaches.models import CoachModel
 from fitlife.members.models import MemberModel
 from fitlife.training_sessions.models import SessionParticipant, TrainingSession
+
+
+class AdminAdmin(ModelView, model=AdminModel):
+    name = 'Admin'
+    name_plural = 'Admins'
+    icon = 'fa-solid fa-user-shield'
+
+    column_list = [
+        AdminModel.id,
+        AdminModel.email,
+        AdminModel.first_name,
+        AdminModel.last_name,
+        AdminModel.phone_number,
+        AdminModel.role,
+        AdminModel.created_at,
+    ]
+
+    column_searchable_list = [
+        AdminModel.email,
+        AdminModel.first_name,
+        AdminModel.last_name,
+        AdminModel.phone_number,
+    ]
+
+    column_sortable_list = [
+        AdminModel.email,
+        AdminModel.first_name,
+        AdminModel.last_name,
+        AdminModel.created_at,
+    ]
+
+    column_details_exclude_list = [AdminModel.password]
+    form_excluded_columns = [AdminModel.password]
+
+    can_create = True
+    can_edit = True
+    can_delete = True
+    can_view_details = True
 
 
 class MemberAdmin(ModelView, model=MemberModel):
@@ -190,6 +229,7 @@ def setup_admin(app, engine, authentication_backend):
         authentication_backend=authentication_backend,
     )
 
+    admin.add_view(AdminAdmin)
     admin.add_view(MemberAdmin)
     admin.add_view(CoachAdmin)
     admin.add_view(TrainingSessionAdmin)
