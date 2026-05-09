@@ -97,7 +97,7 @@ class CoachAdmin(ModelView, model=CoachModel):
         CoachModel.email,
         CoachModel.first_name,
         CoachModel.last_name,
-        CoachModel.specialization,
+        CoachModel.specializations,
         CoachModel.experience,
         CoachModel.created_at,
     ]
@@ -106,14 +106,12 @@ class CoachAdmin(ModelView, model=CoachModel):
         CoachModel.email,
         CoachModel.first_name,
         CoachModel.last_name,
-        CoachModel.specialization,
     ]
 
     column_sortable_list = [
         CoachModel.email,
         CoachModel.first_name,
         CoachModel.last_name,
-        CoachModel.specialization,
         CoachModel.experience,
         CoachModel.created_at,
     ]
