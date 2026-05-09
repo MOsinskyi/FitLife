@@ -292,7 +292,11 @@ export default function Home() {
                 </div>
                 <div className="coach-info">
                   <h3>{c.first_name} {c.last_name}</h3>
-                  <span className="coach-specialty">{c.specialization}</span>
+                  <div className="coach-specialties">
+                    {c.specializations.map((spec, idx) => (
+                      <span key={idx} className="coach-specialty">{spec}</span>
+                    ))}
+                  </div>
                   <div className="coach-meta">
                     <span>📅 {c.experience} {c.experience_label}</span>
                     {c.email && <span>✉️ {c.email}</span>}
