@@ -19,6 +19,7 @@ from fitlife.config import settings  # noqa
 from fitlife.models import Base, UserBase  # noqa
 from fitlife.members.models import MemberModel  # noqa
 from fitlife.coaches.models import CoachModel  # noqa
+from fitlife.admin.models import AdminModel  # noqa
 from fitlife.training_sessions.models import TrainingSession  # noqa
 
 target_metadata = Base.metadata
