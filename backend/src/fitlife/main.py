@@ -18,6 +18,7 @@ from fitlife.database import engine
 from fitlife.gallery.routers import gallery_router
 from fitlife.members.routers import member_router
 from fitlife.middleware import process_time_middleware
+from fitlife.specializations.routers import specialization_router
 from fitlife.training_sessions.routers import training_session_router
 
 
@@ -64,6 +65,7 @@ app.include_router(member_router)
 app.include_router(coach_router)
 app.include_router(training_session_router)
 app.include_router(gallery_router)
+app.include_router(specialization_router)
 
 setup_admin(app, engine, authentication_backend)
 
