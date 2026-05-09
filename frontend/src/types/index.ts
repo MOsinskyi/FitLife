@@ -6,27 +6,13 @@ export const UserRole = {
 
 export type UserRole = typeof UserRole[keyof typeof UserRole]
 
-export const Specialization = {
-  YOGA: 'Yoga',
-  CROSSFIT: 'CrossFit',
-  AEROBICS: 'Aerobics',
-  STRENGTH_TRAINING: 'Strength Training',
-  CARDIO: 'Cardio',
-  MEDITATION: 'Meditation',
-} as const
-
-export type Specialization = typeof Specialization[keyof typeof Specialization]
-
-export const Emoji = {
-  YOGA: '🧘',
-  CROSSFIT: '🏋️',
-  AEROBICS: '🤸',
-  STRENGTH_TRAINING: '💪',
-  CARDIO: '🏃',
-  MEDITATION: '🪷',
-} as const
-
-export type Emoji = typeof Emoji[keyof typeof Emoji]
+export interface Specialization {
+  id: string
+  name: string
+  emoji: string
+  created_at: string
+  updated_at: string
+}
 
 export interface User {
   id: string
@@ -46,7 +32,7 @@ export interface Member extends User {
 export interface Coach extends User {
   role: 'coach'
   specializations: Specialization[]
-  emoji: Emoji
+  emoji: string
   experience: number
   experience_label: string
 }
@@ -70,8 +56,8 @@ export interface MemberRegisterRequest {
 }
 
 export interface CoachRegisterRequest extends MemberRegisterRequest {
-  specializations: Specialization[]
-  emoji: Emoji
+  specialization_ids: string[]
+  emoji: string
   experience: number
   experience_label: string
 }
