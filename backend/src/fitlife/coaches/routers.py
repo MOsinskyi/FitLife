@@ -4,9 +4,11 @@ from fastapi import APIRouter, HTTPException, status
 from fastapi_cache.decorator import cache
 
 from fitlife.exceptions import UserAlreadyExists
+from fitlife.schemas import UserRoles
 
 from ..config import settings
 from ..utils import custom_key_builder
+from ..auth.dependencies import CurrentUserDep
 from .dependencies import CoachServiceDep
 from .schemas import CoachRegisterSchema, CoachSchema, CoachUpdateSchema
 
@@ -72,7 +74,16 @@ async def get_coaches(service: CoachServiceDep):
         },
     },
 )
-async def register_coach(member_data: CoachRegisterSchema, service: CoachServiceDep):
+async def register_coach(
+    member_data: CoachRegisterSchema,
+    service: CoachServiceDep,
+    current_user: CurrentUserDep,
+):
+    if current_user.role != UserRoles.ADMIN.value:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail='Only administrators can register coaches',
+        )
     try:
         return await service.register_coach(member_data)
     except UserAlreadyExists as e:
