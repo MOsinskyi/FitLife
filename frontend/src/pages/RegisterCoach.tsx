@@ -1,18 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { Specialization, Emoji } from '../types'
+import { apiClient } from '../services/api'
+import type { Specialization } from '../types'
 import './Auth.css'
-
-const specializationOptions = [
-  { value: Specialization.YOGA, label: 'Йога', emoji: Emoji.YOGA },
-  { value: Specialization.CROSSFIT, label: 'Кросфіт', emoji: Emoji.CROSSFIT },
-  { value: Specialization.AEROBICS, label: 'Аеробіка', emoji: Emoji.AEROBICS },
-  { value: Specialization.STRENGTH_TRAINING, label: 'Силові тренування', emoji: Emoji.STRENGTH_TRAINING },
-  { value: Specialization.CARDIO, label: 'Кардіо', emoji: Emoji.CARDIO },
-  { value: Specialization.MEDITATION, label: 'Медитація', emoji: Emoji.MEDITATION },
-]
 
 const experienceLabels = [
   { min: 1, max: 1, label: 'рік' },
@@ -38,18 +30,33 @@ export default function RegisterCoach() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [specializations, setSpecializations] = useState<Specialization[]>([Specialization.STRENGTH_TRAINING])
+  const [specializationIds, setSpecializationIds] = useState<string[]>([])
   const [experience, setExperience] = useState(1)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  
+  const [availableSpecializations, setAvailableSpecializations] = useState<Specialization[]>([])
+  const [fetchingSpecializations, setFetchingSpecializations] = useState(true)
 
-  const handleSpecializationChange = (spec: Specialization) => {
-    if (specializations.includes(spec)) {
-      if (specializations.length > 1) {
-        setSpecializations(specializations.filter(s => s !== spec))
+  useEffect(() => {
+    const fetchSpecs = async () => {
+      try {
+        const specs = await apiClient.getSpecializations()
+        setAvailableSpecializations(specs)
+      } catch (err) {
+        console.error('Failed to fetch specializations', err)
+      } finally {
+        setFetchingSpecializations(false)
       }
+    }
+    fetchSpecs()
+  }, [])
+
+  const handleSpecializationChange = (id: string) => {
+    if (specializationIds.includes(id)) {
+      setSpecializationIds(specializationIds.filter(s => s !== id))
     } else {
-      setSpecializations([...specializations, spec])
+      setSpecializationIds([...specializationIds, id])
     }
   }
 
@@ -67,7 +74,7 @@ export default function RegisterCoach() {
       return
     }
 
-    if (specializations.length === 0) {
+    if (specializationIds.length === 0) {
       setError('Оберіть хоча б одну спеціалізацію')
       return
     }
@@ -75,7 +82,7 @@ export default function RegisterCoach() {
     setLoading(true)
 
     // Use the emoji of the first specialization as the main coach emoji
-    const firstSpecOption = specializationOptions.find(opt => opt.value === specializations[0])
+    const firstSpec = availableSpecializations.find(s => s.id === specializationIds[0])
 
     try {
       await registerCoach({
@@ -84,8 +91,8 @@ export default function RegisterCoach() {
         phone_number: phoneNumber,
         email: email || null,
         password,
-        specializations,
-        emoji: firstSpecOption?.emoji || Emoji.STRENGTH_TRAINING,
+        specialization_ids: specializationIds,
+        emoji: firstSpec?.emoji || '💪',
         experience,
         experience_label: getExperienceLabel(experience),
       })
@@ -167,18 +174,25 @@ export default function RegisterCoach() {
 
           <div className="form-field">
             <label>Спеціалізації</label>
-            <div className="checkbox-grid">
-              {specializationOptions.map((opt) => (
-                <label key={opt.value} className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={specializations.includes(opt.value)}
-                    onChange={() => handleSpecializationChange(opt.value)}
-                  />
-                  <span>{opt.emoji} {opt.label}</span>
-                </label>
-              ))}
-            </div>
+            {fetchingSpecializations ? (
+              <p className="loading-text">Завантаження спеціалізацій...</p>
+            ) : (
+              <div className="checkbox-grid">
+                {availableSpecializations.map((spec) => (
+                  <label key={spec.id} className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={specializationIds.includes(spec.id)}
+                      onChange={() => handleSpecializationChange(spec.id)}
+                    />
+                    <span>{spec.emoji} {spec.name}</span>
+                  </label>
+                ))}
+                {availableSpecializations.length === 0 && (
+                  <p className="error-text small">Спеціалізації ще не додані адміністратором</p>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="form-field">
@@ -225,7 +239,7 @@ export default function RegisterCoach() {
             </div>
           </div>
 
-          <button type="submit" className="btn-primary large full-width" disabled={loading}>
+          <button type="submit" className="btn-primary large full-width" disabled={loading || fetchingSpecializations}>
             {loading ? 'Реєстрація...' : 'Зареєструватися як тренер →'}
           </button>
         </form>
