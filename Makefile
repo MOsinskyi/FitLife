@@ -1,4 +1,4 @@
-.PHONY: lint, install, update, backend, frontend, run-dev, install-pre-commit, install-backend, install-frontend, tests, backend-host
+.PHONY: lint, install, update, backend, frontend, run-dev, install-pre-commit, install-backend, install-frontend, tests, backend-host, superuser
 
 lint:
 	cd backend && \
@@ -44,3 +44,7 @@ backend-host:
 
 frontend:
 	cd frontend && npm run dev
+
+superuser:
+	cd backend && \
+	PYTHONPATH=src poetry run python scripts/create_admin.py $(first_name) $(last_name) $(phone) $(email) $(password)
