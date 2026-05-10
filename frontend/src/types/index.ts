@@ -75,3 +75,20 @@ export interface Gallery {
   created_at: string
   updated_at: string
 }
+
+export interface Participant {
+  joined_at: string
+  member: User
+}
+
+export interface TrainingSession {
+  id: string
+  title: string
+  description: string
+  start_time: string
+  end_time: string
+  status: string
+  max_participants: number
+  coach: Coach
+  participants: Participant[]
+}
