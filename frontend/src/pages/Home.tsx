@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { apiClient } from '../services/api'
-import type { Coach, Gallery } from '../types'
+import type { Coach, Gallery, TrainingSession } from '../types'
 import '../App.css'
 
 const benefits = [
@@ -25,7 +25,10 @@ export default function Home() {
   const [coachesError, setCoachesError] = useState<string | null>(null)
 
   const [gallery, setGallery] = useState<Gallery[]>([])
-  const [galleryLoading, setGalleryLoading] = useState(true)
+
+  const [trainingSessions, setTrainingSessions] = useState<TrainingSession[]>([])
+  const [trainingSessionsLoading, setTrainingSessionsLoading] = useState(true)
+  const [trainingSessionsError, setTrainingSessionsError] = useState<string | null>(null)
 
   const fetchCoaches = async () => {
     setCoachesLoading(true)
@@ -41,20 +44,31 @@ export default function Home() {
   }
 
   const fetchGallery = async () => {
-    setGalleryLoading(true)
     try {
       const data = await apiClient.getGallery()
       setGallery(data)
     } catch (e) {
       console.error('Failed to fetch gallery', e)
+    }
+  }
+
+  const fetchTrainingSessions = async () => {
+    setTrainingSessionsLoading(true)
+    setTrainingSessionsError(null)
+    try {
+      const data = await apiClient.getTrainingSessions()
+      setTrainingSessions(data)
+    } catch (e) {
+      setTrainingSessionsError(e instanceof Error ? e.message : 'Не вдалося завантажити розклад')
     } finally {
-      setGalleryLoading(false)
+      setTrainingSessionsLoading(false)
     }
   }
 
   useEffect(() => {
     fetchCoaches()
     fetchGallery()
+    fetchTrainingSessions()
   }, [])
 
   useEffect(() => {
@@ -91,6 +105,7 @@ export default function Home() {
           <div className={`nav-links ${menuOpen ? 'open' : ''}`}>
             <a href="#about" onClick={() => setMenuOpen(false)}>Про нас</a>
             <a href="#benefits" onClick={() => setMenuOpen(false)}>Переваги</a>
+            <a href="#schedule" onClick={() => setMenuOpen(false)}>Розклад</a>
             <a href="#gallery" onClick={() => setMenuOpen(false)}>Галерея</a>
             <a href="#coaches" onClick={() => setMenuOpen(false)}>Тренери</a>
             {isAuthenticated ? (
@@ -251,6 +266,74 @@ export default function Home() {
         </div>
       </section>
 
+      {/* SCHEDULE */}
+      <section className="schedule section" id="schedule">
+        <div className="section-tag">Розклад</div>
+        <h2 className="section-title">Найближчі тренування</h2>
+        <p className="section-sub">Обери зручний час та приєднуйся до нашої спільноти</p>
+
+        {trainingSessionsLoading && (
+          <div className="coaches-skeleton-grid">
+            {[...Array(3)].map((_, i) => <div key={i} className="coach-skeleton" />)}
+          </div>
+        )}
+
+        {trainingSessionsError && (
+          <div className="coaches-state">
+            <span>⚠️</span>
+            <p>{trainingSessionsError}</p>
+            <button className="btn-ghost" onClick={fetchTrainingSessions}>Спробувати знову</button>
+          </div>
+        )}
+
+        {!trainingSessionsLoading && !trainingSessionsError && trainingSessions.length === 0 && (
+          <div className="coaches-state">
+            <p>На найближчий час тренувань не заплановано</p>
+          </div>
+        )}
+
+        {!trainingSessionsLoading && !trainingSessionsError && trainingSessions.length > 0 && (
+          <div className="schedule-grid">
+            {trainingSessions.map((s, i) => (
+              <div
+                key={s.id}
+                id={`session-${i}`}
+                data-animate
+                className={`session-card fade-up ${isVisible(`session-${i}`) ? 'in' : ''}`}
+                style={{ transitionDelay: `${i * 100}ms` }}
+              >
+                <div className="session-time">
+                  <span className="time-badge">
+                    {s.start_time.substring(0, 5)} - {s.end_time.substring(0, 5)}
+                  </span>
+                </div>
+                <div className="session-info">
+                  <h3>{s.title}</h3>
+                  <p>{s.description}</p>
+                  <div className="session-meta">
+                    <span className="session-coach">
+                      👤 {s.coach.first_name} {s.coach.last_name}
+                    </span>
+                    <span className="session-spots">
+                      👥 {s.participants.length} / {s.max_participants} місць
+                    </span>
+                  </div>
+                </div>
+                {isAuthenticated ? (
+                  <button className="btn-primary full-width" disabled={s.participants.length >= s.max_participants}>
+                    {s.participants.length >= s.max_participants ? 'Місць немає' : 'Записатись'}
+                  </button>
+                ) : (
+                  <Link to="/register/member" className="btn-primary full-width">
+                    Записатись
+                  </Link>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
       {/* COACHES */}
       <section className="coaches section" id="coaches">
         <div className="section-tag">Команда</div>
@@ -351,6 +434,7 @@ export default function Home() {
               <strong>Навігація</strong>
               <a href="#about">Про нас</a>
               <a href="#benefits">Переваги</a>
+              <a href="#schedule">Розклад</a>
               <a href="#gallery">Галерея</a>
               <a href="#coaches">Тренери</a>
             </div>
