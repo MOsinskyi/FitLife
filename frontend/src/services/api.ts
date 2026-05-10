@@ -8,6 +8,7 @@ import type {
   ApiError,
   Gallery,
   Specialization,
+  TrainingSession,
 } from '../types'
 
 const API_BASE_URL = 'http://localhost:8000/api/v1'
@@ -93,6 +94,14 @@ class ApiClient {
     })
 
     return this.handleResponse<Gallery[]>(response)
+  }
+
+  async getTrainingSessions(): Promise<TrainingSession[]> {
+    const response = await fetch(`${API_BASE_URL}/training-sessions`, {
+      headers: this.getAuthHeaders(),
+    })
+
+    return this.handleResponse<TrainingSession[]>(response)
   }
 
   async getSpecializations(): Promise<Specialization[]> {
