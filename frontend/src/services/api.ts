@@ -112,6 +112,25 @@ class ApiClient {
     return this.handleResponse<Specialization[]>(response)
   }
 
+  async bookSession(sessionId: string, memberIds: string[]): Promise<TrainingSession> {
+    const response = await fetch(`${API_BASE_URL}/training-sessions/${sessionId}/participants`, {
+      method: 'POST',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify(memberIds),
+    })
+
+    return this.handleResponse<TrainingSession>(response)
+  }
+
+  async cancelSession(sessionId: string, memberId: string): Promise<TrainingSession> {
+    const response = await fetch(`${API_BASE_URL}/training-sessions/${sessionId}/participants/${memberId}`, {
+      method: 'DELETE',
+      headers: this.getAuthHeaders(),
+    })
+
+    return this.handleResponse<TrainingSession>(response)
+  }
+
   logout(): void {
     localStorage.removeItem('access_token')
   }
