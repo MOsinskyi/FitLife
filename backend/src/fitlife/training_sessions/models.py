@@ -26,8 +26,8 @@ class TrainingSession(Base):
 
     title: Mapped[str] = mapped_column(String(100))
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
-    start_time: Mapped[time] = mapped_column(Time)
-    end_time: Mapped[time] = mapped_column(Time)
+    start_time: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    end_time: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     status: Mapped[SessionStatus] = mapped_column(SQLEnum(SessionStatus), default=SessionStatus.SCHEDULED)
     max_participants: Mapped[int] = mapped_column(Integer, default=10)
 
