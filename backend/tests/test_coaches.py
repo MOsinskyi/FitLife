@@ -3,10 +3,14 @@ from uuid import uuid4
 
 import pytest
 
+# Ensure all models are loaded for SQLAlchemy relationships
+from fitlife.members.models import MemberModel
+from fitlife.coaches.models import CoachModel
+from fitlife.training_sessions.models import TrainingSession, SessionParticipant
+
 from fitlife.coaches.schemas import (
     CoachRegisterSchema,
     CoachUpdateSchema,
-    Specializations,
 )
 from fitlife.coaches.services import CoachService
 from fitlife.security import Security
@@ -37,8 +41,12 @@ class TestCoachRegistration:
         security = MagicMock()
         security.hash_password = MagicMock(return_value="hashed_password")
 
+        spec_repo = MagicMock()
+        spec_repo.get_by_ids = AsyncMock(return_value=[])
+
         service = CoachService(
             repository=repo,
+            specialization_repository=spec_repo,
             security=security,
             background_tasks=get_mock_background_tasks(),
             cache_namespace="test_coach",
@@ -50,7 +58,7 @@ class TestCoachRegistration:
             email="taras@gym.ua",
             phone_number="+380671234567",
             password="password123",
-            specialization=Specializations.YOGA,
+            specialization_ids=[uuid4()],
             experience=5,
         )
 
@@ -74,6 +82,7 @@ class TestCoachRegistration:
         security = MagicMock()
         service = CoachService(
             repository=repo,
+            specialization_repository=MagicMock(),
             security=security,
             background_tasks=get_mock_background_tasks(),
             cache_namespace="test_coach",
@@ -85,7 +94,7 @@ class TestCoachRegistration:
             email="duplicate@gym.ua",
             phone_number="+380671234567",
             password="password123",
-            specialization=Specializations.YOGA,
+            specialization_ids=[uuid4()],
             experience=5,
         )
 
@@ -106,6 +115,7 @@ class TestCoachRegistration:
         security = MagicMock()
         service = CoachService(
             repository=repo,
+            specialization_repository=MagicMock(),
             security=security,
             background_tasks=get_mock_background_tasks(),
             cache_namespace="test_coach",
@@ -117,7 +127,7 @@ class TestCoachRegistration:
             email="test@gym.ua",
             phone_number="+380671234567",
             password="password123",
-            specialization=Specializations.YOGA,
+            specialization_ids=[uuid4()],
             experience=5,
         )
 
@@ -142,6 +152,7 @@ class TestCoachCRUD:
         security = MagicMock()
         service = CoachService(
             repository=repo,
+            specialization_repository=MagicMock(),
             security=security,
             background_tasks=get_mock_background_tasks(),
             cache_namespace="test_coach",
@@ -163,6 +174,7 @@ class TestCoachCRUD:
         security = MagicMock()
         service = CoachService(
             repository=repo,
+            specialization_repository=MagicMock(),
             security=security,
             background_tasks=get_mock_background_tasks(),
             cache_namespace="test_coach",
@@ -179,6 +191,7 @@ class TestCoachCRUD:
         security = MagicMock()
         service = CoachService(
             repository=repo,
+            specialization_repository=MagicMock(),
             security=security,
             background_tasks=get_mock_background_tasks(),
             cache_namespace="test_coach",
@@ -196,24 +209,29 @@ class TestCoachCRUD:
         mock_coach.id = coach_id
 
         repo = MagicMock()
+        repo.get_user_by_id = AsyncMock(return_value=mock_coach)
         repo.update_user = AsyncMock(return_value=mock_coach)
 
         security = MagicMock()
+        spec_repo = MagicMock()
+        spec_repo.get_by_ids = AsyncMock(return_value=[])
+
         service = CoachService(
             repository=repo,
+            specialization_repository=spec_repo,
             security=security,
             background_tasks=get_mock_background_tasks(),
             cache_namespace="test_coach",
         )
 
         schema = CoachUpdateSchema(
-            specialization=Specializations.CROSSFIT,
+            specialization_ids=[uuid4()],
             experience=10,
         )
 
         result = await service.update_coach_profile(coach_id, schema)
 
-        repo.update_user.assert_awaited_once()
+        assert result.experience == 10
         assert result == mock_coach
 
     @pytest.mark.asyncio
@@ -229,6 +247,7 @@ class TestCoachCRUD:
         security = MagicMock()
         service = CoachService(
             repository=repo,
+            specialization_repository=MagicMock(),
             security=security,
             background_tasks=get_mock_background_tasks(),
             cache_namespace="test_coach",
@@ -241,19 +260,19 @@ class TestCoachCRUD:
 
 class TestCoachSchemas:
     def test_coach_register_schema_valid(self):
+        spec_id = uuid4()
         schema = CoachRegisterSchema(
             first_name="Тарас",
             last_name="Шевченко",
             email="taras@gym.ua",
             phone_number="+380671234567",
             password="password123",
-            specialization=Specializations.YOGA,
+            specialization_ids=[spec_id],
             experience=8,
         )
 
         assert schema.first_name == "Тарас"
-        # Schema uses enum values (strings) not enum objects due to use_enum_values=True
-        assert schema.specialization == Specializations.YOGA.value
+        assert schema.specialization_ids == [spec_id]
         assert schema.experience == 8
 
     @pytest.mark.parametrize("experience", [-1, -5, 0])
@@ -267,12 +286,13 @@ class TestCoachSchemas:
                 email="test@gym.ua",
                 phone_number="+380671234567",
                 password="password123",
-                specialization=Specializations.YOGA,
+                specialization_ids=[uuid4()],
                 experience=experience,
             )
 
     def test_coach_update_schema_partial_update(self):
-        schema = CoachUpdateSchema(specialization=Specializations.YOGA)
+        spec_id = uuid4()
+        schema = CoachUpdateSchema(specialization_ids=[spec_id])
 
-        assert schema.specialization == Specializations.YOGA
+        assert schema.specialization_ids == [spec_id]
         assert schema.experience is None
