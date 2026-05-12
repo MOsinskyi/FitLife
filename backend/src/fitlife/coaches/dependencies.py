@@ -26,7 +26,13 @@ def get_coach_service(
 ) -> CoachService:
     cache_namespace: str = settings.cache.namespace.coach
 
-    return CoachService(repository, specialization_repository, security, background_tasks, cache_namespace)
+    return CoachService(
+        repository,
+        specialization_repository,
+        security,
+        background_tasks,
+        cache_namespace,
+    )
 
 
 CoachServiceDep = Annotated[CoachService, Depends(get_coach_service)]

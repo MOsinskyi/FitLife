@@ -6,6 +6,7 @@ from fitlife.admin.models import AdminModel
 from fitlife.security import Security
 from fitlife.schemas import UserRoles
 
+
 async def create_admin(first_name, last_name, phone_number, email, password):
     async with new_session() as session:
         # Check if admin already exists
@@ -23,15 +24,23 @@ async def create_admin(first_name, last_name, phone_number, email, password):
             phone_number=phone_number,
             email=email,
             password=hashed_password,
-            role=UserRoles.ADMIN.value
+            role=UserRoles.ADMIN.value,
         )
         session.add(admin)
         await session.commit()
         print(f"Admin {first_name} {last_name} created successfully")
 
+
 if __name__ == "__main__":
     import sys
+
     if len(sys.argv) < 6:
-        print("Usage: python create_admin.py <first_name> <last_name> <phone_number> <email> <password>")
+        print(
+            "Usage: python create_admin.py <first_name> <last_name> <phone_number> <email> <password>"
+        )
     else:
-        asyncio.run(create_admin(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5]))
+        asyncio.run(
+            create_admin(
+                sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5]
+            )
+        )

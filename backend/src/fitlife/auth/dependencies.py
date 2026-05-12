@@ -18,7 +18,7 @@ from .services import AuthService
 if TYPE_CHECKING:
     pass
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/auth/login')
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 
 async def get_authentication_service(
@@ -36,17 +36,17 @@ async def get_current_user(
     admin_repository: AdminRepositoryDep,
     security: SecurityDep,
     token: str = Depends(oauth2_scheme),
-) -> 'UserBase':
+) -> "UserBase":
     try:
         payload = security.decode_access_token(token)
-        user_id: str = payload.get('sub')
-        role: str = payload.get('role')
+        user_id: str = payload.get("sub")
+        role: str = payload.get("role")
 
         if user_id is None or role is None:
-            raise InvalidCredentialsException('Invalid token')
+            raise InvalidCredentialsException("Invalid token")
 
     except InvalidTokenError:
-        raise InvalidCredentialsException('Invalid token') from None
+        raise InvalidCredentialsException("Invalid token") from None
 
     if role == UserRoles.MEMBER.value:
         user = await member_repository.get_user_by_id(UUID(user_id))
@@ -55,10 +55,10 @@ async def get_current_user(
     elif role == UserRoles.ADMIN.value:
         user = await admin_repository.get_user_by_id(UUID(user_id))
     else:
-        raise InvalidCredentialsException('Invalid role')
+        raise InvalidCredentialsException("Invalid role")
 
     if user is None:
-        raise InvalidCredentialsException('Invalid credentials')
+        raise InvalidCredentialsException("Invalid credentials")
 
     return user
 

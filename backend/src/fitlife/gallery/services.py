@@ -1,6 +1,7 @@
 from fitlife.gallery.repositories import GalleryRepository
 from fitlife.gallery.schemas import GalleryResponse
 
+
 class GalleryService:
     def __init__(self, repository: GalleryRepository):
         self.repository = repository

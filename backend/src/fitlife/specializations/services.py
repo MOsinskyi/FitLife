@@ -1,6 +1,7 @@
 from fitlife.specializations.repositories import SpecializationRepository
 from fitlife.specializations.schemas import SpecializationResponse
 
+
 class SpecializationService:
     def __init__(self, repository: SpecializationRepository):
         self.repository = repository

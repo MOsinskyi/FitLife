@@ -28,31 +28,31 @@ class UserBase(Base):
     first_name = Column(
         String,
         nullable=False,
-        default='',
+        default="",
     )
     last_name = Column(
         String,
         nullable=False,
-        default='',
+        default="",
     )
     phone_number = Column(
         String,
         nullable=False,
-        default='',
+        default="",
         index=True,
     )
     email = Column(
         String,
-        default='',
+        default="",
         index=True,
     )
     password = Column(
         String,
         nullable=False,
-        default='',
+        default="",
     )
     role = Column(
         String,
         nullable=False,
-        default='member',
+        default="member",
     )

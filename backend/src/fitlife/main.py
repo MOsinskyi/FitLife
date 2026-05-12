@@ -54,8 +54,8 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
     return JSONResponse(
         status_code=exc.status_code,
         content={
-            'success': False,
-            'msg': exc.detail,
+            "success": False,
+            "msg": exc.detail,
         },
     )
 
@@ -69,9 +69,9 @@ app.include_router(specialization_router)
 
 setup_admin(app, engine, authentication_backend)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     uvicorn.run(
-        'main:app',
+        "main:app",
         host=settings.app.host,
         port=settings.app.port,
         reload=True,

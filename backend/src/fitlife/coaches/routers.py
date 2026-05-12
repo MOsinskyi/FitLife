@@ -12,20 +12,20 @@ from ..auth.dependencies import CurrentUserDep
 from .dependencies import CoachServiceDep
 from .schemas import CoachRegisterSchema, CoachSchema, CoachUpdateSchema
 
-coach_router = APIRouter(prefix='/coaches', tags=['🏋️ Coaches'])
+coach_router = APIRouter(prefix="/coaches", tags=["🏋️ Coaches"])
 
 
 @coach_router.get(
-    '/{user_id}',
+    "/{user_id}",
     response_model=CoachSchema,
-    description='Get member profile',
+    description="Get member profile",
     responses={
         status.HTTP_200_OK: {
-            'description': 'Success',
-            'model': CoachSchema,
+            "description": "Success",
+            "model": CoachSchema,
         },
         status.HTTP_404_NOT_FOUND: {
-            'description': 'Not found',
+            "description": "Not found",
         },
     },
 )
@@ -40,13 +40,13 @@ async def get_coach(user_id: UUID, service: CoachServiceDep):
 
 
 @coach_router.get(
-    '/',
+    "/",
     response_model=list[CoachSchema],
-    description='Get all members',
+    description="Get all members",
     responses={
         status.HTTP_200_OK: {
-            'description': 'Success',
-            'model': list[CoachSchema],
+            "description": "Success",
+            "model": list[CoachSchema],
         },
     },
 )
@@ -60,17 +60,17 @@ async def get_coaches(service: CoachServiceDep):
 
 
 @coach_router.post(
-    '/',
+    "/",
     response_model=CoachSchema,
-    description='Register new member',
+    description="Register new member",
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_201_CREATED: {
-            'description': 'Success',
-            'model': CoachSchema,
+            "description": "Success",
+            "model": CoachSchema,
         },
         status.HTTP_409_CONFLICT: {
-            'description': 'User already exists',
+            "description": "User already exists",
         },
     },
 )
@@ -82,7 +82,7 @@ async def register_coach(
     if current_user.role != UserRoles.ADMIN.value:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail='Only administrators can register coaches',
+            detail="Only administrators can register coaches",
         )
     try:
         return await service.register_coach(member_data)
@@ -94,20 +94,22 @@ async def register_coach(
 
 
 @coach_router.put(
-    '/{user_id}',
+    "/{user_id}",
     response_model=CoachSchema,
-    description='Update member profile',
+    description="Update member profile",
     responses={
         status.HTTP_200_OK: {
-            'description': 'Success',
-            'model': CoachSchema,
+            "description": "Success",
+            "model": CoachSchema,
         },
         status.HTTP_404_NOT_FOUND: {
-            'description': 'Not found',
+            "description": "Not found",
         },
     },
 )
-async def update_coach(user_id: UUID, member_data: CoachUpdateSchema, service: CoachServiceDep):
+async def update_coach(
+    user_id: UUID, member_data: CoachUpdateSchema, service: CoachServiceDep
+):
     try:
         return await service.update_coach_profile(user_id, member_data)
     except ValueError as e:
@@ -118,15 +120,15 @@ async def update_coach(user_id: UUID, member_data: CoachUpdateSchema, service: C
 
 
 @coach_router.delete(
-    '/{user_id}',
-    description='Delete member profile',
+    "/{user_id}",
+    description="Delete member profile",
     status_code=status.HTTP_204_NO_CONTENT,
     responses={
         status.HTTP_204_NO_CONTENT: {
-            'description': 'Success',
+            "description": "Success",
         },
         status.HTTP_404_NOT_FOUND: {
-            'description': 'Not found',
+            "description": "Not found",
         },
     },
 )

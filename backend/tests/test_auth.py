@@ -18,7 +18,6 @@ SECURITY = Security()
 
 
 class TestSecurity:
-
     def test_hash_password_returns_non_empty_string(self):
         hashed = SECURITY.hash_password("mypassword")
         assert isinstance(hashed, str)
@@ -82,7 +81,6 @@ class TestSecurity:
 
 
 class TestAuthSchemas:
-
     def test_member_register_valid_ukrainian_phone(self):
         schema = UserRegisterSchema(
             first_name="Іван",
@@ -93,9 +91,12 @@ class TestAuthSchemas:
         )
         assert schema.phone_number == "+380671234567"
 
-    @pytest.mark.parametrize("phone", [
-        "+380501234567",
-    ])
+    @pytest.mark.parametrize(
+        "phone",
+        [
+            "+380501234567",
+        ],
+    )
     def test_member_register_valid_phone_formats(self, phone):
         schema = UserRegisterSchema(
             first_name="A",
@@ -106,14 +107,18 @@ class TestAuthSchemas:
         )
         assert schema.phone_number == phone
 
-    @pytest.mark.parametrize("bad_phone", [
-        "+7911234567",
-        "911234567",
-        "380123456",
-        "+380001234567",
-    ])
+    @pytest.mark.parametrize(
+        "bad_phone",
+        [
+            "+7911234567",
+            "911234567",
+            "380123456",
+            "+380001234567",
+        ],
+    )
     def test_member_register_invalid_phone_raises(self, bad_phone):
         import pydantic
+
         with pytest.raises(pydantic.ValidationError):
             UserRegisterSchema(
                 first_name="A",
@@ -135,7 +140,6 @@ class TestAuthSchemas:
 
 
 class TestGetCurrentUserDependency:
-
     @pytest.mark.asyncio
     async def test_valid_member_token_returns_member(self, mock_member_model):
         from fitlife.auth.dependencies import get_current_user
@@ -240,10 +244,10 @@ class TestGetCurrentUserDependency:
                 token="valid-looking",
             )
 
-class TestUserRoles:
 
+class TestUserRoles:
     def test_user_roles_enum_has_member_and_coach(self):
         from fitlife.schemas import UserRoles
 
-        assert UserRoles.MEMBER.value == 'member'
-        assert UserRoles.COACH.value == 'coach'
+        assert UserRoles.MEMBER.value == "member"
+        assert UserRoles.COACH.value == "coach"

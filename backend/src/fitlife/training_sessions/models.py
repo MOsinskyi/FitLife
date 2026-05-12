@@ -1,9 +1,9 @@
 import enum
-from datetime import datetime, time
+from datetime import datetime
 from typing import TYPE_CHECKING, Optional
 from uuid import UUID
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, Time
+from sqlalchemy import DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
@@ -16,42 +16,52 @@ if TYPE_CHECKING:
 
 
 class SessionStatus(enum.StrEnum):
-    SCHEDULED = 'scheduled'
-    COMPLETED = 'completed'
-    CANCELLED = 'cancelled'
+    SCHEDULED = "scheduled"
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
 
 
 class TrainingSession(Base):
-    __tablename__ = 'training_sessions'
+    __tablename__ = "training_sessions"
 
     title: Mapped[str] = mapped_column(String(100))
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     start_time: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     end_time: Mapped[datetime] = mapped_column(DateTime(timezone=True))
-    status: Mapped[SessionStatus] = mapped_column(SQLEnum(SessionStatus), default=SessionStatus.SCHEDULED)
+    status: Mapped[SessionStatus] = mapped_column(
+        SQLEnum(SessionStatus), default=SessionStatus.SCHEDULED
+    )
     max_participants: Mapped[int] = mapped_column(Integer, default=10)
 
-    coach_id: Mapped[UUID | None] = mapped_column(ForeignKey('coaches.id', ondelete='SET NULL'), nullable=True)
+    coach_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("coaches.id", ondelete="SET NULL"), nullable=True
+    )
 
-    coach: Mapped[Optional['CoachModel']] = relationship(back_populates='sessions')
-    participants: Mapped[list['SessionParticipant']] = relationship(
-        back_populates='session', cascade='all, delete-orphan'
+    coach: Mapped[Optional["CoachModel"]] = relationship(back_populates="sessions")
+    participants: Mapped[list["SessionParticipant"]] = relationship(
+        back_populates="session", cascade="all, delete-orphan"
     )
 
     def __str__(self):
-        return f'{self.title} ({self.start_time.strftime("%H:%M")} - {self.end_time.strftime("%H:%M")})'
+        return f"{self.title} ({self.start_time.strftime('%H:%M')} - {self.end_time.strftime('%H:%M')})"
 
 
 class SessionParticipant(Base):
-    __tablename__ = 'session_participants'
+    __tablename__ = "session_participants"
 
-    member_id: Mapped[UUID] = mapped_column(ForeignKey('members.id', ondelete='CASCADE'), primary_key=True)
-    session_id: Mapped[UUID] = mapped_column(ForeignKey('training_sessions.id', ondelete='CASCADE'), primary_key=True)
+    member_id: Mapped[UUID] = mapped_column(
+        ForeignKey("members.id", ondelete="CASCADE"), primary_key=True
+    )
+    session_id: Mapped[UUID] = mapped_column(
+        ForeignKey("training_sessions.id", ondelete="CASCADE"), primary_key=True
+    )
 
-    joined_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    joined_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
 
-    member: Mapped['MemberModel'] = relationship(back_populates='participations')
-    session: Mapped['TrainingSession'] = relationship(back_populates='participants')
+    member: Mapped["MemberModel"] = relationship(back_populates="participations")
+    session: Mapped["TrainingSession"] = relationship(back_populates="participants")
 
     def __str__(self):
-        return f'Participant: {self.member_id}'
+        return f"Participant: {self.member_id}"

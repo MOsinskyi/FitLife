@@ -2,9 +2,11 @@ from datetime import datetime
 from uuid import UUID
 from pydantic import BaseModel, ConfigDict
 
+
 class SpecializationBase(BaseModel):
     name: str
-    emoji: str = '⚡'
+    emoji: str = "⚡"
+
 
 class SpecializationResponse(SpecializationBase):
     id: UUID

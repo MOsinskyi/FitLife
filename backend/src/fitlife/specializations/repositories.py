@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fitlife.specializations.models import SpecializationModel
 from uuid import UUID
 
+
 class SpecializationRepository:
     def __init__(self, session: AsyncSession):
         self.session = session

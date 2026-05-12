@@ -1,4 +1,4 @@
-from datetime import UTC, datetime, time
+from datetime import UTC, datetime
 from typing import Annotated
 from uuid import UUID, uuid4
 
@@ -9,14 +9,14 @@ from fitlife.training_sessions.models import SessionStatus
 
 class UserSchema(BaseModel):
     id: Annotated[UUID, Field(default_factory=uuid4)]
-    first_name: Annotated[str, Field(default='John')]
-    last_name: Annotated[str, Field(default='Doe')]
+    first_name: Annotated[str, Field(default="John")]
+    last_name: Annotated[str, Field(default="Doe")]
 
     model_config = ConfigDict(from_attributes=True)
 
 
 class CoachSchema(UserSchema):
-    specialization: Annotated[str, Field(default='Yoga')]
+    specialization: Annotated[str, Field(default="Yoga")]
 
 
 class ParticipantSchema(BaseModel):
@@ -27,9 +27,12 @@ class ParticipantSchema(BaseModel):
 
 
 class TrainingSessionCreateSchema(BaseModel):
-    title: Annotated[str, Field(default='Кросфіт для початківців')]
+    title: Annotated[str, Field(default="Кросфіт для початківців")]
     description: Annotated[
-        str, Field(default="Інтенсивне кругове тренування на всі групи м'язів. Підходить для новачків.")
+        str,
+        Field(
+            default="Інтенсивне кругове тренування на всі групи м'язів. Підходить для новачків."
+        ),
     ]
     start_time: Annotated[datetime, Field(default=datetime.now(UTC))]
     end_time: Annotated[datetime, Field(default=datetime.now(UTC))]

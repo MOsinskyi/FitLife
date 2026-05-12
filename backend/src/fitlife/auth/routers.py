@@ -7,22 +7,22 @@ from ..schemas import UserSchema
 from .dependencies import AuthServiceDep, CurrentUserDep
 from .schemas import TokenSchema
 
-auth_router = APIRouter(prefix='/auth', tags=['✅ Authentication'])
+auth_router = APIRouter(prefix="/auth", tags=["✅ Authentication"])
 
 
 @auth_router.post(
-    '/login',
+    "/login",
     response_model=TokenSchema,
     responses={
         status.HTTP_200_OK: {
-            'description': 'Success',
-            'model': TokenSchema,
+            "description": "Success",
+            "model": TokenSchema,
         },
         status.HTTP_401_UNAUTHORIZED: {
-            'description': 'Invalid credentials',
+            "description": "Invalid credentials",
         },
         status.HTTP_404_NOT_FOUND: {
-            'description': 'Not found',
+            "description": "Not found",
         },
     },
 )
@@ -43,21 +43,21 @@ async def login(
     except InvalidCredentialsException as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            headers={'WWW-Authenticate': 'Bearer'},
+            headers={"WWW-Authenticate": "Bearer"},
             detail=str(e),
         ) from e
 
 
 @auth_router.get(
-    '/me',
+    "/me",
     response_model=UserSchema,
     responses={
         status.HTTP_200_OK: {
-            'description': 'Success',
-            'model': UserSchema,
+            "description": "Success",
+            "model": UserSchema,
         },
         status.HTTP_401_UNAUTHORIZED: {
-            'description': 'Invalid credentials',
+            "description": "Invalid credentials",
         },
     },
 )
@@ -67,6 +67,6 @@ async def read_users_me(current_user: CurrentUserDep):
     except InvalidCredentialsException as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            headers={'WWW-Authenticate': 'Bearer'},
+            headers={"WWW-Authenticate": "Bearer"},
             detail=str(e),
         ) from e

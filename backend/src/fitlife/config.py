@@ -7,47 +7,47 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 def is_not_none(value: Any) -> Any:
     if value is None:
-        return ValueError('Value cannot be None')
+        return ValueError("Value cannot be None")
     return value
 
 
 class AppConfig(BaseModel):
-    name: str = 'FastAPI'
-    api_v1: str = '/api/v1'
-    host: str = 'localhost'
+    name: str = "FastAPI"
+    api_v1: str = "/api/v1"
+    host: str = "localhost"
     port: int = 8000
-    log_filename: str = 'fitlife.log'
-    version: str = '0.1.0'
+    log_filename: str = "fitlife.log"
+    version: str = "0.1.0"
 
 
 class SecurityConfig(BaseModel):
-    secret_key: str = 'xxx'
-    algorithm: str = 'xxx'
+    secret_key: str = "xxx"
+    algorithm: str = "xxx"
     access_token_expire_minutes: int = 30
-    hash_encoding: str = 'utf-8'
+    hash_encoding: str = "utf-8"
 
 
 class MiddlewareConfig(BaseModel):
-    allow_origins: list[str] | str = '*'
-    allow_methods: list[str] | str = '*'
-    allow_headers: list[str] | str = '*'
+    allow_origins: list[str] | str = "*"
+    allow_methods: list[str] | str = "*"
+    allow_headers: list[str] | str = "*"
     allow_credentials: bool = True
 
 
 class PostgresConfig(BaseModel):
-    user: str = 'postgres'
-    password: str = ''
-    db: str = 'fitlife'
-    host: str = 'localhost'
+    user: str = "postgres"
+    password: str = ""
+    db: str = "fitlife"
+    host: str = "localhost"
     port: int = 5432
 
     @computed_field
     @property
     def effective_host(self) -> str:
-        if self.host == 'db' and not os.path.exists('/.dockerenv'):
-            return 'localhost'
-        if self.host == 'localhost' and os.path.exists('/.dockerenv'):
-            return 'db'
+        if self.host == "db" and not os.path.exists("/.dockerenv"):
+            return "localhost"
+        if self.host == "localhost" and os.path.exists("/.dockerenv"):
+            return "db"
         return self.host
 
     @computed_field
@@ -61,41 +61,41 @@ class RedisDB(BaseModel):
 
 
 class RedisConfig(BaseModel):
-    host: str = 'localhost'
+    host: str = "localhost"
     port: int = 6379
     db: RedisDB = RedisDB()
 
     @computed_field
     @property
     def effective_host(self) -> str:
-        if self.host == 'redis' and not os.path.exists('/.dockerenv'):
-            return 'localhost'
-        if self.host == 'localhost' and os.path.exists('/.dockerenv'):
-            return 'redis'
+        if self.host == "redis" and not os.path.exists("/.dockerenv"):
+            return "localhost"
+        if self.host == "localhost" and os.path.exists("/.dockerenv"):
+            return "redis"
         return self.host
 
 
 class CacheNamespace(BaseModel):
-    member: str = 'member'
-    coach: str = 'coach'
-    training_session: str = 'training_session'
+    member: str = "member"
+    coach: str = "coach"
+    training_session: str = "training_session"
 
 
 class CacheConfig(BaseModel):
-    prefix: str = 'fitlife'
+    prefix: str = "fitlife"
     namespace: CacheNamespace = CacheNamespace()
 
 
 class AdminConfig(BaseModel):
-    title: str = 'FitLife Admin'
+    title: str = "FitLife Admin"
     enabled: bool = True
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file='.env.dev',
+        env_file=".env.dev",
         env_ignore_empty=True,
-        env_nested_delimiter='_',
+        env_nested_delimiter="_",
         env_nested_max_split=1,
     )
 

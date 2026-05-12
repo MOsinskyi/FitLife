@@ -522,7 +522,7 @@ export default function Home() {
         <div className="modal-overlay" onClick={() => setSelectedSession(null)}>
           <div className="modal booking-modal" onClick={e => e.stopPropagation()}>
             <button className="modal-close" onClick={() => setSelectedSession(null)}>✕</button>
-            
+
             <div className="booking-header">
               <div className="section-tag">Тренування</div>
               <h2>{selectedSession.title}</h2>
@@ -535,7 +535,7 @@ export default function Home() {
 
             <div className="booking-body">
               <p className="booking-desc">{selectedSession.description}</p>
-              
+
               <div className="booking-coach">
                 <div className="coach-mini-avatar">{selectedSession.coach.emoji}</div>
                 <div className="coach-mini-info">
@@ -558,7 +558,7 @@ export default function Home() {
 
             <div className="booking-footer">
               {bookingError && <div className="booking-error">⚠️ {bookingError}</div>}
-              
+
               {!isAuthenticated ? (
                 <Link to="/login" className="btn-primary large" style={{ textAlign: 'center', textDecoration: 'none' }}>
                   Увійдіть, щоб записатись
@@ -568,20 +568,20 @@ export default function Home() {
                   <p>Тільки клієнти можуть записуватись на тренування</p>
                 </div>
               ) : isUserParticipating(selectedSession) ? (
-                <button 
-                  className="btn-ghost large" 
+                <button
+                  className="btn-ghost large"
                   onClick={handleCancelBooking}
                   disabled={bookingLoading}
                 >
                   {bookingLoading ? 'Скасування...' : 'Скасувати запис'}
                 </button>
               ) : (
-                <button 
-                  className="btn-primary large" 
+                <button
+                  className="btn-primary large"
                   onClick={handleBookSession}
                   disabled={bookingLoading || selectedSession.participants.length >= selectedSession.max_participants}
                 >
-                  {bookingLoading ? 'Бронювання...' : 
+                  {bookingLoading ? 'Бронювання...' :
                    selectedSession.participants.length >= selectedSession.max_participants ? 'Місць немає' : 'Записатись на тренування'}
                 </button>
               )}

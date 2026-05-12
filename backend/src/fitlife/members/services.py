@@ -19,8 +19,8 @@ if TYPE_CHECKING:
 class MemberService:
     def __init__(
         self,
-        repository: 'MemberRepository',
-        security: 'Security',
+        repository: "MemberRepository",
+        security: "Security",
         background_tasks: BackgroundTasks,
         cache_namespace: str,
     ):
@@ -32,17 +32,17 @@ class MemberService:
     async def get_member_profile(self, member_id: UUID) -> MemberModel:
         user = await self._repository.get_user_by_id(member_id)
         if not user:
-            raise ValueError('Member not found')
+            raise ValueError("Member not found")
         return user
 
-    async def register_member(self, user_data: 'UserRegisterSchema') -> MemberModel:
+    async def register_member(self, user_data: "UserRegisterSchema") -> MemberModel:
         new_user = MemberModel(**user_data.model_dump())
 
         if await self._repository.get_user_by_phone(new_user.phone_number):
-            raise UserAlreadyExists('User with this phone number already exists')
+            raise UserAlreadyExists("User with this phone number already exists")
 
         if await self._repository.get_user_by_email(new_user.email):
-            raise UserAlreadyExists('User with this email already exists')
+            raise UserAlreadyExists("User with this email already exists")
 
         user = await self._repository.create_user(new_user)
 
@@ -53,19 +53,21 @@ class MemberService:
 
         return user
 
-    async def update_member_profile(self, member_id: UUID, user_data: 'UserUpdateSchema') -> MemberModel:
+    async def update_member_profile(
+        self, member_id: UUID, user_data: "UserUpdateSchema"
+    ) -> MemberModel:
         user = await self._repository.update_user(member_id, user_data)
 
         await clear_cache(self._background_tasks, self._cache_namespace)
 
         if not user:
-            raise ValueError('Member not found')
+            raise ValueError("Member not found")
         return user
 
     async def delete_member_profile(self, member_id: UUID) -> None:
         user = await self._repository.get_user_by_id(member_id)
         if not user:
-            raise ValueError('Member not found')
+            raise ValueError("Member not found")
 
         await self._repository.delete_user(member_id)
 

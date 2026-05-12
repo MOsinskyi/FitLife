@@ -5,9 +5,11 @@ from fitlife.training_sessions.models import SessionParticipant
 
 
 class MemberModel(UserBase):
-    __tablename__ = 'members'
+    __tablename__ = "members"
 
-    participations: Mapped[list['SessionParticipant']] = relationship(back_populates='member')
+    participations: Mapped[list["SessionParticipant"]] = relationship(
+        back_populates="member"
+    )
 
     def __str__(self):
-        return f'{self.first_name} {self.last_name} ({self.email})'
+        return f"{self.first_name} {self.last_name} ({self.email})"

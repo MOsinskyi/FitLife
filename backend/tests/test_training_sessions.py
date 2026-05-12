@@ -7,13 +7,13 @@ from fitlife.training_sessions.schemas import TrainingSessionCreateSchema
 from fitlife.training_sessions.services import TrainingSessionService
 
 BASE_VALID_PAYLOAD = {
-    'title': 'Ранкова йога',
-    'description': 'Заняття для початківців',
-    'start_time': '09:00',
-    'end_time': '10:00',
-    'max_participants': 10,
-    'coach': uuid4(),
-    'participants': [],
+    "title": "Ранкова йога",
+    "description": "Заняття для початківців",
+    "start_time": "09:00",
+    "end_time": "10:00",
+    "max_participants": 10,
+    "coach": uuid4(),
+    "participants": [],
 }
 
 
@@ -32,7 +32,7 @@ class TestTrainingSessionService:
         member_repo = MagicMock()
 
         mock_coach = MagicMock()
-        mock_coach.id = BASE_VALID_PAYLOAD['coach']
+        mock_coach.id = BASE_VALID_PAYLOAD["coach"]
         coach_repo.get_user_by_id = AsyncMock(return_value=mock_coach)
 
         created_session = MagicMock()
@@ -46,7 +46,7 @@ class TestTrainingSessionService:
             coach_repository=coach_repo,
             member_repository=member_repo,
             background_tasks=get_mock_background_tasks(),
-            cache_namespace='test_training_session',
+            cache_namespace="test_training_session",
         )
 
         schema = TrainingSessionCreateSchema(**BASE_VALID_PAYLOAD)
@@ -68,7 +68,7 @@ class TestTrainingSessionService:
             coach_repository=coach_repo,
             member_repository=member_repo,
             background_tasks=get_mock_background_tasks(),
-            cache_namespace='test_training_session',
+            cache_namespace="test_training_session",
         )
 
         schema = TrainingSessionCreateSchema(**BASE_VALID_PAYLOAD)
@@ -76,8 +76,8 @@ class TestTrainingSessionService:
         with pytest.raises(ValueError) as exc_info:
             await service.create_training_session(schema)
 
-        assert 'Coach' in str(exc_info.value)
-        assert 'not found' in str(exc_info.value)
+        assert "Coach" in str(exc_info.value)
+        assert "not found" in str(exc_info.value)
 
     @pytest.mark.asyncio
     async def test_get_training_session_success(self):
@@ -96,7 +96,7 @@ class TestTrainingSessionService:
             coach_repository=coach_repo,
             member_repository=member_repo,
             background_tasks=get_mock_background_tasks(),
-            cache_namespace='test_training_session',
+            cache_namespace="test_training_session",
         )
 
         result = await service.get_training_session(session_id)
@@ -116,14 +116,14 @@ class TestTrainingSessionService:
             coach_repository=coach_repo,
             member_repository=member_repo,
             background_tasks=get_mock_background_tasks(),
-            cache_namespace='test_training_session',
+            cache_namespace="test_training_session",
         )
 
         with pytest.raises(ValueError) as exc_info:
             await service.get_training_session(uuid4())
 
-        assert 'Training session' in str(exc_info.value)
-        assert 'not found' in str(exc_info.value)
+        assert "Training session" in str(exc_info.value)
+        assert "not found" in str(exc_info.value)
 
     @pytest.mark.asyncio
     async def test_get_all_training_sessions(self):
@@ -140,7 +140,7 @@ class TestTrainingSessionService:
             coach_repository=coach_repo,
             member_repository=member_repo,
             background_tasks=get_mock_background_tasks(),
-            cache_namespace='test_training_session',
+            cache_namespace="test_training_session",
         )
 
         result = await service.get_all_training_sessions()
@@ -166,7 +166,7 @@ class TestTrainingSessionService:
             coach_repository=coach_repo,
             member_repository=member_repo,
             background_tasks=get_mock_background_tasks(),
-            cache_namespace='test_training_session',
+            cache_namespace="test_training_session",
         )
 
         await service.delete_training_session(session_id)
@@ -198,7 +198,7 @@ class TestTrainingSessionService:
             coach_repository=coach_repo,
             member_repository=member_repo,
             background_tasks=get_mock_background_tasks(),
-            cache_namespace='test_training_session',
+            cache_namespace="test_training_session",
         )
 
         result = await service.add_participants_to_session(session_id, [member_id])
@@ -228,18 +228,18 @@ class TestTrainingSessionService:
             coach_repository=coach_repo,
             member_repository=member_repo,
             background_tasks=get_mock_background_tasks(),
-            cache_namespace='test_training_session',
+            cache_namespace="test_training_session",
         )
 
         with pytest.raises(ValueError) as exc_info:
             await service.add_participants_to_session(session_id, [member_id])
 
-        assert 'Cannot add' in str(exc_info.value)
+        assert "Cannot add" in str(exc_info.value)
 
 
 class TestTrainingSessionSchemas:
     @pytest.mark.parametrize(
-        'participants,should_raise',
+        "participants,should_raise",
         [
             (0, True),
             (1, False),

@@ -34,7 +34,7 @@ export default function RegisterCoach() {
   const [experience, setExperience] = useState(1)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  
+
   const [availableSpecializations, setAvailableSpecializations] = useState<Specialization[]>([])
   const [fetchingSpecializations, setFetchingSpecializations] = useState(true)
 

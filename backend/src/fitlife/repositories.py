@@ -64,7 +64,11 @@ class BaseUserRepository[T](IUserRepository):
         smtp = (
             update(self.model)
             .where(self.model.id == user_id)
-            .values(**data.model_dump(exclude_unset=True, exclude_none=True, exclude_defaults=True))
+            .values(
+                **data.model_dump(
+                    exclude_unset=True, exclude_none=True, exclude_defaults=True
+                )
+            )
             .returning(self.model)
         )
         result = await self.session.execute(smtp)

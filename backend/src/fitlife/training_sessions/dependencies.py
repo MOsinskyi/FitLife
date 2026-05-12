@@ -10,11 +10,15 @@ from fitlife.training_sessions.repositories import TrainingSessionRepository
 from fitlife.training_sessions.services import TrainingSessionService
 
 
-async def get_training_session_repository(session: SessionDep) -> TrainingSessionRepository:
+async def get_training_session_repository(
+    session: SessionDep,
+) -> TrainingSessionRepository:
     return TrainingSessionRepository(session)
 
 
-TrainingSessionRepositoryDep = Annotated[TrainingSessionRepository, Depends(get_training_session_repository)]
+TrainingSessionRepositoryDep = Annotated[
+    TrainingSessionRepository, Depends(get_training_session_repository)
+]
 
 
 async def get_training_session_service(
@@ -34,4 +38,6 @@ async def get_training_session_service(
     )
 
 
-TrainingSessionServiceDep = Annotated[TrainingSessionService, Depends(get_training_session_service)]
+TrainingSessionServiceDep = Annotated[
+    TrainingSessionService, Depends(get_training_session_service)
+]

@@ -30,6 +30,6 @@ def custom_key_builder(  # noqa: PLR0913
             continue
         new_kw[key] = value
     cache_key = hashlib.md5(  # noqa: S324
-        f'{func.__module__}:{func.__name__}:{args}:{new_kw}'.encode()
+        f"{func.__module__}:{func.__name__}:{args}:{new_kw}".encode()
     ).hexdigest()
-    return f'{namespace}:{cache_key}'
+    return f"{namespace}:{cache_key}"

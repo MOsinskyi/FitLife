@@ -14,10 +14,10 @@ if TYPE_CHECKING:
 class AuthService:
     def __init__(
         self,
-        member_repository: 'MemberRepository',
-        coach_repository: 'CoachRepository',
-        admin_repository: 'AdminRepository',
-        security: 'Security',
+        member_repository: "MemberRepository",
+        coach_repository: "CoachRepository",
+        admin_repository: "AdminRepository",
+        security: "Security",
     ):
         self.member_repository = member_repository
         self.coach_repository = coach_repository
@@ -34,11 +34,13 @@ class AuthService:
             user = await self.admin_repository.get_user_by_phone(phone_number)
 
         if not user:
-            raise ValueError('User not found')
+            raise ValueError("User not found")
 
         if not self.security.verify_password(password, user.password):
-            raise InvalidCredentialsException('Invalid password or phone number')
+            raise InvalidCredentialsException("Invalid password or phone number")
 
-        access_token = self.security.create_access_token({'sub': str(user.id), 'role': user.role})
+        access_token = self.security.create_access_token(
+            {"sub": str(user.id), "role": user.role}
+        )
 
         return TokenSchema(access_token=access_token)

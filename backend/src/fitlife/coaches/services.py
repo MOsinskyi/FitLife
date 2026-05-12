@@ -20,9 +20,9 @@ if TYPE_CHECKING:
 class CoachService:
     def __init__(
         self,
-        repository: 'CoachRepository',
-        specialization_repository: 'SpecializationRepository',
-        security: 'Security',
+        repository: "CoachRepository",
+        specialization_repository: "SpecializationRepository",
+        security: "Security",
         background_tasks: BackgroundTasks,
         cache_namespace: str,
     ):
@@ -35,26 +35,28 @@ class CoachService:
     async def get_coach_profile(self, member_id: UUID) -> CoachModel:
         user = await self._repository.get_user_by_id(member_id)
         if not user:
-            raise ValueError('Coach not found')
+            raise ValueError("Coach not found")
         return user
 
-    async def register_coach(self, user_data: 'CoachRegisterSchema') -> CoachModel:
+    async def register_coach(self, user_data: "CoachRegisterSchema") -> CoachModel:
         # Extract specialization_ids before creating the model
         data = user_data.model_dump()
-        specialization_ids = data.pop('specialization_ids', [])
-        password = data.pop('password')
-        
+        specialization_ids = data.pop("specialization_ids", [])
+        password = data.pop("password")
+
         new_user = CoachModel(**data)
 
         if await self._repository.get_user_by_phone(new_user.phone_number):
-            raise UserAlreadyExists('User with this phone number already exists')
+            raise UserAlreadyExists("User with this phone number already exists")
 
         if await self._repository.get_user_by_email(new_user.email):
-            raise UserAlreadyExists('User with this email already exists')
+            raise UserAlreadyExists("User with this email already exists")
 
         # Link specializations
         if specialization_ids:
-            specializations = await self._specialization_repository.get_by_ids(specialization_ids)
+            specializations = await self._specialization_repository.get_by_ids(
+                specialization_ids
+            )
             new_user.specializations = specializations
 
         user = await self._repository.create_user(new_user)
@@ -66,19 +68,25 @@ class CoachService:
 
         return user
 
-    async def update_coach_profile(self, member_id: UUID, user_data: 'CoachUpdateSchema') -> CoachModel:
-        data = user_data.model_dump(exclude_unset=True, exclude_none=True, exclude_defaults=True)
-        specialization_ids = data.pop('specialization_ids', None)
-        
+    async def update_coach_profile(
+        self, member_id: UUID, user_data: "CoachUpdateSchema"
+    ) -> CoachModel:
+        data = user_data.model_dump(
+            exclude_unset=True, exclude_none=True, exclude_defaults=True
+        )
+        specialization_ids = data.pop("specialization_ids", None)
+
         # We need the user object to update relationships
         user = await self._repository.get_user_by_id(member_id)
         if not user:
-            raise ValueError('Coach not found')
-            
+            raise ValueError("Coach not found")
+
         if specialization_ids is not None:
-            specializations = await self._specialization_repository.get_by_ids(specialization_ids)
+            specializations = await self._specialization_repository.get_by_ids(
+                specialization_ids
+            )
             user.specializations = specializations
-            
+
         # Update other fields
         for key, value in data.items():
             setattr(user, key, value)
@@ -89,7 +97,7 @@ class CoachService:
     async def delete_coach(self, member_id: UUID) -> None:
         user = await self._repository.get_user_by_id(member_id)
         if not user:
-            raise ValueError('Coach not found')
+            raise ValueError("Coach not found")
 
         await self._repository.delete_user(member_id)
 

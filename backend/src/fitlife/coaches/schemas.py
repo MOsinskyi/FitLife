@@ -4,11 +4,12 @@ from fitlife import schemas as base
 from fitlife.specializations.schemas import SpecializationResponse
 from uuid import UUID
 
+
 class CoachCreateSchema(base.UserCreateSchema):
     specialization_ids: list[UUID] = Field(default_factory=list)
-    emoji: str = Field(default='💪')
+    emoji: str = Field(default="💪")
     experience: Annotated[int, Field(default=1, ge=1)]
-    experience_label: Annotated[str, Field(default='рік')]
+    experience_label: Annotated[str, Field(default="рік")]
 
     model_config = ConfigDict(use_enum_values=True)
 
@@ -29,6 +30,6 @@ class CoachSchema(base.UserSchema):
     emoji: str
     experience: int
     experience_label: str
-    role: str = 'coach'
-    
+    role: str = "coach"
+
     model_config = ConfigDict(from_attributes=True)

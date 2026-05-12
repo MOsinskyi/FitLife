@@ -18,7 +18,9 @@ class TrainingSessionRepository:
             .where(TrainingSession.id == id_)
             .options(
                 selectinload(TrainingSession.coach),
-                selectinload(TrainingSession.participants).joinedload(SessionParticipant.member),
+                selectinload(TrainingSession.participants).joinedload(
+                    SessionParticipant.member
+                ),
             )
         )
 
@@ -26,7 +28,9 @@ class TrainingSessionRepository:
 
         return result.scalar_one_or_none()
 
-    async def create_training_session(self, training_session: TrainingSession) -> TrainingSession:
+    async def create_training_session(
+        self, training_session: TrainingSession
+    ) -> TrainingSession:
         self._session.add(training_session)
         await self._session.flush()
         return training_session
@@ -34,16 +38,24 @@ class TrainingSessionRepository:
     async def get_training_sessions(self) -> list[TrainingSession]:
         stmt = select(TrainingSession).options(
             selectinload(TrainingSession.coach),
-            selectinload(TrainingSession.participants).joinedload(SessionParticipant.member),
+            selectinload(TrainingSession.participants).joinedload(
+                SessionParticipant.member
+            ),
         )
         result = await self._session.execute(stmt)
         return list(result.scalars().all())
 
-    async def update_training_session(self, id_: UUID, data: TrainingSessionUpdateSchema) -> TrainingSession | None:
+    async def update_training_session(
+        self, id_: UUID, data: TrainingSessionUpdateSchema
+    ) -> TrainingSession | None:
         stmt = (
             update(TrainingSession)
             .where(TrainingSession.id == id_)
-            .values(**data.model_dump(exclude_unset=True, exclude_none=True, exclude_defaults=True))
+            .values(
+                **data.model_dump(
+                    exclude_unset=True, exclude_none=True, exclude_defaults=True
+                )
+            )
             .returning(TrainingSession)
         )
         result = await self._session.execute(stmt)

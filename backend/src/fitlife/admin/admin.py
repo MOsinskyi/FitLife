@@ -13,9 +13,9 @@ from fitlife.training_sessions.models import SessionParticipant, TrainingSession
 
 
 class AdminAdmin(ModelView, model=AdminModel):
-    name = 'Admin'
-    name_plural = 'Admins'
-    icon = 'fa-solid fa-user-shield'
+    name = "Admin"
+    name_plural = "Admins"
+    icon = "fa-solid fa-user-shield"
 
     column_list = [
         AdminModel.id,
@@ -51,9 +51,9 @@ class AdminAdmin(ModelView, model=AdminModel):
 
 
 class MemberAdmin(ModelView, model=MemberModel):
-    name = 'Member'
-    name_plural = 'Members'
-    icon = 'fa-solid fa-users'
+    name = "Member"
+    name_plural = "Members"
+    icon = "fa-solid fa-users"
 
     column_list = [
         MemberModel.id,
@@ -89,9 +89,9 @@ class MemberAdmin(ModelView, model=MemberModel):
 
 
 class CoachAdmin(ModelView, model=CoachModel):
-    name = 'Coach'
-    name_plural = 'Coaches'
-    icon = 'fa-solid fa-chalkboard-user'
+    name = "Coach"
+    name_plural = "Coaches"
+    icon = "fa-solid fa-chalkboard-user"
 
     column_list = [
         CoachModel.id,
@@ -127,9 +127,9 @@ class CoachAdmin(ModelView, model=CoachModel):
 
 
 class SpecializationAdmin(ModelView, model=SpecializationModel):
-    name = 'Specialization'
-    name_plural = 'Specializations'
-    icon = 'fa-solid fa-tags'
+    name = "Specialization"
+    name_plural = "Specializations"
+    icon = "fa-solid fa-tags"
 
     column_list = [
         SpecializationModel.id,
@@ -147,9 +147,9 @@ class SpecializationAdmin(ModelView, model=SpecializationModel):
 
 
 class TrainingSessionAdmin(ModelView, model=TrainingSession):
-    name = 'Training Session'
-    name_plural = 'Training Sessions'
-    icon = 'fa-solid fa-dumbbell'
+    name = "Training Session"
+    name_plural = "Training Sessions"
+    icon = "fa-solid fa-dumbbell"
 
     column_list = [
         TrainingSession.id,
@@ -172,13 +172,15 @@ class TrainingSessionAdmin(ModelView, model=TrainingSession):
     ]
 
     # Eager load coach and participants with their members
-    column_select_related_list = ['coach']
+    column_select_related_list = ["coach"]
 
     # Override how we fetch data to include eager loading of participants and their members
     async def get_query(self, request, stmt):
         stmt = stmt.options(
             selectinload(TrainingSession.coach),
-            selectinload(TrainingSession.participants).selectinload(SessionParticipant.member),
+            selectinload(TrainingSession.participants).selectinload(
+                SessionParticipant.member
+            ),
         )
         return await super().get_query(request, stmt)
 
@@ -186,20 +188,22 @@ class TrainingSessionAdmin(ModelView, model=TrainingSession):
         """Override to ensure eager loading when fetching model objects for forms"""
         stmt = stmt.options(
             selectinload(TrainingSession.coach),
-            selectinload(TrainingSession.participants).selectinload(SessionParticipant.member),
+            selectinload(TrainingSession.participants).selectinload(
+                SessionParticipant.member
+            ),
         )
         return await super().get_model_objects(stmt)
 
     # Include coach and participants in the form
     form_columns = [
-        'title',
-        'description',
-        'start_time',
-        'end_time',
-        'status',
-        'max_participants',
-        'coach',
-        'participants',
+        "title",
+        "description",
+        "start_time",
+        "end_time",
+        "status",
+        "max_participants",
+        "coach",
+        "participants",
     ]
 
     can_create = True
@@ -209,9 +213,9 @@ class TrainingSessionAdmin(ModelView, model=TrainingSession):
 
 
 class SessionParticipantAdmin(ModelView, model=SessionParticipant):
-    name = 'Session Participant'
-    name_plural = 'Session Participants'
-    icon = 'fa-solid fa-user-check'
+    name = "Session Participant"
+    name_plural = "Session Participants"
+    icon = "fa-solid fa-user-check"
 
     column_list = [
         SessionParticipant.member,
@@ -219,19 +223,19 @@ class SessionParticipantAdmin(ModelView, model=SessionParticipant):
         SessionParticipant.joined_at,
     ]
 
-    column_select_related_list = ['member', 'session']
+    column_select_related_list = ["member", "session"]
 
     column_labels = {
-        SessionParticipant.member: 'Member',
-        SessionParticipant.session: 'Training Session',
+        SessionParticipant.member: "Member",
+        SessionParticipant.session: "Training Session",
     }
 
     async def get_object_for_details(self, request: Request) -> Any:
         await super().get_object_for_details(request)
 
     form_columns = [
-        'member',
-        'session',
+        "member",
+        "session",
     ]
 
     can_create = True
@@ -241,9 +245,9 @@ class SessionParticipantAdmin(ModelView, model=SessionParticipant):
 
 
 class GalleryAdmin(ModelView, model=GalleryModel):
-    name = 'Gallery'
-    name_plural = 'Gallery'
-    icon = 'fa-solid fa-image'
+    name = "Gallery"
+    name_plural = "Gallery"
+    icon = "fa-solid fa-image"
 
     column_list = [
         GalleryModel.id,
@@ -273,8 +277,8 @@ def setup_admin(app, engine, authentication_backend):
     admin = Admin(
         app,
         engine,
-        title='FitLife Admin',
-        base_url='/admin',
+        title="FitLife Admin",
+        base_url="/admin",
         authentication_backend=authentication_backend,
     )
 

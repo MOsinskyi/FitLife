@@ -16,8 +16,8 @@ from fitlife.security import Security
 class AdminAuth(AuthenticationBackend):
     async def login(self, request: Request) -> bool:
         form = await request.form()
-        email = form.get('username')
-        password = form.get('password')
+        email = form.get("username")
+        password = form.get("password")
 
         if not email or not password:
             return False
@@ -31,9 +31,11 @@ class AdminAuth(AuthenticationBackend):
             if not Security.verify_password(password, admin.password):
                 return False
 
-            token = Security.create_access_token(data={'sub': str(admin.id), 'email': admin.email, 'role': admin.role})
+            token = Security.create_access_token(
+                data={"sub": str(admin.id), "email": admin.email, "role": admin.role}
+            )
 
-            request.session.update({'token': token})
+            request.session.update({"token": token})
 
         return True
 
@@ -43,16 +45,16 @@ class AdminAuth(AuthenticationBackend):
         return True
 
     async def authenticate(self, request: Request) -> bool:
-        token = request.session.get('token')
+        token = request.session.get("token")
 
         if not token:
             return False
 
         payload = Security.decode_access_token(token)
-        if not payload or payload.get('role') != UserRoles.ADMIN.value:
+        if not payload or payload.get("role") != UserRoles.ADMIN.value:
             return False
 
-        user_id = UUID(payload.get('sub'))
+        user_id = UUID(payload.get("sub"))
         if not user_id:
             return False
 
@@ -64,17 +66,20 @@ class AdminAuth(AuthenticationBackend):
         return True
 
     @staticmethod
-    async def _get_admin_by_email(session: AsyncSession, email: str) -> AdminModel | None:
+    async def _get_admin_by_email(
+        session: AsyncSession, email: str
+    ) -> AdminModel | None:
         stmt = select(AdminModel).where(AdminModel.email == email)
         result = await session.execute(stmt)
         return result.scalar_one_or_none()
 
     @staticmethod
-    async def _get_admin_by_id(session: AsyncSession, admin_id: UUID) -> AdminModel | None:
+    async def _get_admin_by_id(
+        session: AsyncSession, admin_id: UUID
+    ) -> AdminModel | None:
         stmt = select(AdminModel).where(AdminModel.id == admin_id)
         result = await session.execute(stmt)
         return result.scalar_one_or_none()
-
 
 
 authentication_backend = AdminAuth(secret_key=settings.security.secret_key)
