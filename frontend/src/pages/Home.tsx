@@ -1,9 +1,25 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
+import { Calendar, dateFnsLocalizer } from 'react-big-calendar'
+import { format, parse, startOfWeek, getDay } from 'date-fns'
+import { uk } from 'date-fns/locale'
 import { useAuth } from '../context/AuthContext'
 import { apiClient } from '../services/api'
 import type { Coach, Gallery, TrainingSession } from '../types'
+import 'react-big-calendar/lib/css/react-big-calendar.css'
 import '../App.css'
+
+const locales = {
+  'uk': uk,
+}
+
+const localizer = dateFnsLocalizer({
+  format,
+  parse,
+  startOfWeek,
+  getDay,
+  locales,
+})
 
 const benefits = [
   { icon: '⚡', title: 'Персональний підхід', desc: 'Кожна програма адаптована під твій рівень підготовки та цілі' },
@@ -29,6 +45,13 @@ export default function Home() {
   const [trainingSessions, setTrainingSessions] = useState<TrainingSession[]>([])
   const [trainingSessionsLoading, setTrainingSessionsLoading] = useState(true)
   const [trainingSessionsError, setTrainingSessionsError] = useState<string | null>(null)
+
+  const [calendarDate, setCalendarDate] = useState(new Date())
+  const [calendarView, setCalendarView] = useState<'month' | 'week' | 'day' | 'agenda'>('month')
+
+  const [selectedSession, setSelectedSession] = useState<TrainingSession | null>(null)
+  const [bookingLoading, setBookingLoading] = useState(false)
+  const [bookingError, setBookingError] = useState<string | null>(null)
 
   const fetchCoaches = async () => {
     setCoachesLoading(true)
@@ -84,13 +107,60 @@ export default function Home() {
     )
     document.querySelectorAll('[data-animate]').forEach((el) => observer.observe(el))
     return () => observer.disconnect()
-  }, [coaches])
+  }, [coaches, trainingSessions])
 
   const isVisible = (id: string) => visible.has(id)
 
   const handleLogout = () => {
     logout()
     setMenuOpen(false)
+  }
+
+  const calendarEvents = trainingSessions.map(session => ({
+    id: session.id,
+    title: session.title,
+    start: new Date(session.start_time),
+    end: new Date(session.end_time),
+    resource: session
+  }))
+
+  const handleSelectEvent = (event: any) => {
+    setSelectedSession(event.resource)
+    setBookingError(null)
+  }
+
+  const isUserParticipating = (session: TrainingSession) => {
+    return session.participants.some(p => p.member.id === user?.id)
+  }
+
+  const handleBookSession = async () => {
+    if (!selectedSession || !user) return
+    setBookingLoading(true)
+    setBookingError(null)
+    try {
+      const updatedSession = await apiClient.bookSession(selectedSession.id, [user.id])
+      setTrainingSessions(prev => prev.map(s => s.id === updatedSession.id ? updatedSession : s))
+      setSelectedSession(updatedSession)
+    } catch (e) {
+      setBookingError(e instanceof Error ? e.message : 'Не вдалося забронювати тренування')
+    } finally {
+      setBookingLoading(false)
+    }
+  }
+
+  const handleCancelBooking = async () => {
+    if (!selectedSession || !user) return
+    setBookingLoading(true)
+    setBookingError(null)
+    try {
+      const updatedSession = await apiClient.cancelSession(selectedSession.id, user.id)
+      setTrainingSessions(prev => prev.map(s => s.id === updatedSession.id ? updatedSession : s))
+      setSelectedSession(updatedSession)
+    } catch (e) {
+      setBookingError(e instanceof Error ? e.message : 'Не вдалося скасувати бронювання')
+    } finally {
+      setBookingLoading(false)
+    }
   }
 
   return (
@@ -145,8 +215,8 @@ export default function Home() {
           </p>
           <div className="hero-actions">
             {isAuthenticated ? (
-              <a href="#coaches" className="btn-primary large">
-                Переглянути тренерів →
+              <a href="#schedule" className="btn-primary large">
+                Переглянути розклад →
               </a>
             ) : (
               <>
@@ -266,11 +336,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SCHEDULE */}
+      {/* SCHEDULE (CALENDAR) */}
       <section className="schedule section" id="schedule">
         <div className="section-tag">Розклад</div>
-        <h2 className="section-title">Найближчі тренування</h2>
-        <p className="section-sub">Обери зручний час та приєднуйся до нашої спільноти</p>
+        <h2 className="section-title">Календар тренувань</h2>
+        <p className="section-sub">Обери зручний час та забронюй своє місце в команді</p>
 
         {trainingSessionsLoading && (
           <div className="coaches-skeleton-grid">
@@ -286,50 +356,33 @@ export default function Home() {
           </div>
         )}
 
-        {!trainingSessionsLoading && !trainingSessionsError && trainingSessions.length === 0 && (
-          <div className="coaches-state">
-            <p>На найближчий час тренувань не заплановано</p>
-          </div>
-        )}
-
-        {!trainingSessionsLoading && !trainingSessionsError && trainingSessions.length > 0 && (
-          <div className="schedule-grid">
-            {trainingSessions.map((s, i) => (
-              <div
-                key={s.id}
-                id={`session-${i}`}
-                data-animate
-                className={`session-card fade-up ${isVisible(`session-${i}`) ? 'in' : ''}`}
-                style={{ transitionDelay: `${i * 100}ms` }}
-              >
-                <div className="session-time">
-                  <span className="time-badge">
-                    {s.start_time.substring(0, 5)} - {s.end_time.substring(0, 5)}
-                  </span>
-                </div>
-                <div className="session-info">
-                  <h3>{s.title}</h3>
-                  <p>{s.description}</p>
-                  <div className="session-meta">
-                    <span className="session-coach">
-                      👤 {s.coach.first_name} {s.coach.last_name}
-                    </span>
-                    <span className="session-spots">
-                      👥 {s.participants.length} / {s.max_participants} місць
-                    </span>
-                  </div>
-                </div>
-                {isAuthenticated ? (
-                  <button className="btn-primary full-width" disabled={s.participants.length >= s.max_participants}>
-                    {s.participants.length >= s.max_participants ? 'Місць немає' : 'Записатись'}
-                  </button>
-                ) : (
-                  <Link to="/register/member" className="btn-primary full-width">
-                    Записатись
-                  </Link>
-                )}
-              </div>
-            ))}
+        {!trainingSessionsLoading && !trainingSessionsError && (
+          <div className="calendar-container fade-up in" data-animate id="calendar-view">
+            <Calendar
+              localizer={localizer}
+              events={calendarEvents}
+              startAccessor="start"
+              endAccessor="end"
+              onSelectEvent={handleSelectEvent}
+              date={calendarDate}
+              view={calendarView}
+              onNavigate={date => setCalendarDate(date)}
+              onView={view => setCalendarView(view as any)}
+              messages={{
+                next: 'Наступний',
+                previous: 'Попередній',
+                today: 'Сьогодні',
+                month: 'Місяць',
+                week: 'Тиждень',
+                day: 'День',
+                agenda: 'Порядок денний',
+                date: 'Дата',
+                time: 'Час',
+                event: 'Подія',
+                noEventsInRange: 'У цьому діапазоні немає подій.',
+              }}
+              culture='uk'
+            />
           </div>
         )}
       </section>
@@ -389,11 +442,11 @@ export default function Home() {
                   </div>
                 </div>
                 {isAuthenticated ? (
-                  <button className="btn-outline">
-                    Записатись
-                  </button>
+                  <a href="#schedule" className="btn-outline" style={{ textAlign: 'center', textDecoration: 'none' }}>
+                    Переглянути розклад
+                  </a>
                 ) : (
-                  <Link to="/register/member" className="btn-outline">
+                  <Link to="/register/member" className="btn-outline" style={{ textAlign: 'center', textDecoration: 'none' }}>
                     Записатись
                   </Link>
                 )}
@@ -410,8 +463,8 @@ export default function Home() {
           <h2>Готовий почати?</h2>
           <p>Зареєструйся сьогодні і отримай перше тренування безкоштовно</p>
           {isAuthenticated ? (
-            <a href="#coaches" className="btn-primary large">
-              Переглянути тренерів
+            <a href="#schedule" className="btn-primary large">
+              Забронювати тренування
             </a>
           ) : (
             <Link to="/register/member" className="btn-primary large">
@@ -463,6 +516,79 @@ export default function Home() {
           <span>© 2025 FitLife. Всі права захищені.</span>
         </div>
       </footer>
+
+      {/* BOOKING MODAL */}
+      {selectedSession && (
+        <div className="modal-overlay" onClick={() => setSelectedSession(null)}>
+          <div className="modal booking-modal" onClick={e => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setSelectedSession(null)}>✕</button>
+            
+            <div className="booking-header">
+              <div className="section-tag">Тренування</div>
+              <h2>{selectedSession.title}</h2>
+              <div className="booking-time">
+                <span>📅 {format(new Date(selectedSession.start_time), 'd MMMM, EEEE', { locale: uk })}</span>
+                <span>•</span>
+                <span>🕒 {format(new Date(selectedSession.start_time), 'HH:mm')} - {format(new Date(selectedSession.end_time), 'HH:mm')}</span>
+              </div>
+            </div>
+
+            <div className="booking-body">
+              <p className="booking-desc">{selectedSession.description}</p>
+              
+              <div className="booking-coach">
+                <div className="coach-mini-avatar">{selectedSession.coach.emoji}</div>
+                <div className="coach-mini-info">
+                  <h4>{selectedSession.coach.first_name} {selectedSession.coach.last_name}</h4>
+                  <p>Тренер</p>
+                </div>
+              </div>
+
+              <div className="booking-stats">
+                <div className="booking-stat">
+                  <span className="booking-stat-val">{selectedSession.participants.length} / {selectedSession.max_participants}</span>
+                  <span className="booking-stat-label">Місць зайнято</span>
+                </div>
+                <div className="booking-stat">
+                  <span className="booking-stat-val">{selectedSession.status === 'scheduled' ? 'Заплановано' : 'Завершено'}</span>
+                  <span className="booking-stat-label">Статус</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="booking-footer">
+              {bookingError && <div className="booking-error">⚠️ {bookingError}</div>}
+              
+              {!isAuthenticated ? (
+                <Link to="/login" className="btn-primary large" style={{ textAlign: 'center', textDecoration: 'none' }}>
+                  Увійдіть, щоб записатись
+                </Link>
+              ) : user?.role === 'coach' || user?.role === 'admin' ? (
+                <div className="coaches-state" style={{ padding: '10px' }}>
+                  <p>Тільки клієнти можуть записуватись на тренування</p>
+                </div>
+              ) : isUserParticipating(selectedSession) ? (
+                <button 
+                  className="btn-ghost large" 
+                  onClick={handleCancelBooking}
+                  disabled={bookingLoading}
+                >
+                  {bookingLoading ? 'Скасування...' : 'Скасувати запис'}
+                </button>
+              ) : (
+                <button 
+                  className="btn-primary large" 
+                  onClick={handleBookSession}
+                  disabled={bookingLoading || selectedSession.participants.length >= selectedSession.max_participants}
+                >
+                  {bookingLoading ? 'Бронювання...' : 
+                   selectedSession.participants.length >= selectedSession.max_participants ? 'Місць немає' : 'Записатись на тренування'}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
