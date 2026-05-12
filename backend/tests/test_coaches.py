@@ -4,9 +4,6 @@ from uuid import uuid4
 import pytest
 
 # Ensure all models are loaded for SQLAlchemy relationships
-from fitlife.members.models import MemberModel
-from fitlife.coaches.models import CoachModel
-from fitlife.training_sessions.models import TrainingSession, SessionParticipant
 
 from fitlife.coaches.schemas import (
     CoachRegisterSchema,
