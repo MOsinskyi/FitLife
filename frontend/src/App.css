@@ -129,7 +129,7 @@ h1, h2, h3 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.04em; line
   transition: transform .15s, box-shadow .2s, opacity .2s;
   letter-spacing: 0.02em;
 }
-.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(232,255,71,0.35); color: var(--text) !important; }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgb(228 255 26); color: var(--text) !important; }
 .btn-primary.large:hover { color: #000 !important; }
 .btn-primary.large { padding: 15px 32px; font-size: 15px; border-radius: 12px; }
 .btn-primary.full-width { width: 100%; margin-top: 4px; }
@@ -542,6 +542,12 @@ h1, h2, h3 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.04em; line
   align-items: center;
   justify-content: center;
   border: 1px solid var(--border);
+  overflow: hidden;
+}
+.coach-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 .coach-info h3 { font-family: 'Manrope', sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 4px; }
 .coach-specialties {
@@ -869,6 +875,12 @@ h1, h2, h3 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.04em; line
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+}
+.coach-mini-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 .coach-mini-info h4 {
   font-size: 15px;
