@@ -32,9 +32,9 @@ export interface Member extends User {
 export interface Coach extends User {
   role: 'coach'
   specializations: Specialization[]
-  emoji: string
   experience: number
   experience_label: string
+  image_url: string
 }
 
 export interface LoginRequest {
@@ -57,7 +57,6 @@ export interface MemberRegisterRequest {
 
 export interface CoachRegisterRequest extends MemberRegisterRequest {
   specialization_ids: string[]
-  emoji: string
   experience: number
   experience_label: string
 }
