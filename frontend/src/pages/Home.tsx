@@ -424,7 +424,11 @@ export default function Home() {
                 style={{ transitionDelay: `${i * 100}ms` }}
               >
                 <div className="coach-avatar">
-                  {c.emoji}
+                  {c.image_url ? (
+                    <img src={c.image_url} alt={`${c.first_name} ${c.last_name}`} />
+                  ) : (
+                    <>{c.specializations?.[0]?.emoji || '💪'}</>
+                  )}
                 </div>
                 <div className="coach-info">
                   <h3>{c.first_name} {c.last_name}</h3>
@@ -537,7 +541,13 @@ export default function Home() {
               <p className="booking-desc">{selectedSession.description}</p>
 
               <div className="booking-coach">
-                <div className="coach-mini-avatar">{selectedSession.coach.emoji}</div>
+                <div className="coach-mini-avatar">
+                  {selectedSession.coach.image_url ? (
+                    <img src={selectedSession.coach.image_url} alt={`${selectedSession.coach.first_name} ${selectedSession.coach.last_name}`} />
+                  ) : (
+                    <>{selectedSession.coach.specializations?.[0]?.emoji || '💪'}</>
+                  )}
+                </div>
                 <div className="coach-mini-info">
                   <h4>{selectedSession.coach.first_name} {selectedSession.coach.last_name}</h4>
                   <p>Тренер</p>
