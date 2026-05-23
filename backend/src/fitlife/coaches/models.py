@@ -12,7 +12,7 @@ from fitlife.training_sessions.models import TrainingSession
 class CoachModel(UserBase):
     __tablename__ = "coaches"
 
-    emoji = Column(
+    image_url = Column(
         String,
         nullable=False,
         default="",
@@ -36,4 +36,4 @@ class CoachModel(UserBase):
     sessions: Mapped[list["TrainingSession"]] = relationship(back_populates="coach")
 
     def __str__(self):
-        return f"{self.emoji} {self.first_name} {self.last_name}"
+        return f"{self.first_name} {self.last_name}"

@@ -7,7 +7,7 @@ from uuid import UUID
 
 class CoachCreateSchema(base.UserCreateSchema):
     specialization_ids: list[UUID] = Field(default_factory=list)
-    emoji: str = Field(default="💪")
+    image_url: str = Field(default="")
     experience: Annotated[int, Field(default=1, ge=1)]
     experience_label: Annotated[str, Field(default="рік")]
 
@@ -20,14 +20,14 @@ class CoachRegisterSchema(base.UserRegisterSchema, CoachCreateSchema):
 
 class CoachUpdateSchema(base.UserUpdateSchema):
     specialization_ids: list[UUID] | None = None
-    emoji: str | None = None
+    image_url: str | None = None
     experience: int | None = None
     experience_label: str | None = None
 
 
 class CoachSchema(base.UserSchema):
     specializations: list[SpecializationResponse] = Field(default_factory=list)
-    emoji: str
+    image_url: str
     experience: int
     experience_label: str
     role: str = "coach"
