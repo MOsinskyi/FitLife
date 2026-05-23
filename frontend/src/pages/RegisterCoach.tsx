@@ -81,9 +81,6 @@ export default function RegisterCoach() {
 
     setLoading(true)
 
-    // Use the emoji of the first specialization as the main coach emoji
-    const firstSpec = availableSpecializations.find(s => s.id === specializationIds[0])
-
     try {
       await registerCoach({
         first_name: firstName,
@@ -92,7 +89,6 @@ export default function RegisterCoach() {
         email: email || null,
         password,
         specialization_ids: specializationIds,
-        emoji: firstSpec?.emoji || '💪',
         experience,
         experience_label: getExperienceLabel(experience),
       })
