@@ -804,6 +804,13 @@ h1, h2, h3 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.04em; line
   font-size: 13px !important;
   font-weight: 600 !important;
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  overflow: hidden;
+}
+.rbc-event-content {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
 }
 .rbc-event:focus {
   outline: 2px solid var(--accent);

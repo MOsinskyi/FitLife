@@ -368,6 +368,10 @@ export default function Home() {
               view={calendarView}
               onNavigate={date => setCalendarDate(date)}
               onView={view => setCalendarView(view as any)}
+              min={new Date(0, 0, 0, 7, 0, 0)}
+              max={new Date(0, 0, 0, 22, 0, 0)}
+              step={30}
+              timeslots={2}
               messages={{
                 next: 'Наступний',
                 previous: 'Попередній',
