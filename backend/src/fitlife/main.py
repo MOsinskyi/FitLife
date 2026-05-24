@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 
 import uvicorn
-from fastapi import FastAPI, Request
+from fastapi import APIRouter, FastAPI, Request
 from fastapi.exceptions import HTTPException as StarletteHTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -31,9 +31,7 @@ async def lifespan(_: FastAPI):
 app = FastAPI(
     title=settings.app.name,
     lifespan=lifespan,
-    root_path=settings.app.api_v1,
     version=settings.app.version,
-    root_path_in_servers=False,
 )
 
 app.add_middleware(
@@ -60,12 +58,17 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
     )
 
 
-app.include_router(auth_router)
-app.include_router(member_router)
-app.include_router(coach_router)
-app.include_router(training_session_router)
-app.include_router(gallery_router)
-app.include_router(specialization_router)
+# Versioned API Router
+v1_router = APIRouter(prefix=settings.app.api_v1)
+
+v1_router.include_router(auth_router)
+v1_router.include_router(member_router)
+v1_router.include_router(coach_router)
+v1_router.include_router(training_session_router)
+v1_router.include_router(gallery_router)
+v1_router.include_router(specialization_router)
+
+app.include_router(v1_router)
 
 setup_admin(app, engine, authentication_backend)
 
