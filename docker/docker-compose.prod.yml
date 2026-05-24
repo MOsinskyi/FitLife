@@ -1,7 +1,7 @@
 services:
   nginx:
     image: nginx:alpine
-    container_name: fitlife_nginx
+    container_name: proxy
     restart: always
     ports:
       - "80:80"
@@ -13,14 +13,14 @@ services:
 
   redis:
     image: redis:8.4-alpine
-    container_name: fitlife_redis
+    container_name: redis
     restart: always
     volumes:
       - cache_prod:/data
 
   db:
     image: postgres:16-alpine
-    container_name: fitlife_db
+    container_name: db
     restart: always
     env_file:
       - ../backend/.env.prod
@@ -31,7 +31,7 @@ services:
     build:
       context: ../backend
       dockerfile: Dockerfile
-    container_name: fitlife_backend
+    container_name: backend
     restart: always
     env_file:
       - ../backend/.env.prod
@@ -46,7 +46,7 @@ services:
     build:
       context: ../frontend
       dockerfile: Dockerfile.prod
-    container_name: fitlife_frontend
+    container_name: frontend
     restart: always
     depends_on:
       - backend
