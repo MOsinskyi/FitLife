@@ -47,7 +47,6 @@ export default function Home() {
   const [trainingSessionsError, setTrainingSessionsError] = useState<string | null>(null)
 
   const [calendarDate, setCalendarDate] = useState(new Date())
-  const [calendarView, setCalendarView] = useState<'month' | 'week' | 'day' | 'agenda'>('month')
 
   const [selectedSession, setSelectedSession] = useState<TrainingSession | null>(null)
   const [bookingLoading, setBookingLoading] = useState(false)
@@ -365,21 +364,14 @@ export default function Home() {
               endAccessor="end"
               onSelectEvent={handleSelectEvent}
               date={calendarDate}
-              view={calendarView}
+              views={['month']}
+              defaultView="month"
               onNavigate={date => setCalendarDate(date)}
-              onView={view => setCalendarView(view as any)}
-              min={new Date(0, 0, 0, 7, 0, 0)}
-              max={new Date(0, 0, 0, 22, 0, 0)}
-              step={30}
-              timeslots={2}
               messages={{
                 next: 'Наступний',
                 previous: 'Попередній',
                 today: 'Сьогодні',
                 month: 'Місяць',
-                week: 'Тиждень',
-                day: 'День',
-                agenda: 'Порядок денний',
                 date: 'Дата',
                 time: 'Час',
                 event: 'Подія',
