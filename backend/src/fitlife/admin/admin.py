@@ -8,6 +8,7 @@ from fitlife.admin.models import AdminModel
 from fitlife.coaches.models import CoachModel
 from fitlife.gallery.models import GalleryModel
 from fitlife.members.models import MemberModel
+from fitlife.passes.models import PassModel, PassFeatureModel
 from fitlife.specializations.models import SpecializationModel
 from fitlife.training_sessions.models import SessionParticipant, TrainingSession
 
@@ -273,6 +274,49 @@ class GalleryAdmin(ModelView, model=GalleryModel):
     can_view_details = True
 
 
+class PassFeatureAdmin(ModelView, model=PassFeatureModel):
+    name = "Pass Feature"
+    name_plural = "Pass Features"
+    icon = "fa-solid fa-star"
+
+    column_list = [
+        PassFeatureModel.id,
+        PassFeatureModel.name,
+        PassFeatureModel.created_at,
+    ]
+
+    column_searchable_list = [PassFeatureModel.name]
+
+    can_create = True
+    can_edit = True
+    can_delete = True
+    can_view_details = True
+
+
+class PassAdmin(ModelView, model=PassModel):
+    name = "Pass"
+    name_plural = "Passes"
+    icon = "fa-solid fa-money-bill-wave"
+
+    column_list = [
+        PassModel.id,
+        PassModel.title,
+        PassModel.price,
+        PassModel.duration_days,
+        PassModel.features,
+        PassModel.is_active,
+        PassModel.created_at,
+    ]
+
+    column_searchable_list = [PassModel.title]
+    column_sortable_list = [PassModel.price, PassModel.duration_days, PassModel.created_at]
+
+    can_create = True
+    can_edit = True
+    can_delete = True
+    can_view_details = True
+
+
 def setup_admin(app, engine, authentication_backend):
     admin = Admin(
         app,
@@ -289,5 +333,7 @@ def setup_admin(app, engine, authentication_backend):
     admin.add_view(TrainingSessionAdmin)
     admin.add_view(SessionParticipantAdmin)
     admin.add_view(GalleryAdmin)
+    admin.add_view(PassFeatureAdmin)
+    admin.add_view(PassAdmin)
 
     return admin
