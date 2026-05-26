@@ -91,3 +91,19 @@ export interface TrainingSession {
   coach: Coach
   participants: Participant[]
 }
+
+export interface PassFeature {
+  id: string
+  name: string
+}
+
+export interface Pass {
+  id: string
+  title: string
+  price: number
+  duration_days: number
+  features: PassFeature[]
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}

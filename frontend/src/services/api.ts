@@ -9,9 +9,10 @@ import type {
   Gallery,
   Specialization,
   TrainingSession,
+  Pass,
 } from '../types'
 
-const API_BASE_URL = '/api/v1'
+const API_BASE_URL = '//api.fitlife.space/api/v1'
 
 class ApiClient {
   private getAuthHeaders(): HeadersInit {
@@ -110,6 +111,14 @@ class ApiClient {
     })
 
     return this.handleResponse<Specialization[]>(response)
+  }
+
+  async getPasses(): Promise<Pass[]> {
+    const response = await fetch(`${API_BASE_URL}/passes`, {
+      headers: this.getAuthHeaders(),
+    })
+
+    return this.handleResponse<Pass[]>(response)
   }
 
   async bookSession(sessionId: string, memberIds: string[]): Promise<TrainingSession> {
