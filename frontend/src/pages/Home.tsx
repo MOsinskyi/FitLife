@@ -5,7 +5,7 @@ import { format, parse, startOfWeek, getDay } from 'date-fns'
 import { uk } from 'date-fns/locale'
 import { useAuth } from '../context/AuthContext'
 import { apiClient } from '../services/api'
-import type { Coach, Gallery, TrainingSession } from '../types'
+import type { Coach, Gallery, TrainingSession, Pass } from '../types'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import '../App.css'
 
@@ -45,6 +45,9 @@ export default function Home() {
   const [trainingSessions, setTrainingSessions] = useState<TrainingSession[]>([])
   const [trainingSessionsLoading, setTrainingSessionsLoading] = useState(true)
   const [trainingSessionsError, setTrainingSessionsError] = useState<string | null>(null)
+
+  const [passes, setPasses] = useState<Pass[]>([])
+  const [passesLoading, setPassesLoading] = useState(true)
 
   const [calendarDate, setCalendarDate] = useState(new Date())
 
@@ -87,10 +90,23 @@ export default function Home() {
     }
   }
 
+  const fetchPasses = async () => {
+    setPassesLoading(true)
+    try {
+      const data = await apiClient.getPasses()
+      setPasses(data)
+    } catch (e) {
+      console.error('Failed to fetch passes', e)
+    } finally {
+      setPassesLoading(false)
+    }
+  }
+
   useEffect(() => {
     fetchCoaches()
     fetchGallery()
     fetchTrainingSessions()
+    fetchPasses()
   }, [])
 
   useEffect(() => {
@@ -175,6 +191,7 @@ export default function Home() {
             <a href="#about" onClick={() => setMenuOpen(false)}>Про нас</a>
             <a href="#benefits" onClick={() => setMenuOpen(false)}>Переваги</a>
             <a href="#schedule" onClick={() => setMenuOpen(false)}>Розклад</a>
+            <a href="#pricing" onClick={() => setMenuOpen(false)}>Тарифи</a>
             <a href="#gallery" onClick={() => setMenuOpen(false)}>Галерея</a>
             <a href="#coaches" onClick={() => setMenuOpen(false)}>Тренери</a>
             {isAuthenticated ? (
@@ -449,6 +466,55 @@ export default function Home() {
                   <Link to="/register/member" className="btn-outline" style={{ textAlign: 'center', textDecoration: 'none' }}>
                     Записатись
                   </Link>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* PRICING */}
+      <section className="pricing section" id="pricing">
+        <div className="section-tag">Тарифи</div>
+        <h2 className="section-title">Обери свій абонемент</h2>
+        <p className="section-sub">Ми пропонуємо гнучкі плани для будь-якого рівня підготовки</p>
+
+        {passesLoading ? (
+          <div className="coaches-skeleton-grid">
+            {[...Array(3)].map((_, i) => <div key={i} className="coach-skeleton" />)}
+          </div>
+        ) : (
+          <div className="pricing-grid">
+            {passes.map((p, i) => (
+              <div
+                key={p.id}
+                id={`pass-${i}`}
+                data-animate
+                className={`pricing-card fade-up ${isVisible(`pass-${i}`) ? 'in' : ''}`}
+                style={{ transitionDelay: `${i * 100}ms` }}
+              >
+                <div className="pricing-header">
+                  <h3>{p.title}</h3>
+                  <div className="pricing-price">
+                    <span className="currency">₴</span>
+                    <span className="amount">{p.price}</span>
+                    <span className="period">/{p.duration_days} днів</span>
+                  </div>
+                </div>
+                <ul className="pricing-features">
+                  {p.features.map((feature, fIndex) => (
+                    <li key={feature.id}>
+                      <span className="feature-icon">✓</span>
+                      {feature.name}
+                    </li>
+                  ))}
+                </ul>
+                {!isAuthenticated ? (
+                  <Link to="/register/member" className="btn-primary">
+                    Придбати
+                  </Link>
+                ) : (
+                  <button className="btn-primary">Придбати</button>
                 )}
               </div>
             ))}
