@@ -961,6 +961,82 @@ h1, h2, h3 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.04em; line
   50%       { transform: scale(1.06); }
 }
 
+/* ── PRICING ── */
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 32px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.pricing-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 40px 32px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+  position: relative;
+  overflow: hidden;
+}
+.pricing-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-8px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+}
+.pricing-header {
+  margin-bottom: 32px;
+  text-align: center;
+}
+.pricing-header h3 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+}
+.pricing-price {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+}
+.pricing-price .currency {
+  font-size: 20px;
+  color: var(--accent);
+  font-weight: 700;
+}
+.pricing-price .amount {
+  font-size: 48px;
+  font-weight: 800;
+  color: var(--text);
+}
+.pricing-price .period {
+  color: var(--muted);
+  font-size: 14px;
+}
+.pricing-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 40px;
+  flex-grow: 1;
+}
+.pricing-features li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  color: var(--text-soft);
+  font-size: 15px;
+}
+.feature-icon {
+  color: var(--accent);
+  font-weight: 700;
+}
+.pricing-card .btn-primary {
+  width: 100%;
+}
+
 /* ── RESPONSIVE ── */
 @media (max-width: 1024px) {
   .coaches-grid { grid-template-columns: repeat(2, 1fr); }
