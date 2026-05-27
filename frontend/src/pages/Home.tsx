@@ -509,13 +509,6 @@ export default function Home() {
                     </li>
                   ))}
                 </ul>
-                {!isAuthenticated ? (
-                  <Link to="/register/member" className="btn-primary">
-                    Придбати
-                  </Link>
-                ) : (
-                  <button className="btn-primary">Придбати</button>
-                )}
               </div>
             ))}
           </div>
