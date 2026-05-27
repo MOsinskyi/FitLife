@@ -1,10 +1,5 @@
 #!/bin/bash
 
-if ! [ -x "$(command -v docker compose)" ]; then
-  echo 'Error: docker compose is not installed.' >&2
-  exit 1
-fi
-
 domains=(fitlife.space api.fitlife.space)
 rsa_key_size=4096
 data_path="./certbot"
