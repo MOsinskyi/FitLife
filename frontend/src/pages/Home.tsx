@@ -502,7 +502,7 @@ export default function Home() {
                   </div>
                 </div>
                 <ul className="pricing-features">
-                  {p.features.map((feature, fIndex) => (
+                  {p.features.map((feature) => (
                     <li key={feature.id}>
                       <span className="feature-icon">✓</span>
                       {feature.name}
