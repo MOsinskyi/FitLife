@@ -220,7 +220,7 @@ export default function Home() {
         <div className="hero-grid-bg" />
         <div className="hero-glow" />
         <div className="hero-content">
-          <div className="hero-badge">🏆 &nbsp;Найкраща фітнес-платформа 2025</div>
+          <div className="hero-badge">🏆 &nbsp;Найкраща фітнес-платформа 2026</div>
           <h1 className="hero-title">
             Тренуйся.<br />
             <span className="accent">Розвивайся.</span><br />
