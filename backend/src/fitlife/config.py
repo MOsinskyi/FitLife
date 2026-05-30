@@ -1,7 +1,7 @@
 import os
 from typing import Any
 
-from pydantic import BaseModel, computed_field, field_validator
+from pydantic import AliasChoices, BaseModel, Field, computed_field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -13,10 +13,12 @@ def is_not_none(value: Any) -> Any:
 
 class AppConfig(BaseModel):
     name: str = "FastAPI"
-    api_v1: str = "/api/v1"
+    api_v1: str = Field("/api/v1", validation_alias=AliasChoices("api_v1", "api_v1_str"))
     host: str = "localhost"
     port: int = 8000
-    log_filename: str = "fitlife.log"
+    log_filename: str = Field(
+        "fitlife.log", validation_alias=AliasChoices("log_filename", "log_file_name")
+    )
     version: str = "0.1.0"
 
 
@@ -28,17 +30,30 @@ class SecurityConfig(BaseModel):
 
 
 class MiddlewareConfig(BaseModel):
-    allow_origins: list[str] = ["*"]
-    allow_methods: list[str] = ["*"]
-    allow_headers: list[str] = ["*"]
-    allow_credentials: bool = True
+    allow_origins: list[str] | str = ["*"]
+    allow_methods: list[str] | str = ["*"]
+    allow_headers: list[str] | str = ["*"]
+    allow_credentials: bool | str = True
 
     @field_validator("allow_origins", "allow_methods", "allow_headers", mode="before")
     @classmethod
     def assemble_list(cls, v: Any) -> list[str]:
         if isinstance(v, str):
+            if v.strip().startswith("["):
+                import json
+                try:
+                    return json.loads(v)
+                except (json.JSONDecodeError, TypeError):
+                    pass
             return [i.strip() for i in v.split(",")]
         return v
+
+    @field_validator("allow_credentials", mode="before")
+    @classmethod
+    def assemble_bool(cls, v: Any) -> bool:
+        if isinstance(v, str):
+            return v.lower() in ("true", "1", "yes", "on")
+        return bool(v)
 
 
 class PostgresConfig(BaseModel):
