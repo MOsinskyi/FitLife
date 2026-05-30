@@ -180,40 +180,41 @@ export default function Home() {
 
   return (
     <div className="site">
-      {/* NAV */}
-      <nav className="nav">
-        <div className="nav-inner">
-          <Link to="/" className="logo">
-            <span className="logo-icon">⚡</span>
-            <span className="logo-text">FitLife</span>
-          </Link>
-          <div className={`nav-links ${menuOpen ? 'open' : ''}`}>
-            <a href="#about" onClick={() => setMenuOpen(false)}>Про нас</a>
-            <a href="#benefits" onClick={() => setMenuOpen(false)}>Переваги</a>
-            <a href="#schedule" onClick={() => setMenuOpen(false)}>Розклад</a>
-            <a href="#pricing" onClick={() => setMenuOpen(false)}>Тарифи</a>
-            <a href="#gallery" onClick={() => setMenuOpen(false)}>Галерея</a>
-            <a href="#coaches" onClick={() => setMenuOpen(false)}>Тренери</a>
-            {isAuthenticated ? (
-              <>
-                {user?.role === 'admin' && (
-                  <Link to="/register/coach" className="nav-link-special" onClick={() => setMenuOpen(false)}>+ Додати тренера</Link>
-                )}
-                <span className="user-greeting">Привіт, {user?.first_name}!</span>
-                <button className="btn-ghost" onClick={handleLogout}>Вийти</button>
-              </>
-            ) : (
-              <>
-                <Link to="/login" className="btn-ghost" onClick={() => setMenuOpen(false)}>Увійти</Link>
-                <Link to="/register/member" className="btn-primary" onClick={() => setMenuOpen(false)}>Розпочати</Link>
-              </>
-            )}
+      <header className="header">
+        <nav className="nav">
+          <div className="nav-inner">
+            <Link to="/" className="logo">
+              <span className="logo-icon">⚡</span>
+              <span className="logo-text">FitLife</span>
+            </Link>
+            <div className={`nav-links ${menuOpen ? 'open' : ''}`}>
+              <a href="#about" onClick={() => setMenuOpen(false)}>Про нас</a>
+              <a href="#benefits" onClick={() => setMenuOpen(false)}>Переваги</a>
+              <a href="#schedule" onClick={() => setMenuOpen(false)}>Розклад</a>
+              <a href="#pricing" onClick={() => setMenuOpen(false)}>Тарифи</a>
+              <a href="#gallery" onClick={() => setMenuOpen(false)}>Галерея</a>
+              <a href="#coaches" onClick={() => setMenuOpen(false)}>Тренери</a>
+              {isAuthenticated ? (
+                <>
+                  {user?.role === 'admin' && (
+                    <Link to="/register/coach" className="nav-link-special" onClick={() => setMenuOpen(false)}>+ Додати тренера</Link>
+                  )}
+                  <span className="user-greeting">Привіт, {user?.first_name}!</span>
+                  <button className="btn-ghost" onClick={handleLogout}>Вийти</button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" className="btn-ghost" onClick={() => setMenuOpen(false)}>Увійти</Link>
+                  <Link to="/register/member" className="btn-primary" onClick={() => setMenuOpen(false)}>Розпочати</Link>
+                </>
+              )}
+            </div>
+            <button className="burger" onClick={() => setMenuOpen(!menuOpen)}>
+              <span /><span /><span />
+            </button>
           </div>
-          <button className="burger" onClick={() => setMenuOpen(!menuOpen)}>
-            <span /><span /><span />
-          </button>
-        </div>
-      </nav>
+        </nav>
+      </header>
 
       {/* HERO */}
       <section className="hero" ref={heroRef}>

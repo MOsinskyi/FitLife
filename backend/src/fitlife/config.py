@@ -1,7 +1,7 @@
 import os
 from typing import Any
 
-from pydantic import BaseModel, computed_field
+from pydantic import BaseModel, computed_field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -32,6 +32,13 @@ class MiddlewareConfig(BaseModel):
     allow_methods: list[str] = ["*"]
     allow_headers: list[str] = ["*"]
     allow_credentials: bool = True
+
+    @field_validator("allow_origins", "allow_methods", "allow_headers", mode="before")
+    @classmethod
+    def assemble_list(cls, v: Any) -> list[str]:
+        if isinstance(v, str):
+            return [i.strip() for i in v.split(",")]
+        return v
 
 
 class PostgresConfig(BaseModel):
