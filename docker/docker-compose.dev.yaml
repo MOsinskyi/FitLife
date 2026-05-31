@@ -48,7 +48,7 @@ services:
     depends_on:
       - redis
       - db
-    command: celery -A fitlife.worker.celery_app worker --loglevel=info
+    command: sh -c "PYTHONPATH=src celery -A fitlife.worker.celery_app worker --loglevel=info"
 
   celery_beat:
     build:
@@ -62,7 +62,7 @@ services:
     depends_on:
       - redis
       - db
-    command: celery -A fitlife.worker.celery_app beat --loglevel=info
+    command: sh -c "PYTHONPATH=src celery -A fitlife.worker.celery_app beat --loglevel=info"
 
   frontend:
     build:

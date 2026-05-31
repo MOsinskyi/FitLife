@@ -65,7 +65,7 @@ services:
       - redis
       - db
     command: >
-      sh -c "celery -A fitlife.worker.celery_app worker --loglevel=info"
+      sh -c "PYTHONPATH=src celery -A fitlife.worker.celery_app worker --loglevel=info"
 
   celery_beat:
     build:
@@ -79,7 +79,7 @@ services:
       - redis
       - db
     command: >
-      sh -c "celery -A fitlife.worker.celery_app beat --loglevel=info"
+      sh -c "PYTHONPATH=src celery -A fitlife.worker.celery_app beat --loglevel=info"
 
   frontend:
     build:
