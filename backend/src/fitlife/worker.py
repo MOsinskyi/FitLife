@@ -10,6 +10,14 @@ from fitlife.campaigns.models import EmailCampaign, CampaignFrequency
 from fitlife.members.models import MemberModel
 from fitlife.campaigns.services import EmailService
 
+# Ensure all models are imported for SQLAlchemy mapper initialization
+from fitlife.coaches.models import CoachModel # noqa
+from fitlife.admin.models import AdminModel # noqa
+from fitlife.gallery.models import GalleryModel # noqa
+from fitlife.passes.models import PassModel, PassFeatureModel # noqa
+from fitlife.specializations.models import SpecializationModel # noqa
+from fitlife.training_sessions.models import TrainingSession, SessionParticipant # noqa
+
 celery_app = Celery(
     "fitlife",
     broker=f"redis://{settings.redis.effective_host}:{settings.redis.port}/{settings.redis.db.cache}",
