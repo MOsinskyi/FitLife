@@ -53,6 +53,34 @@ services:
       sh -c "alembic upgrade head && 
              uvicorn fitlife.main:app --app-dir src --host 0.0.0.0 --port 8000 --proxy-headers --forwarded-allow-ips='*'"
 
+  celery_worker:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: celery_worker
+    restart: always
+    env_file:
+      - ../backend/.env.prod
+    depends_on:
+      - redis
+      - db
+    command: >
+      sh -c "celery -A fitlife.worker.celery_app worker --loglevel=info"
+
+  celery_beat:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: celery_beat
+    restart: always
+    env_file:
+      - ../backend/.env.prod
+    depends_on:
+      - redis
+      - db
+    command: >
+      sh -c "celery -A fitlife.worker.celery_app beat --loglevel=info"
+
   frontend:
     build:
       context: ../frontend

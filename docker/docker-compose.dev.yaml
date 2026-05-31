@@ -36,6 +36,34 @@ services:
       - redis
       - db
 
+  celery_worker:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: celery_worker_dev
+    volumes:
+      - ../backend:/app
+    env_file:
+      - ../backend/.env.dev
+    depends_on:
+      - redis
+      - db
+    command: celery -A fitlife.worker.celery_app worker --loglevel=info
+
+  celery_beat:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: celery_beat_dev
+    volumes:
+      - ../backend:/app
+    env_file:
+      - ../backend/.env.dev
+    depends_on:
+      - redis
+      - db
+    command: celery -A fitlife.worker.celery_app beat --loglevel=info
+
   frontend:
     build:
       context: ../frontend

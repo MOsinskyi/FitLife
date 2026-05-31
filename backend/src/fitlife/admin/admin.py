@@ -5,12 +5,54 @@ from sqlalchemy.orm import selectinload
 from starlette.requests import Request
 
 from fitlife.admin.models import AdminModel
+from fitlife.campaigns.models import EmailCampaign
 from fitlife.coaches.models import CoachModel
 from fitlife.gallery.models import GalleryModel
 from fitlife.members.models import MemberModel
 from fitlife.passes.models import PassModel, PassFeatureModel
 from fitlife.specializations.models import SpecializationModel
 from fitlife.training_sessions.models import SessionParticipant, TrainingSession
+
+
+class EmailCampaignAdmin(ModelView, model=EmailCampaign):
+    name = "Email Campaign"
+    name_plural = "Email Campaigns"
+    icon = "fa-solid fa-envelope"
+
+    column_list = [
+        EmailCampaign.id,
+        EmailCampaign.title,
+        EmailCampaign.subject,
+        EmailCampaign.frequency,
+        EmailCampaign.send_time,
+        EmailCampaign.is_active,
+        EmailCampaign.last_sent_at,
+    ]
+
+    column_searchable_list = [EmailCampaign.title, EmailCampaign.subject]
+    column_sortable_list = [EmailCampaign.send_time, EmailCampaign.last_sent_at]
+
+    form_columns = [
+        "title",
+        "subject",
+        "body",
+        "frequency",
+        "send_time",
+        "send_day",
+        "is_active",
+    ]
+
+    form_widget_args = {
+        "body": {
+            "class": "wysiwyg-editor",
+            "rows": 10,
+        }
+    }
+
+    can_create = True
+    can_edit = True
+    can_delete = True
+    can_view_details = True
 
 
 class AdminAdmin(ModelView, model=AdminModel):
@@ -318,12 +360,17 @@ class PassAdmin(ModelView, model=PassModel):
 
 
 def setup_admin(app, engine, authentication_backend):
+    import os
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    templates_dir = os.path.join(current_dir, "templates")
+    
     admin = Admin(
         app,
         engine,
         title="FitLife Admin",
         base_url="/admin",
         authentication_backend=authentication_backend,
+        templates_dir=templates_dir,
     )
 
     admin.add_view(AdminAdmin)
@@ -335,5 +382,6 @@ def setup_admin(app, engine, authentication_backend):
     admin.add_view(GalleryAdmin)
     admin.add_view(PassFeatureAdmin)
     admin.add_view(PassAdmin)
+    admin.add_view(EmailCampaignAdmin)
 
     return admin

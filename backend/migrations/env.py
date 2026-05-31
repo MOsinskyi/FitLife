@@ -24,6 +24,7 @@ from fitlife.gallery.models import GalleryModel  # noqa
 from fitlife.passes.models import PassModel, PassFeatureModel  # noqa
 from fitlife.specializations.models import SpecializationModel  # noqa
 from fitlife.training_sessions.models import TrainingSession  # noqa
+from fitlife.campaigns.models import EmailCampaign  # noqa
 
 target_metadata = Base.metadata
 

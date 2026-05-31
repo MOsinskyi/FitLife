@@ -113,6 +113,15 @@ class AdminConfig(BaseModel):
     enabled: bool = True
 
 
+class SMTPConfig(BaseModel):
+    host: str = "smtp.gmail.com"
+    port: int = 587
+    user: str = ""
+    password: str = ""
+    from_email: str = "no-reply@fitlife.space"
+    use_tls: bool = True
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env.dev",
@@ -128,6 +137,7 @@ class Settings(BaseSettings):
     postgres: PostgresConfig = PostgresConfig()
     security: SecurityConfig = SecurityConfig()
     admin: AdminConfig = AdminConfig()
+    smtp: SMTPConfig = SMTPConfig()
 
 
 settings = Settings()
